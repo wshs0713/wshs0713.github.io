@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en,zh-tw,default">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/favicon-180x180.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-32x32.png">
+  <link rel="mask-icon" href="/img/favicon-180x180.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"wshs0713.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="最近從 Sublime 跳槽到 Visual Studio Code(VS Code)，雖然在開啟速度上，會明顯地感覺到比 Sublime 慢，但是 VS Code 有很多的 plugin 可以讓開發效率更好，雖然 Sublime 也有不少 plugin，但是有些很基本的功能還要另外安裝，有點麻煩(例如: SideBarEnhancements，這大概是裝完 Sublime 之後第一個裝的 pl">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[VS Code] VS Code Plugins">
+<meta property="og:url" content="https://wshs0713.github.io/posts/5b00a1ae/">
+<meta property="og:site_name" content="wshs0713&#39;s blog">
+<meta property="og:description" content="最近從 Sublime 跳槽到 Visual Studio Code(VS Code)，雖然在開啟速度上，會明顯地感覺到比 Sublime 慢，但是 VS Code 有很多的 plugin 可以讓開發效率更好，雖然 Sublime 也有不少 plugin，但是有些很基本的功能還要另外安裝，有點麻煩(例如: SideBarEnhancements，這大概是裝完 Sublime 之後第一個裝的 pl">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://bit.ly/2FcMbaC">
+<meta property="og:image" content="https://i.imgur.com/r1R0oau.png">
+<meta property="og:image" content="https://i.imgur.com/4h2jTzp.png">
+<meta property="og:image" content="https://i.imgur.com/kZW2AAN.png">
+<meta property="og:image" content="https://i.imgur.com/PRhKpXP.gif">
+<meta property="og:image" content="https://i.imgur.com/O56prvv.png">
+<meta property="og:image" content="https://i.imgur.com/2aryGDX.gif">
+<meta property="og:image" content="https://i.imgur.com/8Ays7uD.gif">
+<meta property="og:image" content="https://i.imgur.com/LWS51GN.gif">
+<meta property="og:image" content="https://user-images.githubusercontent.com/1908863/28495106-30b3b15e-6f09-11e7-8eb6-ca4ca001ab15.png">
+<meta property="og:image" content="https://i.imgur.com/99GvHD7.gif">
+<meta property="og:image" content="https://i.imgur.com/cK8iE5E.gif">
+<meta property="og:image" content="https://i.imgur.com/4vpyOZY.gif">
+<meta property="og:image" content="https://i.imgur.com/KUVHydP.png">
+<meta property="og:image" content="https://i.imgur.com/pT6kCAr.gif">
+<meta property="article:published_time" content="2018-01-22T04:27:41.000Z">
+<meta property="article:modified_time" content="2018-01-22T04:27:41.000Z">
+<meta property="article:author" content="Szu-Hsuan, Wu">
+<meta property="article:tag" content="VS Code">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://bit.ly/2FcMbaC">
+
+<link rel="canonical" href="https://wshs0713.github.io/posts/5b00a1ae/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>[VS Code] VS Code Plugins | wshs0713's blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-8XTKEMPTGC"></script>
+    <script>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-8XTKEMPTGC');
+      }
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">wshs0713's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Programming notes</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-resume">
+
+    <a href="/resume/" rel="section"><i class="fa fa-address-card fa-fw"></i>Resume</a>
+
+  </li>
+        <li class="menu-item menu-item-projects">
+
+    <a href="/projects/" rel="section"><i class="fa fa-folder fa-fw"></i>Projects</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://wshs0713.github.io/posts/5b00a1ae/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/img/user.jpg">
+      <meta itemprop="name" content="Szu-Hsuan, Wu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="wshs0713's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          [VS Code] VS Code Plugins
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-01-22 12:27:41" itemprop="dateCreated datePublished" datetime="2018-01-22T12:27:41+08:00">2018-01-22</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/VS-Code/" itemprop="url" rel="index"><span itemprop="name">VS Code</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus: </span>
+    
+    <a title="disqus" href="/posts/5b00a1ae/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="posts/5b00a1ae/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>3.6k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>3 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><a target="_blank" rel="noopener" href="http://bit.ly/2FcMbaC"><img src="http://bit.ly/2FcMbaC" alt="VS Code"></a></p>
+<p>最近從 Sublime 跳槽到 Visual Studio Code(VS Code)，雖然在開啟速度上，會明顯地感覺到比 Sublime 慢，但是 VS Code 有很多的 plugin 可以讓開發效率更好，雖然 Sublime 也有不少 plugin，但是有些很基本的功能還要另外安裝，有點麻煩(例如: SideBarEnhancements，這大概是裝完 Sublime 之後第一個裝的 plugin XD)，再加上常常在儲存檔案時出現提醒視窗也很煩，最後就決定跳槽到 VS Code，在這裡紀錄一下自己在開發時常用的 plugins.</p>
+<span id="more"></span>
+
+<h2 id="外觀"><a href="#外觀" class="headerlink" title="外觀"></a>外觀</h2><h3 id="Flatland-Monokai-Theme"><a href="#Flatland-Monokai-Theme" class="headerlink" title="Flatland Monokai Theme"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=gerane.Theme-FlatlandMonokai">Flatland Monokai Theme</a></h3><p><img src="https://i.imgur.com/r1R0oau.png"></p>
+<ul>
+<li>更多主題: <a target="_blank" rel="noopener" href="http://orta.io/vscode-themes/">Themes</a></li>
+</ul>
+<h3 id="Material-Icon-Theme"><a href="#Material-Icon-Theme" class="headerlink" title="Material Icon Theme"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=PKief.material-icon-theme">Material Icon Theme</a></h3><h4 id="File-icon"><a href="#File-icon" class="headerlink" title="File icon"></a>File icon</h4><p><img src="https://i.imgur.com/4h2jTzp.png"></p>
+<h4 id="Folder-icon"><a href="#Folder-icon" class="headerlink" title="Folder icon"></a>Folder icon</h4><p><img src="https://i.imgur.com/kZW2AAN.png"></p>
+<hr>
+<h2 id="Linter"><a href="#Linter" class="headerlink" title="Linter"></a>Linter</h2><h3 id="ESLint"><a href="#ESLint" class="headerlink" title="ESLint"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint">ESLint</a></h3><p>Integrates ESLint into VS Code.</p>
+<ul>
+<li>常見的規則有<a target="_blank" rel="noopener" href="https://github.com/airbnb/javascript">Airbnb</a>、<a target="_blank" rel="noopener" href="https://github.com/google/eslint-config-google">Google</a></li>
+</ul>
+<h3 id="stylelint"><a href="#stylelint" class="headerlink" title="stylelint"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=shinnn.stylelint">stylelint</a></h3><p>Linter for CSS, SCSS, Less.</p>
+<h3 id="markdownlint"><a href="#markdownlint" class="headerlink" title="markdownlint"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=DavidAnson.vscode-markdownlint">markdownlint</a></h3><p>Linter for Markdown.</p>
+<hr>
+<h2 id="Formatter"><a href="#Formatter" class="headerlink" title="Formatter"></a>Formatter</h2><h3 id="Beautify"><a href="#Beautify" class="headerlink" title="Beautify"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=HookyQR.beautify">Beautify</a></h3><p>程式碼自動排版，支援 JavaScript, JSON, CSS, Sass 和 HTML.</p>
+<ul>
+<li>Ctrl+Shift+P → Beautify file</li>
+<li>自訂快捷鍵: Alt+C B</li>
+</ul>
+<hr>
+<h2 id="Snippets"><a href="#Snippets" class="headerlink" title="Snippets"></a>Snippets</h2><h3 id="HTML-snippets"><a href="#HTML-snippets" class="headerlink" title="HTML snippets"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=abusaidm.html-snippets">HTML snippets</a></h3><p>This extension adds rich language support for the HTML Markup to VS Code, including: Full HTML5 Tags, Colorization and Snippets.  </p>
+<p><img src="https://i.imgur.com/PRhKpXP.gif"></p>
+<h3 id="JavaScript-ES6-code-snippets"><a href="#JavaScript-ES6-code-snippets" class="headerlink" title="JavaScript (ES6) code snippets"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=xabikos.JavaScriptSnippets">JavaScript (ES6) code snippets</a></h3><p>This extension contains code snippets for JavaScript in ES6 syntax for Vs Code editor (supports both JavaScript and TypeScript).  </p>
+<h3 id="jQuery-Code-Snippets"><a href="#jQuery-Code-Snippets" class="headerlink" title="jQuery Code Snippets"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=donjayamanne.jquerysnippets">jQuery Code Snippets</a></h3><p>Over 130 jQuery Code Snippets for JavaScript code.</p>
+<p><img src="https://i.imgur.com/O56prvv.png"></p>
+<h3 id="Vue-2-Snippets"><a href="#Vue-2-Snippets" class="headerlink" title="Vue 2 Snippets"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=hollowtree.vue-snippets">Vue 2 Snippets</a></h3><p>This extension adds Vue 2 Code Snippets into Visual Studio Code.</p>
+<h2 id="Auto-completes"><a href="#Auto-completes" class="headerlink" title="Auto-completes"></a>Auto-completes</h2><h3 id="Auto-Rename-Tag"><a href="#Auto-Rename-Tag" class="headerlink" title="Auto Rename Tag"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=formulahendry.auto-rename-tag">Auto Rename Tag</a></h3><p>自動 rename 對應的 tag.</p>
+<p><img src="https://i.imgur.com/2aryGDX.gif"></p>
+<h3 id="npm-Intellisense"><a href="#npm-Intellisense" class="headerlink" title="npm Intellisense"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=christian-kohler.npm-intellisense">npm Intellisense</a></h3><p>Autocompletes npm modules in import statements.</p>
+<p><img src="https://i.imgur.com/8Ays7uD.gif"></p>
+<h3 id="Path-Intellisense"><a href="#Path-Intellisense" class="headerlink" title="Path Intellisense"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=christian-kohler.path-intellisense">Path Intellisense</a></h3><p>Autocompletes file path.</p>
+<p><img src="https://i.imgur.com/LWS51GN.gif"></p>
+<hr>
+<h2 id="Other-useful-plugins"><a href="#Other-useful-plugins" class="headerlink" title="Other useful plugins"></a>Other useful plugins</h2><h3 id="Dash"><a href="#Dash" class="headerlink" title="Dash"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=deerawan.vscode-dash">Dash</a></h3><p>方便快速查找 API 資料。</p>
+<h3 id="Vetur"><a href="#Vetur" class="headerlink" title="Vetur"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=octref.vetur">Vetur</a></h3><p>Vue tooling for VS Code, powered by vue-language-server.</p>
+<h3 id="Auto-Open-Markdown-Preview"><a href="#Auto-Open-Markdown-Preview" class="headerlink" title="Auto-Open Markdown Preview"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=hnw.vscode-auto-open-markdown-preview">Auto-Open Markdown Preview</a></h3><p>Preview markdown file.</p>
+<h3 id="Markdown-All-in-One"><a href="#Markdown-All-in-One" class="headerlink" title="Markdown All in One"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=yzhang.markdown-all-in-one">Markdown All in One</a></h3><p>All you need for Markdown (keyboard shortcuts, table of contents, auto preview and more).</p>
+<h3 id="Markdown-Preview-Enhanced"><a href="#Markdown-Preview-Enhanced" class="headerlink" title="Markdown Preview Enhanced"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=shd101wyy.markdown-preview-enhanced">Markdown Preview Enhanced</a></h3><p>Preview markdown file, 且支援許多好用的功能，例如: 插入/上傳圖片、將 markdown file 轉為 PDF 等功能。</p>
+<p><img src="https://user-images.githubusercontent.com/1908863/28495106-30b3b15e-6f09-11e7-8eb6-ca4ca001ab15.png"></p>
+<h3 id="Color-Picker"><a href="#Color-Picker" class="headerlink" title="Color Picker"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=anseki.vscode-color">Color Picker</a></h3><p>調色盤，快速選取顏色:</p>
+<ul>
+<li>快捷鍵: Ctrl+C P</li>
+<li>如果無法顯示調色盤，須修改 VS code config (<code>settings.json</code>):</li>
+</ul>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">&quot;colorHelper.disableGpu&quot;</span>: <span class="number">1</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://i.imgur.com/99GvHD7.gif"></p>
+<h3 id="Debugger-for-chrome"><a href="#Debugger-for-chrome" class="headerlink" title="Debugger for chrome"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=msjsdiag.debugger-for-chrome">Debugger for chrome</a></h3><p>Debug JavaScript code in Chrome browser.</p>
+<p><img src="https://i.imgur.com/cK8iE5E.gif"></p>
+<h3 id="ejs"><a href="#ejs" class="headerlink" title=".ejs"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=QassimFarid.ejs-language-support">.ejs</a></h3><p>支援 EJS.</p>
+<h3 id="Easy-LESS"><a href="#Easy-LESS" class="headerlink" title="Easy LESS"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=mrcrowl.easy-less">Easy LESS</a></h3><p>在儲存時，自動將 Less 轉為 css.</p>
+<h3 id="Git-History-git-log"><a href="#Git-History-git-log" class="headerlink" title="Git History(git log)"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=donjayamanne.githistory">Git History(git log)</a></h3><p>查看 Git history, git log.</p>
+<p><img src="https://i.imgur.com/4vpyOZY.gif"></p>
+<h3 id="npm"><a href="#npm" class="headerlink" title="npm"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=eg2.vscode-npm-script">npm</a></h3><p>支援 npm.</p>
+<p><img src="https://i.imgur.com/KUVHydP.png"></p>
+<h3 id="open-in-browser"><a href="#open-in-browser" class="headerlink" title="open in browser"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=techer.open-in-browser">open in browser</a></h3><p>在 browser 中開啟目前的檔案:</p>
+<ul>
+<li>Alt+B: Open in default browser</li>
+<li>Alt+Shift+B: Open in browser</li>
+</ul>
+<h3 id="Python"><a href="#Python" class="headerlink" title="Python"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=ms-python.python">Python</a></h3><ul>
+<li>Linting</li>
+<li>Intellisense</li>
+<li>Auto indenting</li>
+<li>Code formatting</li>
+<li>Code refactoring</li>
+<li>Viewing references, code navigation, view signature</li>
+<li>Excellent debugging support</li>
+<li>Running and debugging Unit tests</li>
+<li>Execute file or code in a python terminal</li>
+<li>Local help file</li>
+<li>Snippets</li>
+</ul>
+<h3 id="Regex-Previewer"><a href="#Regex-Previewer" class="headerlink" title="Regex Previewer"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=chrmarti.regex">Regex Previewer</a></h3><p>Preview Regex 比對結果。</p>
+<p><img src="https://i.imgur.com/pT6kCAr.gif"></p>
+<h3 id="SFTP"><a href="#SFTP" class="headerlink" title="SFTP"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=liximomo.sftp">SFTP</a></h3><p>SFTP/FTP 同步。</p>
+<h3 id="vscode-hexo"><a href="#vscode-hexo" class="headerlink" title="vscode-hexo"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=codeyu.vscode-hexo">vscode-hexo</a></h3><p>Provides Hexo init, new, generate, server, deploy, publish, clean commands in the VSCode Editor.</p>
+<h3 id="Code-Spell-Checker"><a href="#Code-Spell-Checker" class="headerlink" title="Code Spell Checker"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker">Code Spell Checker</a></h3><p>自動檢查拼字是否錯誤。</p>
+<h3 id="VSCode-Reveal"><a href="#VSCode-Reveal" class="headerlink" title="VSCode Reveal"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=evilz.vscode-reveal">VSCode Reveal</a></h3><p>使用 VSCode 做 slides.</p>
+<h3 id="Swagger-Viewer"><a href="#Swagger-Viewer" class="headerlink" title="Swagger Viewer"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=Arjun.swagger-viewer">Swagger Viewer</a></h3><p>方便直接瀏覽 Swagger API 文件。</p>
+<h3 id="Settings-Sync"><a href="#Settings-Sync" class="headerlink" title="Settings Sync"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=Shan.code-settings-sync">Settings Sync</a></h3><p>透過 Gist 同步 VS code settings, 不需要在每台電腦都重新設定一次 VS Code 的環境。</p>
+<hr>
+<h2 id="Config"><a href="#Config" class="headerlink" title="Config"></a>Config</h2><p>除了上面的 plugins 之外，在這裡順便紀錄一下自己常用的 config:</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// settings.json</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="attr">&quot;sync.gist&quot;</span>: <span class="string">&quot;&lt;gist id&gt;&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;workbench.iconTheme&quot;</span>: <span class="string">&quot;material-icon-theme&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;python.pythonPath&quot;</span>: <span class="string">&quot;C:\\Users\\USER\\AppData\\Local\\Programs\\Python\\Python38-32\\python.exe&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;files.defaultLanguage&quot;</span>: <span class="string">&quot;python&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;workbench.colorTheme&quot;</span>: <span class="string">&quot;Monokai&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;editor.fontLigatures&quot;</span>: <span class="literal">null</span>,</span><br><span class="line">    <span class="attr">&quot;[markdown]&quot;</span>: &#123;</span><br><span class="line">        <span class="attr">&quot;editor.wordWrap&quot;</span>: <span class="string">&quot;on&quot;</span>,</span><br><span class="line">        <span class="attr">&quot;editor.quickSuggestions&quot;</span>: <span class="literal">true</span>,</span><br><span class="line">        <span class="attr">&quot;editor.defaultFormatter&quot;</span>: <span class="string">&quot;darkriszty.markdown-table-prettify&quot;</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">&quot;markdown.preview.fontSize&quot;</span>: <span class="number">16</span>,</span><br><span class="line">    <span class="attr">&quot;markdown.preview.lineHeight&quot;</span>: <span class="number">1.8</span>,</span><br><span class="line">    <span class="attr">&quot;files.exclude&quot;</span>: &#123;</span><br><span class="line">        <span class="attr">&quot;**.mp4&quot;</span>: <span class="literal">true</span>,</span><br><span class="line">        <span class="attr">&quot;**/.DS_Store&quot;</span>: <span class="literal">true</span>,</span><br><span class="line">        <span class="attr">&quot;**/.git&quot;</span>: <span class="literal">true</span>,</span><br><span class="line">        <span class="attr">&quot;**/.hg&quot;</span>: <span class="literal">true</span>,</span><br><span class="line">        <span class="attr">&quot;**/.svn&quot;</span>: <span class="literal">true</span>,</span><br><span class="line">        <span class="attr">&quot;**/build&quot;</span>: <span class="literal">true</span>,</span><br><span class="line">        <span class="attr">&quot;**/CVS&quot;</span>: <span class="literal">true</span>,</span><br><span class="line">        <span class="attr">&quot;**/data&quot;</span>: <span class="literal">true</span>,</span><br><span class="line">        <span class="attr">&quot;**/env&quot;</span>: <span class="literal">true</span>,</span><br><span class="line">        <span class="attr">&quot;**/node_modules&quot;</span>: <span class="literal">true</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">&quot;files.eol&quot;</span>: <span class="string">&quot;\n&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;editor.fontFamily&quot;</span>: <span class="string">&quot;&#x27;Source Code Pro&#x27;, Consolas, &#x27;微軟正黑體&#x27;, &#x27;Courier New&#x27;, monospace&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;editor.fontSize&quot;</span>: <span class="number">16</span>,</span><br><span class="line">    <span class="attr">&quot;emmet.includeLanguages&quot;</span>: &#123;</span><br><span class="line">        <span class="attr">&quot;ejs&quot;</span>: <span class="string">&quot;html&quot;</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">&quot;editor.codeActionsOnSave&quot;</span>: <span class="literal">null</span>,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/VS-Code/" rel="tag"># VS Code</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/255a957f/" rel="prev" title="[Hexo] Hexo 安裝及使用 (搭配GitHub/Bitbucket Page)">
+      <i class="fa fa-chevron-left"></i> [Hexo] Hexo 安裝及使用 (搭配GitHub/Bitbucket Page)
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/posts/b9b8571c/" rel="next" title="[word2vec] Word2vec 實作">
+      [word2vec] Word2vec 實作 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%96%E8%A7%80"><span class="nav-number">1.</span> <span class="nav-text">外觀</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Flatland-Monokai-Theme"><span class="nav-number">1.1.</span> <span class="nav-text">Flatland Monokai Theme</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Material-Icon-Theme"><span class="nav-number">1.2.</span> <span class="nav-text">Material Icon Theme</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#File-icon"><span class="nav-number">1.2.1.</span> <span class="nav-text">File icon</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Folder-icon"><span class="nav-number">1.2.2.</span> <span class="nav-text">Folder icon</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linter"><span class="nav-number">2.</span> <span class="nav-text">Linter</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ESLint"><span class="nav-number">2.1.</span> <span class="nav-text">ESLint</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#stylelint"><span class="nav-number">2.2.</span> <span class="nav-text">stylelint</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#markdownlint"><span class="nav-number">2.3.</span> <span class="nav-text">markdownlint</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Formatter"><span class="nav-number">3.</span> <span class="nav-text">Formatter</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Beautify"><span class="nav-number">3.1.</span> <span class="nav-text">Beautify</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Snippets"><span class="nav-number">4.</span> <span class="nav-text">Snippets</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#HTML-snippets"><span class="nav-number">4.1.</span> <span class="nav-text">HTML snippets</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#JavaScript-ES6-code-snippets"><span class="nav-number">4.2.</span> <span class="nav-text">JavaScript (ES6) code snippets</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#jQuery-Code-Snippets"><span class="nav-number">4.3.</span> <span class="nav-text">jQuery Code Snippets</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Vue-2-Snippets"><span class="nav-number">4.4.</span> <span class="nav-text">Vue 2 Snippets</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Auto-completes"><span class="nav-number">5.</span> <span class="nav-text">Auto-completes</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Auto-Rename-Tag"><span class="nav-number">5.1.</span> <span class="nav-text">Auto Rename Tag</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#npm-Intellisense"><span class="nav-number">5.2.</span> <span class="nav-text">npm Intellisense</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Path-Intellisense"><span class="nav-number">5.3.</span> <span class="nav-text">Path Intellisense</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Other-useful-plugins"><span class="nav-number">6.</span> <span class="nav-text">Other useful plugins</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Dash"><span class="nav-number">6.1.</span> <span class="nav-text">Dash</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Vetur"><span class="nav-number">6.2.</span> <span class="nav-text">Vetur</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Auto-Open-Markdown-Preview"><span class="nav-number">6.3.</span> <span class="nav-text">Auto-Open Markdown Preview</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Markdown-All-in-One"><span class="nav-number">6.4.</span> <span class="nav-text">Markdown All in One</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Markdown-Preview-Enhanced"><span class="nav-number">6.5.</span> <span class="nav-text">Markdown Preview Enhanced</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Color-Picker"><span class="nav-number">6.6.</span> <span class="nav-text">Color Picker</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Debugger-for-chrome"><span class="nav-number">6.7.</span> <span class="nav-text">Debugger for chrome</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ejs"><span class="nav-number">6.8.</span> <span class="nav-text">.ejs</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Easy-LESS"><span class="nav-number">6.9.</span> <span class="nav-text">Easy LESS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Git-History-git-log"><span class="nav-number">6.10.</span> <span class="nav-text">Git History(git log)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#npm"><span class="nav-number">6.11.</span> <span class="nav-text">npm</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#open-in-browser"><span class="nav-number">6.12.</span> <span class="nav-text">open in browser</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Python"><span class="nav-number">6.13.</span> <span class="nav-text">Python</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Regex-Previewer"><span class="nav-number">6.14.</span> <span class="nav-text">Regex Previewer</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SFTP"><span class="nav-number">6.15.</span> <span class="nav-text">SFTP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#vscode-hexo"><span class="nav-number">6.16.</span> <span class="nav-text">vscode-hexo</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Code-Spell-Checker"><span class="nav-number">6.17.</span> <span class="nav-text">Code Spell Checker</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#VSCode-Reveal"><span class="nav-number">6.18.</span> <span class="nav-text">VSCode Reveal</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Swagger-Viewer"><span class="nav-number">6.19.</span> <span class="nav-text">Swagger Viewer</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Settings-Sync"><span class="nav-number">6.20.</span> <span class="nav-text">Settings Sync</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Config"><span class="nav-number">7.</span> <span class="nav-text">Config</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Szu-Hsuan, Wu"
+      src="/img/user.jpg">
+  <p class="site-author-name" itemprop="name">Szu-Hsuan, Wu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">56</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">21</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">50</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/wshs0713" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;wshs0713" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:shuan0713@gmail.com" title="E-Mail → mailto:shuan0713@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="http://linkedin.com/in/wshs0713" title="LinkedIn → http:&#x2F;&#x2F;linkedin.com&#x2F;in&#x2F;wshs0713" rel="noopener" target="_blank"><i class="fab fa-linkedin fa-fw"></i>LinkedIn</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/wshs0713" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;wshs0713" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Szu-Hsuan, Wu</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://wshs0713.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "https://wshs0713.github.io/posts/5b00a1ae/";
+    this.page.identifier = "posts/5b00a1ae/";
+    this.page.title = "[VS Code] VS Code Plugins";
+    };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://wshs0713.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+</body>
+</html>
