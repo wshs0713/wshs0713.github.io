@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en,zh-tw,default">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/favicon-180x180.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-32x32.png">
+  <link rel="mask-icon" href="/img/favicon-180x180.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"wshs0713.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="前言這篇文章主要是記錄一下使用跨域 cookie 需要設定及注意的地方，以下範例程式後端是使用 Python&#x2F;Flask, 前端則是用 Axios 來送出 request 到後端。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[Cookie] Cross site cookie">
+<meta property="og:url" content="https://wshs0713.github.io/posts/cbecdf44/">
+<meta property="og:site_name" content="wshs0713&#39;s blog">
+<meta property="og:description" content="前言這篇文章主要是記錄一下使用跨域 cookie 需要設定及注意的地方，以下範例程式後端是使用 Python&#x2F;Flask, 前端則是用 Axios 來送出 request 到後端。">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2021-04-01T17:06:39.000Z">
+<meta property="article:modified_time" content="2021-04-01T17:06:39.000Z">
+<meta property="article:author" content="Szu-Hsuan, Wu">
+<meta property="article:tag" content="Cookie">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://wshs0713.github.io/posts/cbecdf44/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>[Cookie] Cross site cookie | wshs0713's blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-8XTKEMPTGC"></script>
+    <script>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-8XTKEMPTGC');
+      }
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">wshs0713's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Programming notes</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-projects">
+
+    <a href="/projects/" rel="section"><i class="fa fa-folder fa-fw"></i>Projects</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://wshs0713.github.io/posts/cbecdf44/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Szu-Hsuan, Wu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="wshs0713's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          [Cookie] Cross site cookie
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-04-02 01:06:39" itemprop="dateCreated datePublished" datetime="2021-04-02T01:06:39+08:00">2021-04-02</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Cookie/" itemprop="url" rel="index"><span itemprop="name">Cookie</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus: </span>
+    
+    <a title="disqus" href="/posts/cbecdf44/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="posts/cbecdf44/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>2.9k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>3 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>這篇文章主要是記錄一下使用跨域 cookie 需要設定及注意的地方，以下範例程式後端是使用 Python&#x2F;Flask, 前端則是用 Axios 來送出 request 到後端。</p>
+<span id="more"></span>
+
+<h2 id="Cookies"><a href="#Cookies" class="headerlink" title="Cookies"></a>Cookies</h2><p>首先，先來介紹一下 Cookie 幾個比較重要的屬性：</p>
+<ul>
+<li>HttpOnly: 只能被用在 HTTP 傳輸，不可被 JavaScript 存取</li>
+<li>Domain: 可使用的 domain, 如果沒有設定，則只能被設定此 cookie 的 domain 所使用，如果希望設定子網域都可使用此 cookie, 則可以設為 <code>.domain.com</code></li>
+<li>Path: 指定可存取 cookie 的路徑</li>
+<li>Max-Age: cookie 的期限，單位為秒，或者可以用 <code>Expires</code> 來設定，格式是 Unix time</li>
+<li>SameSite: 用來防止瀏覽器將 cookie 跨網站傳送，可以幫助避免 CSRF 攻擊，以下是 <code>SameSite</code> 的三種設定值:<ul>
+<li>Strict: 最嚴謹，request 的網域與目前網址相同才會發送 cookie</li>
+<li>Lax: 除了 same site request 能夠使用 cookie之外，部分的 cross-site request 也能夠使用 cookie, 包含 HTML 中的 <code>&lt;a&gt;</code> , <code>&lt;link rel=&quot;prerender&quot;&gt;</code>, <code>&lt;form method=&quot;GET&quot;&gt;</code></li>
+<li>None: Cross site 的 request 都能夠使用 cookie, <strong>注意在 Chrome 80 之後，若使用這個選項，則必須要設定 Secure</strong></li>
+</ul>
+</li>
+<li>Secure: 若設為 True, 表示只能透過 HTTPS 傳輸</li>
+</ul>
+<p><strong>注意</strong>: 在 Chrome 80 之後，如果沒有設定 SameSite, 則預設為 Lax, 如果 SameSite 設為 None, 則必須要有 Secure.</p>
+<h2 id="Backend"><a href="#Backend" class="headerlink" title="Backend"></a>Backend</h2><p>後端需要設定 CORS (Cross Origin Resource Sharing), 因為會使用到 Cross site cookie, 所以也記得要設定 <code>Access-Control-Allow-Credentials = true</code> , for example:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># In app.py</span></span><br><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask, jsonify</span><br><span class="line"><span class="keyword">from</span> flask_cors <span class="keyword">import</span> CORS</span><br><span class="line"></span><br><span class="line">app = Flask(__name__)</span><br><span class="line">whitelist = [<span class="string">&#x27;http://localhost:8080&#x27;</span>, <span class="string">&#x27;https://domain1.com&#x27;</span>, <span class="string">&#x27;https://domain2.com&#x27;</span>]</span><br><span class="line">resource = &#123;</span><br><span class="line">  <span class="string">r&#x27;/.*&#x27;</span>: &#123;</span><br><span class="line">    <span class="string">&#x27;origins&#x27;</span>: whitelist</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">CORS(app, resources=resource, supports_credentials=<span class="literal">True</span>, methods=<span class="string">&#x27;GET,POST,OPTIONS&#x27;</span>, allow_headers=<span class="string">&#x27;*&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route(<span class="params"><span class="string">&#x27;/login&#x27;</span>, methods=[<span class="string">&#x27;POST&#x27;</span>]</span>)</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">login</span>():</span><br><span class="line">  <span class="comment"># User authentication</span></span><br><span class="line"></span><br><span class="line">  <span class="comment"># Set cookie</span></span><br><span class="line">  response = jsonify(status=<span class="string">&#x27;success&#x27;</span>)</span><br><span class="line">  response.set_cookie(</span><br><span class="line">    <span class="string">&#x27;access_token&#x27;</span>, <span class="string">&#x27;your_access_token&#x27;</span>, </span><br><span class="line">    domain=<span class="string">&#x27;.your_domain.com&#x27;</span>, </span><br><span class="line">    path=<span class="string">&#x27;/&#x27;</span>, </span><br><span class="line">    max_age=<span class="number">600</span>,</span><br><span class="line">    secure=<span class="literal">True</span>, </span><br><span class="line">    httponly=<span class="literal">True</span>,</span><br><span class="line">    samesite=<span class="literal">None</span></span><br><span class="line">  )</span><br><span class="line">  response.set_cookie(</span><br><span class="line">    <span class="string">&#x27;refresh_token&#x27;</span>, <span class="string">&#x27;your_refresh_token&#x27;</span>, </span><br><span class="line">    domain=<span class="string">&#x27;.your_domain.com&#x27;</span>, </span><br><span class="line">    path=<span class="string">&#x27;/refresh&#x27;</span>, </span><br><span class="line">    max_age=<span class="number">86400</span>,</span><br><span class="line">    secure=<span class="literal">True</span>, </span><br><span class="line">    httponly=<span class="literal">True</span>,</span><br><span class="line">    samesite=<span class="literal">None</span></span><br><span class="line">  )</span><br><span class="line">  <span class="keyword">return</span> response</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">  app.run()</span><br></pre></td></tr></table></figure>
+
+<p><strong>注意</strong>: 設定 <code>supports_credentials</code> 的話， <code>origins</code> 就不能用 <code>*</code></p>
+<h2 id="Frontend"><a href="#Frontend" class="headerlink" title="Frontend"></a>Frontend</h2><p>前端的部分，我們是使用 Axios 來送出 request 到後端，這邊記得要設定 <code>withCredentials: true</code>, for example:</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">axios.<span class="title function_">post</span>(<span class="string">&#x27;/login&#x27;</span>, data, &#123;</span><br><span class="line">  <span class="attr">withCredentials</span>: <span class="literal">true</span></span><br><span class="line">&#125;).<span class="title function_">then</span>(<span class="function">(<span class="params">response</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(response);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>如果順利的話，會在在網頁的 Cookie 中看到新增了兩個 Cookie (access_token, refresh_token).</p>
+<p>但是，在 localhost 測試時會發現無法設定 cookie, 這是因為要跨域使用 cookie, SameSite 就必須設為 None, 而 SameSite 設為 None 就必須要設定 Secure, 但我們目前的 localhost 是沒有設定 SSL 的，所以會無法設定 cookie. 解決方式是把 localhost 加上 SSL.</p>
+<p>Localhost 加上 SSL 可參考以下文章:</p>
+<ul>
+<li>Windows: <a target="_blank" rel="noopener" href="https://pvencs.blogspot.com/2019/01/windows-localhost-https.html">讓 Windows 環境的 localhost 啟用 HTTPS 連線</a></li>
+<li>MacOS: <a target="_blank" rel="noopener" href="https://manglekuo.medium.com/%E8%A8%AD%E5%AE%9Amacos%E6%9C%AC%E5%9C%B0%E7%AB%AFhttps-ssl%E8%AD%89%E6%9B%B8-b2f79bcdedf0">設定macOS本地端HTTPs&#x2F;SSL證書</a> (MacOS 的部分沒測試過，可能需要大家自行測試)</li>
+</ul>
+<h2 id="參考資料"><a href="#參考資料" class="headerlink" title="參考資料"></a>參考資料</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://jcbaey.com/authentication-in-spa-reactjs-and-vuejs-the-right-way?utm_source=medium&utm_campaign=spa-authentication">Authentication in SPA (ReactJS and VueJS) the right way - Part 1</a></li>
+<li><a target="_blank" rel="noopener" href="https://ianhung0529.medium.com/chrome-80-%E5%BE%8C%E9%87%9D%E5%B0%8D%E7%AC%AC%E4%B8%89%E6%96%B9-cookie-%E7%9A%84%E8%A6%8F%E5%89%87%E8%AA%BF%E6%95%B4-default-samesite-lax-aaba0bc785a3">Chrome 80 後針對第三方 Cookie 的規則調整 (default SameSite&#x3D;Lax)</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Cookie/" rel="tag"># Cookie</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/fe688d83/" rel="prev" title="[Docker] Use non-root user in docker container">
+      <i class="fa fa-chevron-left"></i> [Docker] Use non-root user in docker container
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/posts/9c9bf6/" rel="next" title="[Python] Deal with Chinese in Cookie">
+      [Python] Deal with Chinese in Cookie <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Cookies"><span class="nav-number">2.</span> <span class="nav-text">Cookies</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Backend"><span class="nav-number">3.</span> <span class="nav-text">Backend</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Frontend"><span class="nav-number">4.</span> <span class="nav-text">Frontend</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%83%E8%80%83%E8%B3%87%E6%96%99"><span class="nav-number">5.</span> <span class="nav-text">參考資料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Szu-Hsuan, Wu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">61</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">57</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/wshs0713" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;wshs0713" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:shuan0713@gmail.com" title="E-Mail → mailto:shuan0713@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="http://linkedin.com/in/wshs0713" title="LinkedIn → http:&#x2F;&#x2F;linkedin.com&#x2F;in&#x2F;wshs0713" rel="noopener" target="_blank"><i class="fab fa-linkedin fa-fw"></i>LinkedIn</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/wshs0713" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;wshs0713" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Szu-Hsuan, Wu</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://wshs0713.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "https://wshs0713.github.io/posts/cbecdf44/";
+    this.page.identifier = "posts/cbecdf44/";
+    this.page.title = "[Cookie] Cross site cookie";
+    };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://wshs0713.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+</body>
+</html>

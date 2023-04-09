@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en,zh-tw,default">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/favicon-180x180.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-32x32.png">
+  <link rel="mask-icon" href="/img/favicon-180x180.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"wshs0713.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="在 Git strategy 中，主要分為三種 flow: Git flow, Github flow 和 Gitlab flow. 這篇文章主要介紹一下 Gitlab flow, Git flow 的部分可以參考之前的文章: [Git] Git Flow 開發流程.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[Git] Gitlab Flow">
+<meta property="og:url" content="https://wshs0713.github.io/posts/f6ed9129/">
+<meta property="og:site_name" content="wshs0713&#39;s blog">
+<meta property="og:description" content="在 Git strategy 中，主要分為三種 flow: Git flow, Github flow 和 Gitlab flow. 這篇文章主要介紹一下 Gitlab flow, Git flow 的部分可以參考之前的文章: [Git] Git Flow 開發流程.">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://docs.gitlab.com/ee/topics/img/gitlab_flow_production_branch.png">
+<meta property="og:image" content="https://docs.gitlab.com/ee/topics/img/gitlab_flow_environment_branches.png">
+<meta property="og:image" content="https://docs.gitlab.com/ee/topics/img/gitlab_flow_release_branches.png">
+<meta property="og:image" content="https://d1dwq032kyr03c.cloudfront.net/upload/images/20191007/200726065kcpm5tcKZ.jpg">
+<meta property="og:image" content="https://d1dwq032kyr03c.cloudfront.net/upload/images/20191008/20072606UNYiue54Jg.jpg">
+<meta property="article:published_time" content="2020-08-07T02:25:59.000Z">
+<meta property="article:modified_time" content="2020-08-07T02:25:59.000Z">
+<meta property="article:author" content="Szu-Hsuan, Wu">
+<meta property="article:tag" content="Git">
+<meta property="article:tag" content="Gitlab Flow">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://docs.gitlab.com/ee/topics/img/gitlab_flow_production_branch.png">
+
+<link rel="canonical" href="https://wshs0713.github.io/posts/f6ed9129/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>[Git] Gitlab Flow | wshs0713's blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-8XTKEMPTGC"></script>
+    <script>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-8XTKEMPTGC');
+      }
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">wshs0713's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Programming notes</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-projects">
+
+    <a href="/projects/" rel="section"><i class="fa fa-folder fa-fw"></i>Projects</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://wshs0713.github.io/posts/f6ed9129/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Szu-Hsuan, Wu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="wshs0713's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          [Git] Gitlab Flow
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-08-07 10:25:59" itemprop="dateCreated datePublished" datetime="2020-08-07T10:25:59+08:00">2020-08-07</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Git/" itemprop="url" rel="index"><span itemprop="name">Git</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus: </span>
+    
+    <a title="disqus" href="/posts/f6ed9129/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="posts/f6ed9129/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>1.5k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>1 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><a target="_blank" rel="noopener" href="https://docs.gitlab.com/ee/topics/img/gitlab_flow_production_branch.png"><img src="https://docs.gitlab.com/ee/topics/img/gitlab_flow_production_branch.png" alt="Gitlab Flow"></a></p>
+<p>在 Git strategy 中，主要分為三種 flow: Git flow, Github flow 和 Gitlab flow. 這篇文章主要介紹一下 Gitlab flow, Git flow 的部分可以參考之前的文章: <a href="/posts/96228b34/">[Git] Git Flow 開發流程</a>.</p>
+<span id="more"></span>
+
+<h2 id="Upstream-First"><a href="#Upstream-First" class="headerlink" title="Upstream First"></a>Upstream First</h2><p>在 Gitlab flow 中最主要的原則是上游優先 (Upstream first), 也就是只存在一個主分支 master, 它是所有分支的上游，只有通過測試之後才能往下游合併。</p>
+<p>Gitlab flow 分成兩種情況，以因應不同的開發流程:</p>
+<ul>
+<li>持續發布</li>
+<li>版本發布</li>
+</ul>
+<h3 id="持續發布"><a href="#持續發布" class="headerlink" title="持續發布"></a>持續發布</h3><p>在持續發布的專案中，建議在 master 分支以外，再多建立不同的環境分支，例如: 開發環境是 master, 預發環境是 pre-production, 生產環境是 production.</p>
+<p><a target="_blank" rel="noopener" href="https://docs.gitlab.com/ee/topics/img/gitlab_flow_environment_branches.png"><img src="https://docs.gitlab.com/ee/topics/img/gitlab_flow_environment_branches.png" alt="Gitlab Flow-持續發布"></a></p>
+<p>在開發時，會從 master 另外建立分支做開發，當開發到一段落後，就會發 pull request (PR) 來 merge to master, 在發 PR 之後，會進行 code review、自動化測試…等等，通過後才可 merge 回 master, 接著再依序往下合併。</p>
+<p>而如果在 production 環境中發生 bug, 則要再從 master 建立一個新的分支，修改完成後要先合併到 master, 通過 code review 及測試之後再使用 <code>cherry-pick</code> 依序往 pre-production、 production 分支合併。</p>
+<h3 id="版本發布"><a href="#版本發布" class="headerlink" title="版本發布"></a>版本發布</h3><p>Gitlab flow 對於版本發布的專案，建議是每一個穩定版本都要從 master 拉出新的分支，例如下圖的 2-3 stable, 2-4 stable. 如果有 bug, 一樣要再建立一個新的分支，修改完後一樣要先合併到最上游的 master, 通過測試之後再合併到版本發布的分支，並且更新版本號。</p>
+<p><a target="_blank" rel="noopener" href="https://docs.gitlab.com/ee/topics/img/gitlab_flow_release_branches.png"><img src="https://docs.gitlab.com/ee/topics/img/gitlab_flow_release_branches.png" alt="Gitlab Flow-版本發布"></a></p>
+<h2 id="合併的方式"><a href="#合併的方式" class="headerlink" title="合併的方式"></a>合併的方式</h2><p>在發布新的版本或功能時，是從 master 依序往下(pre-production, production) merge，但是不一定所有 master 上的 commit 都要發布，所以在 Gitlab flow 中是採用 <code>git cherry-pick</code> 來挑選需要的 commit 部署到 pre-production 和 production 分支。</p>
+<p>如果所有小分支合併回主要分支(master)都是使用 rebase 後進行 fast-forward 的方式合併，那在 master 分支上挑選 commit 的時候，會很容易造成漏挑 commit 的狀況。因此，在 Gitlab flow 中通常會採用 <code>git merge --no-ff</code> 或 <code>git merge --squash</code> 的方式:</p>
+<ul>
+<li><p><code>git merge --no-ff</code>: 透過 <code>--no-ff</code> 合併時，會把合併的 branch 的 commit 包在一個圓圈內，因此在 <code>cherry-pick</code> 時，只要挑選圈內的所有 commit 即可。</p>
+<p>  <a target="_blank" rel="noopener" href="https://d1dwq032kyr03c.cloudfront.net/upload/images/20191007/200726065kcpm5tcKZ.jpg"><img src="https://d1dwq032kyr03c.cloudfront.net/upload/images/20191007/200726065kcpm5tcKZ.jpg" alt="`git merge --no-ff`"></a></p>
+</li>
+<li><p><code>git merge --squash</code>: 透過 <code>--squash</code> 合併時，會把合併的 branch 的所有 commit 壓縮在一個 commit 中，因此在 <code>cherry-pick</code> 時也不會漏挑。</p>
+<p>  <a target="_blank" rel="noopener" href="https://d1dwq032kyr03c.cloudfront.net/upload/images/20191008/20072606UNYiue54Jg.jpg"><img src="https://d1dwq032kyr03c.cloudfront.net/upload/images/20191008/20072606UNYiue54Jg.jpg" alt="`git merge --squash`"></a></p>
+</li>
+</ul>
+<h2 id="總結"><a href="#總結" class="headerlink" title="總結"></a>總結</h2><p>Gitlab flow 不像 Git flow 那麼複雜，也不需要頻繁的切換分支，感覺起來更適合小型團隊、版本快速迭代的專案。</p>
+<h2 id="參考資料"><a href="#參考資料" class="headerlink" title="參考資料"></a>參考資料</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://docs.gitlab.com/ee/topics/gitlab_flow.html">Gitlab Flow</a></li>
+<li><a target="_blank" rel="noopener" href="https://medium.com/@lf2lf2111/%E4%B8%89%E7%A8%AE%E7%89%88%E6%8E%A7%E6%B5%81%E7%A8%8B-29c82f5d4469">三種版控流程</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/henryhu712/article/details/82284702">GitLab 工作流介紹（GitLab Flow）</a></li>
+<li><a target="_blank" rel="noopener" href="https://drprincess.github.io/2017/12/26/Git%E4%B8%89%E5%A4%A7%E7%89%B9%E8%89%B2%E4%B9%8BWorkFlow(%E5%B7%A5%E4%BD%9C%E6%B5%81)/">Git三大特色之WorkFlow(工作流)</a></li>
+<li><a target="_blank" rel="noopener" href="https://ithelp.ithome.com.tw/articles/10228195">Day 29 - GIT 團隊協作 談 流程管理 03 GitLab Flow</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Git/" rel="tag"># Git</a>
+              <a href="/tags/Gitlab-Flow/" rel="tag"># Gitlab Flow</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/e9216f2f/" rel="prev" title="[Python] 使用 conda 建立及管理虛擬環境">
+      <i class="fa fa-chevron-left"></i> [Python] 使用 conda 建立及管理虛擬環境
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/posts/53302290/" rel="next" title="[DevOps] 使用 supervisor 管理 process">
+      [DevOps] 使用 supervisor 管理 process <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Upstream-First"><span class="nav-number">1.</span> <span class="nav-text">Upstream First</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8C%81%E7%BA%8C%E7%99%BC%E5%B8%83"><span class="nav-number">1.1.</span> <span class="nav-text">持續發布</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%89%88%E6%9C%AC%E7%99%BC%E5%B8%83"><span class="nav-number">1.2.</span> <span class="nav-text">版本發布</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%88%E4%BD%B5%E7%9A%84%E6%96%B9%E5%BC%8F"><span class="nav-number">2.</span> <span class="nav-text">合併的方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B8%BD%E7%B5%90"><span class="nav-number">3.</span> <span class="nav-text">總結</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%83%E8%80%83%E8%B3%87%E6%96%99"><span class="nav-number">4.</span> <span class="nav-text">參考資料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Szu-Hsuan, Wu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">61</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">57</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/wshs0713" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;wshs0713" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:shuan0713@gmail.com" title="E-Mail → mailto:shuan0713@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="http://linkedin.com/in/wshs0713" title="LinkedIn → http:&#x2F;&#x2F;linkedin.com&#x2F;in&#x2F;wshs0713" rel="noopener" target="_blank"><i class="fab fa-linkedin fa-fw"></i>LinkedIn</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/wshs0713" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;wshs0713" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Szu-Hsuan, Wu</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://wshs0713.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "https://wshs0713.github.io/posts/f6ed9129/";
+    this.page.identifier = "posts/f6ed9129/";
+    this.page.title = "[Git] Gitlab Flow";
+    };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://wshs0713.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+</body>
+</html>

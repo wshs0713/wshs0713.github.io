@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en,zh-tw,default">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/favicon-180x180.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-32x32.png">
+  <link rel="mask-icon" href="/img/favicon-180x180.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"wshs0713.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="簡介在開發專案時，版本控制是很重要的，透過版本控制系統可以紀錄檔案修改的歷史紀錄、追蹤檔案修改前後的差異、回復到特定版本的檔案內容。若修改後發生問題，也能夠追蹤修改的部分，方便地找出是哪個部分導致了問題的發生。 Git 是一個分散式的版本控制系統，由 Linus Torvalds 開發，一開始是為了管理 Linux Kernel 原始碼，後來設計出 Git 版本控制系統，因為它的分散式、效能好、">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[Git] Git 安裝及使用">
+<meta property="og:url" content="https://wshs0713.github.io/posts/223ce999/">
+<meta property="og:site_name" content="wshs0713&#39;s blog">
+<meta property="og:description" content="簡介在開發專案時，版本控制是很重要的，透過版本控制系統可以紀錄檔案修改的歷史紀錄、追蹤檔案修改前後的差異、回復到特定版本的檔案內容。若修改後發生問題，也能夠追蹤修改的部分，方便地找出是哪個部分導致了問題的發生。 Git 是一個分散式的版本控制系統，由 Linus Torvalds 開發，一開始是為了管理 Linux Kernel 原始碼，後來設計出 Git 版本控制系統，因為它的分散式、效能好、">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Git-logo.svg/400px-Git-logo.svg.png">
+<meta property="article:published_time" content="2018-01-25T16:37:04.000Z">
+<meta property="article:modified_time" content="2018-01-25T16:37:04.000Z">
+<meta property="article:author" content="Szu-Hsuan, Wu">
+<meta property="article:tag" content="Git">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Git-logo.svg/400px-Git-logo.svg.png">
+
+<link rel="canonical" href="https://wshs0713.github.io/posts/223ce999/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>[Git] Git 安裝及使用 | wshs0713's blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-8XTKEMPTGC"></script>
+    <script>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-8XTKEMPTGC');
+      }
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">wshs0713's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Programming notes</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-projects">
+
+    <a href="/projects/" rel="section"><i class="fa fa-folder fa-fw"></i>Projects</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://wshs0713.github.io/posts/223ce999/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Szu-Hsuan, Wu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="wshs0713's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          [Git] Git 安裝及使用
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-01-26 00:37:04" itemprop="dateCreated datePublished" datetime="2018-01-26T00:37:04+08:00">2018-01-26</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Git/" itemprop="url" rel="index"><span itemprop="name">Git</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus: </span>
+    
+    <a title="disqus" href="/posts/223ce999/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="posts/223ce999/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>4k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>4 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><a target="_blank" rel="noopener" href="https://git-scm.com/"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Git-logo.svg/400px-Git-logo.svg.png" alt="Git"></a></p>
+<h1 id="簡介"><a href="#簡介" class="headerlink" title="簡介"></a>簡介</h1><p>在開發專案時，版本控制是很重要的，透過版本控制系統可以紀錄檔案修改的歷史紀錄、追蹤檔案修改前後的差異、回復到特定版本的檔案內容。若修改後發生問題，也能夠追蹤修改的部分，方便地找出是哪個部分導致了問題的發生。</p>
+<p>Git 是一個分散式的版本控制系統，由 Linus Torvalds 開發，一開始是為了管理 Linux Kernel 原始碼，後來設計出 Git 版本控制系統，因為它的分散式、效能好、支援本地存取以及無痛分支的特性，近年來受到許多人的喜愛。</p>
+<span id="more"></span>
+
+<h1 id="安裝"><a href="#安裝" class="headerlink" title="安裝"></a>安裝</h1><h2 id="On-Linux"><a href="#On-Linux" class="headerlink" title="On Linux"></a>On Linux</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo apt-get install git</span><br></pre></td></tr></table></figure>
+
+<h2 id="On-Windows"><a href="#On-Windows" class="headerlink" title="On Windows"></a>On Windows</h2><p>可以直接從<a target="_blank" rel="noopener" href="https://git-scm.com/downloads">Git官方網站</a>下載，安裝後記得在系統環境變數的 <code>PATH</code> 中加上 <code>&lt;Git install path&gt;/bin</code> 才能使用 git 指令。</p>
+<h1 id="初始設定"><a href="#初始設定" class="headerlink" title="初始設定"></a>初始設定</h1><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">$ git config --global user.name <span class="string">&quot;username&quot;</span></span><br><span class="line">$ git config --global user.email <span class="string">&quot;email&quot;</span></span><br><span class="line">$ git config --global core.editor vim        <span class="comment"># 設定預設編輯器</span></span><br><span class="line">$ git config --global merge.tool vimdiff     <span class="comment"># 設定預設合併工具</span></span><br><span class="line">$ git config --global core.autocrlf <span class="literal">false</span>    <span class="comment"># 設定是否自動將LF(\n)轉為CRLF(\r\n)</span></span><br><span class="line">$ git config --list                          <span class="comment"># 檢查目前的設定</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># alias</span></span><br><span class="line">$ git config --global alias.co checkout</span><br><span class="line">$ git config --global alias.br branch</span><br><span class="line">$ git config --global alias.ci commit</span><br><span class="line">$ git config --global alias.st status</span><br></pre></td></tr></table></figure>
+
+<p>如果想要不需要密碼就能夠操作 GitHub 專案，可以參考<a href="/posts/593a6ec9/">[GitHub] 免密碼 push&#x2F;pull&#x2F;clone 操作專案</a>.</p>
+<h1 id="常用指令"><a href="#常用指令" class="headerlink" title="常用指令"></a>常用指令</h1><h2 id="建立新的-Repository"><a href="#建立新的-Repository" class="headerlink" title="建立新的 Repository"></a>建立新的 Repository</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git init</span><br></pre></td></tr></table></figure>
+
+<h2 id="忽略部分檔案"><a href="#忽略部分檔案" class="headerlink" title="忽略部分檔案"></a>忽略部分檔案</h2><p>建立 <code>.gitignore</code> 檔案，並編輯其內容:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ vim .gitignore</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># in .gitignore</span></span><br><span class="line">data/</span><br><span class="line">node_modules/</span><br></pre></td></tr></table></figure>
+
+<h2 id="Status"><a href="#Status" class="headerlink" title="Status"></a>Status</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ git st                        <span class="comment"># 檢查狀態</span></span><br><span class="line">$ git diff &lt;file_name&gt;          <span class="comment"># 檢查檔案修改的部分</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="檔案追蹤"><a href="#檔案追蹤" class="headerlink" title="檔案追蹤"></a>檔案追蹤</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ git add &lt;file_name&gt;           <span class="comment"># 增加</span></span><br><span class="line">$ git reset &lt;file_name&gt;         <span class="comment"># reset已追蹤的檔案</span></span><br><span class="line">$ git <span class="built_in">rm</span> --cache &lt;file_name&gt;    <span class="comment"># 刪除, 加上--cache則不會刪除原檔案</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="Commit"><a href="#Commit" class="headerlink" title="Commit"></a>Commit</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ git ci -m <span class="string">&#x27;Commit message.&#x27;</span>   <span class="comment"># 提交檔案</span></span><br><span class="line">$ git <span class="built_in">log</span>                       <span class="comment"># 檢查提交的歷史紀錄</span></span><br><span class="line">$ git ci --amend                <span class="comment"># 修改最近的commit</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="Remote"><a href="#Remote" class="headerlink" title="Remote"></a>Remote</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ git remote -v                         <span class="comment"># list remote repository</span></span><br><span class="line">$ git remote add &lt;name&gt; &lt;repo url&gt;      <span class="comment"># 新增remote repository</span></span><br><span class="line">$ git remote remove &lt;name&gt;              <span class="comment"># 刪除remote repository</span></span><br><span class="line">$ git remote set-url &lt;name&gt; &lt;repo url&gt;  <span class="comment"># 修改remote repository url</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="Push"><a href="#Push" class="headerlink" title="Push"></a>Push</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git push &lt;name&gt; &lt;branch&gt;              <span class="comment"># push到remote repository, -f: 強制push</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="Clone"><a href="#Clone" class="headerlink" title="Clone"></a>Clone</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git <span class="built_in">clone</span> &lt;repository&gt; [&lt;directory&gt;]  <span class="comment"># 複製remote repository</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="Pull"><a href="#Pull" class="headerlink" title="Pull"></a>Pull</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git pull &lt;name&gt; &lt;branch&gt;              <span class="comment"># 從遠端repository pull最新的內容到local repository</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="Branch"><a href="#Branch" class="headerlink" title="Branch"></a>Branch</h2><p>為了將修改記錄的整體流程分開儲存，讓分開的分支不受其他分支的影響，所以在同一個數據庫裡可以同時進行多個不同的修改。</p>
+<h3 id="Master-branch"><a href="#Master-branch" class="headerlink" title="Master branch"></a>Master branch</h3><p>在數據庫進行最初的提交後，Git 會建立一個名為 master 的分支。之後的提交在切換分支之前都會增加在 master 分支裡。</p>
+<h3 id="Integration-branch"><a href="#Integration-branch" class="headerlink" title="Integration branch"></a>Integration branch</h3><ul>
+<li>新的分支會建立在它的上面，而且 Integration 分支是為了可以隨時建立發布版本的分支。</li>
+<li>如果要進行更改的話，最好先建立 Topic 分支並在上面做操作。</li>
+<li>通常大家會將 master 分支當作 Integration 分支使用。</li>
+</ul>
+<h3 id="Topic-branch"><a href="#Topic-branch" class="headerlink" title="Topic branch"></a>Topic branch</h3><ul>
+<li>為了開發功能或修復錯誤之類的任務所建立的分支。</li>
+<li>若同時進行多個任務時，您必須建立多個的 Topic 分支。</li>
+<li>Topic 分支是從穩定的 Integration 分支上建立的，完成作業後，要將 Topic 分支合併到 Integration 分支。</li>
+</ul>
+<p>如何在開發流程中應用 Branch 可以參考另一篇文章: <a href="/posts/96228b34/">Git Flow 開發流程</a>.</p>
+<h3 id="Branch常用指令"><a href="#Branch常用指令" class="headerlink" title="Branch常用指令"></a>Branch常用指令</h3><h4 id="建立Branch"><a href="#建立Branch" class="headerlink" title="建立Branch"></a>建立Branch</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ git branch &lt;branch_name&gt; [&lt;base&gt;]         <span class="comment"># 建立branch, base:  從哪個分支切出來的</span></span><br><span class="line">$ git branch                                <span class="comment"># 顯示branch列表, 並顯示目前所在的 branch</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="刪除Branch"><a href="#刪除Branch" class="headerlink" title="刪除Branch"></a>刪除Branch</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git branch -d &lt;branch&gt;</span><br></pre></td></tr></table></figure>
+
+<h4 id="切換Branch"><a href="#切換Branch" class="headerlink" title="切換Branch"></a>切換Branch</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ git checkout &lt;branch_name&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment"># -b: 可以同時建立和切換</span></span><br><span class="line"><span class="comment"># $ git checkout -b &lt;branch_name&gt; [&lt;base&gt;]</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>執行 <code>checkout</code> 之後，工作目錄裡的檔案會根據切換到不同的分支而呈現該分支最後提交的內容。而 <code>checkout</code> 之後的提交，則屬於切換後的分支的。</p>
+<p>HEAD &amp; Stash</p>
+<ul>
+<li>HEAD<ul>
+<li>代表當前分支的最新提交名稱</li>
+<li>在建立新的數據庫時，Git 會預設 HEAD 指向 master 分支。</li>
+</ul>
+</li>
+<li>Stash<ul>
+<li>Stash 是暫時儲存檔案修改內容的區域。</li>
+<li>Stash 可以暫時儲存工作目錄還沒提交的修改內容，可以在事後再取出暫時儲存的修改，應用到原先的分支或者其他的分支中。</li>
+</ul>
+</li>
+</ul>
+<h4 id="合併Branch"><a href="#合併Branch" class="headerlink" title="合併Branch"></a>合併Branch</h4><p>Topic 分支完成作業後，必須合併到主要分支 (Integration branch)，合併分支可以使用 <code>merge</code> 或 <code>rebase</code>。</p>
+<h5 id="Merge"><a href="#Merge" class="headerlink" title="Merge"></a>Merge</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ git checkout &lt;main_branch&gt;        <span class="comment"># 切換到要合併的主要 branch</span></span><br><span class="line">$ git merge --no-ff &lt;branch_name&gt;   <span class="comment"># 將指定的 branch 合併到當前使用的 branch</span></span><br><span class="line">$ git merge --abort                 <span class="comment"># 取消 merge</span></span><br></pre></td></tr></table></figure>
+
+<p><code>--no-ff</code> 不要做 fast-forward 的動作。 Fast-forward 是指當被 merge 對象(branch_name)是目前分支(main_branch)的 child 時， merge 後會完全看不出來有 merge 過。</p>
+<ul>
+<li>修改內容的歷史記錄會維持原狀，但是合併後的歷史紀錄會變得更複雜</li>
+<li>如果在同一行文字進行修改，則會產生衝突</li>
+<li>解決合併衝突: 修改發生衝突的地方，之後再 commit 一次</li>
+</ul>
+<h5 id="Rebase"><a href="#Rebase" class="headerlink" title="Rebase"></a>Rebase</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ git checkout &lt;branch_name&gt;    <span class="comment"># 切換到要合併的次要 branch</span></span><br><span class="line">$ git rebase &lt;main_branch&gt;      <span class="comment"># 更改次要 branch 的 base (改為 main_branch)</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>rebase 可以看成是修改某個 branch 的參考基準 (base), 把目前分支的 commit 接到另一個分支後面 (通常是 main_branch ).</p>
+</li>
+<li><p>合併後的歷史記錄會比較清楚簡單，但是會比使用 merge 更容易發生衝突。</p>
+</li>
+<li><p><strong>只能用在還沒有 push 的情況下。</strong></p>
+</li>
+<li><p>解決合併衝突: 修改發生衝突的地方，修改好之後，如果要繼續 rebase 操作，則在 rebase 後加上 –continue，如果要取消 rebase 的話，則加上–abort.</p>
+  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ git add file.txt        <span class="comment"># file.txt 為發生衝突的檔案, 修改好之後再加入</span></span><br><span class="line">$ git rebase --<span class="built_in">continue</span>   <span class="comment"># 繼續 rebase</span></span><br><span class="line">$ git rebase --abort      <span class="comment"># 取消 rebase</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<h1 id="參考資料"><a href="#參考資料" class="headerlink" title="參考資料"></a>參考資料</h1><ul>
+<li><a target="_blank" rel="noopener" href="https://git-scm.com/" title="Git">Git</a></li>
+<li><a target="_blank" rel="noopener" href="https://ihower.tw/git/intro.html">Git 版本控制系統</a></li>
+<li><a target="_blank" rel="noopener" href="https://backlog.com/git-tutorial/tw/intro/intro1_1.html">連猴子都能懂得Git入門指南</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.yorkxin.org/2011/07/29/git-rebase">Git-rebase 小筆記</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Git/" rel="tag"># Git</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/76699f02/" rel="prev" title="[Hexo] 增加 Local search 的功能">
+      <i class="fa fa-chevron-left"></i> [Hexo] 增加 Local search 的功能
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/posts/34fe70a2/" rel="next" title="[Hexo] 增加 Disqus 評論功能">
+      [Hexo] 增加 Disqus 評論功能 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%B0%A1%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">簡介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%89%E8%A3%9D"><span class="nav-number">2.</span> <span class="nav-text">安裝</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#On-Linux"><span class="nav-number">2.1.</span> <span class="nav-text">On Linux</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#On-Windows"><span class="nav-number">2.2.</span> <span class="nav-text">On Windows</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%9D%E5%A7%8B%E8%A8%AD%E5%AE%9A"><span class="nav-number">3.</span> <span class="nav-text">初始設定</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%B8%B8%E7%94%A8%E6%8C%87%E4%BB%A4"><span class="nav-number">4.</span> <span class="nav-text">常用指令</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BB%BA%E7%AB%8B%E6%96%B0%E7%9A%84-Repository"><span class="nav-number">4.1.</span> <span class="nav-text">建立新的 Repository</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BF%BD%E7%95%A5%E9%83%A8%E5%88%86%E6%AA%94%E6%A1%88"><span class="nav-number">4.2.</span> <span class="nav-text">忽略部分檔案</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Status"><span class="nav-number">4.3.</span> <span class="nav-text">Status</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AA%94%E6%A1%88%E8%BF%BD%E8%B9%A4"><span class="nav-number">4.4.</span> <span class="nav-text">檔案追蹤</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Commit"><span class="nav-number">4.5.</span> <span class="nav-text">Commit</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Remote"><span class="nav-number">4.6.</span> <span class="nav-text">Remote</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Push"><span class="nav-number">4.7.</span> <span class="nav-text">Push</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Clone"><span class="nav-number">4.8.</span> <span class="nav-text">Clone</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Pull"><span class="nav-number">4.9.</span> <span class="nav-text">Pull</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Branch"><span class="nav-number">4.10.</span> <span class="nav-text">Branch</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Master-branch"><span class="nav-number">4.10.1.</span> <span class="nav-text">Master branch</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Integration-branch"><span class="nav-number">4.10.2.</span> <span class="nav-text">Integration branch</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Topic-branch"><span class="nav-number">4.10.3.</span> <span class="nav-text">Topic branch</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Branch%E5%B8%B8%E7%94%A8%E6%8C%87%E4%BB%A4"><span class="nav-number">4.10.4.</span> <span class="nav-text">Branch常用指令</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BB%BA%E7%AB%8BBranch"><span class="nav-number">4.10.4.1.</span> <span class="nav-text">建立Branch</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%AA%E9%99%A4Branch"><span class="nav-number">4.10.4.2.</span> <span class="nav-text">刪除Branch</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%87%E6%8F%9BBranch"><span class="nav-number">4.10.4.3.</span> <span class="nav-text">切換Branch</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%90%88%E4%BD%B5Branch"><span class="nav-number">4.10.4.4.</span> <span class="nav-text">合併Branch</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Merge"><span class="nav-number">4.10.4.4.1.</span> <span class="nav-text">Merge</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Rebase"><span class="nav-number">4.10.4.4.2.</span> <span class="nav-text">Rebase</span></a></li></ol></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%83%E8%80%83%E8%B3%87%E6%96%99"><span class="nav-number">5.</span> <span class="nav-text">參考資料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Szu-Hsuan, Wu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">61</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">57</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/wshs0713" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;wshs0713" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:shuan0713@gmail.com" title="E-Mail → mailto:shuan0713@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="http://linkedin.com/in/wshs0713" title="LinkedIn → http:&#x2F;&#x2F;linkedin.com&#x2F;in&#x2F;wshs0713" rel="noopener" target="_blank"><i class="fab fa-linkedin fa-fw"></i>LinkedIn</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/wshs0713" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;wshs0713" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Szu-Hsuan, Wu</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://wshs0713.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "https://wshs0713.github.io/posts/223ce999/";
+    this.page.identifier = "posts/223ce999/";
+    this.page.title = "[Git] Git 安裝及使用";
+    };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://wshs0713.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en,zh-tw,default">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/favicon-180x180.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-32x32.png">
+  <link rel="mask-icon" href="/img/favicon-180x180.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"wshs0713.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="Git Flow當越來越多人一起開發一個專案時，如果沒有好的開發流程，每個人的開發習慣都不同，到後期會讓整個專案很混亂，所以有人提出了一套開發流程: A successful Git branching model，而後來也陸續有一些不錯的開發流程: GitHub flow, GitLab flow，這一篇主要是紀錄 Git flow 開發流程。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[Git] Git Flow 開發流程">
+<meta property="og:url" content="https://wshs0713.github.io/posts/96228b34/">
+<meta property="og:site_name" content="wshs0713&#39;s blog">
+<meta property="og:description" content="Git Flow當越來越多人一起開發一個專案時，如果沒有好的開發流程，每個人的開發習慣都不同，到後期會讓整個專案很混亂，所以有人提出了一套開發流程: A successful Git branching model，而後來也陸續有一些不錯的開發流程: GitHub flow, GitLab flow，這一篇主要是紀錄 Git flow 開發流程。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://bit.ly/2EjGXut">
+<meta property="article:published_time" content="2018-01-29T08:10:04.000Z">
+<meta property="article:modified_time" content="2018-01-29T08:10:04.000Z">
+<meta property="article:author" content="Szu-Hsuan, Wu">
+<meta property="article:tag" content="Git">
+<meta property="article:tag" content="Git Flow">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://bit.ly/2EjGXut">
+
+<link rel="canonical" href="https://wshs0713.github.io/posts/96228b34/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>[Git] Git Flow 開發流程 | wshs0713's blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-8XTKEMPTGC"></script>
+    <script>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-8XTKEMPTGC');
+      }
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">wshs0713's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Programming notes</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-projects">
+
+    <a href="/projects/" rel="section"><i class="fa fa-folder fa-fw"></i>Projects</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://wshs0713.github.io/posts/96228b34/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Szu-Hsuan, Wu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="wshs0713's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          [Git] Git Flow 開發流程
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-01-29 16:10:04" itemprop="dateCreated datePublished" datetime="2018-01-29T16:10:04+08:00">2018-01-29</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Git/" itemprop="url" rel="index"><span itemprop="name">Git</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus: </span>
+    
+    <a title="disqus" href="/posts/96228b34/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="posts/96228b34/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>4k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>4 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><a target="_blank" rel="noopener" href="https://nvie.com/posts/a-successful-git-branching-model/"><img src="http://bit.ly/2EjGXut" alt="Git flow"></a></p>
+<h1 id="Git-Flow"><a href="#Git-Flow" class="headerlink" title="Git Flow"></a>Git Flow</h1><p>當越來越多人一起開發一個專案時，如果沒有好的開發流程，每個人的開發習慣都不同，到後期會讓整個專案很混亂，所以有人提出了一套開發流程: <a target="_blank" rel="noopener" href="http://nvie.com/posts/a-successful-git-branching-model/">A successful Git branching model</a>，而後來也陸續有一些不錯的開發流程: <a target="_blank" rel="noopener" href="https://guides.github.com/introduction/flow/">GitHub flow</a>, <a target="_blank" rel="noopener" href="https://about.gitlab.com/2014/09/29/gitlab-flow/">GitLab flow</a>，這一篇主要是紀錄 Git flow 開發流程。</p>
+<span id="more"></span>
+
+<h1 id="分支"><a href="#分支" class="headerlink" title="分支"></a>分支</h1><p>分支分為 <code>master</code>, <code>develop</code>, <code>feature</code>, <code>release</code> 和 <code>hotfix</code> 這五種分支，各分支分別負責不同的功能。</p>
+<h2 id="主要分支"><a href="#主要分支" class="headerlink" title="主要分支"></a>主要分支</h2><p>主要的分支是 <code>master</code> 和 <code>develop</code>，其他的分支大部分都會在完成後刪除。</p>
+<h3 id="Master"><a href="#Master" class="headerlink" title="Master"></a>Master</h3><p>最新、穩定、隨時可以上線的版本，只能從其他分支合併過來，不可直接 commit 到這個分支。通常會在這個分支的 commit 加上版本號的 tag.</p>
+<h3 id="Develop"><a href="#Develop" class="headerlink" title="Develop"></a>Develop</h3><p>主要用來開發的分支，當要開發新功能時，會從這個分支切出 <code>feature</code> 分支，當 <code>feature</code> 分支完成後，再合併回 <code>develop</code> 分支。</p>
+<h2 id="次要分支"><a href="#次要分支" class="headerlink" title="次要分支"></a>次要分支</h2><p>次要的分支則是 <code>feature</code>, <code>release</code> 和 <code>hotfix</code>.</p>
+<h3 id="Feature"><a href="#Feature" class="headerlink" title="Feature"></a>Feature</h3><p>主要是在新功能開發的時候，從 <code>develop</code> 分出來的，當完成後，會再合併回 <code>develop</code> 分支。</p>
+<h3 id="Release"><a href="#Release" class="headerlink" title="Release"></a>Release</h3><p>為了發布而建立的分支，主要是做為上線前的最後測試。測試完後，<code>release</code> 會同時合併到 <code>master</code> 和 <code>develop</code> 分支，確保所有程式都是最新的狀態。</p>
+<h3 id="Hotfix"><a href="#Hotfix" class="headerlink" title="Hotfix"></a>Hotfix</h3><p>當已經發布的產品發生緊急的問題時，從 <code>master</code> 切出來的分支，當修復完成後，會合併回 <code>master</code>，同時也會合併回 <code>develop</code> 分支，以確保所有程式都是最新狀態。</p>
+<h1 id="開始使用-Git-Flow-開發流程"><a href="#開始使用-Git-Flow-開發流程" class="headerlink" title="開始使用 Git Flow 開發流程"></a>開始使用 Git Flow 開發流程</h1><p><a target="_blank" rel="noopener" href="https://github.com/nvie/gitflow">Git flow GitHub 專案</a> 中有 <code>git flow</code> 工具，或是也可以直接使用 <code>git</code> 來實現 Git Flow 開發流程，這兩個方式我們都會稍微紀錄一下~</p>
+<h2 id="安裝-Git-Flow"><a href="#安裝-Git-Flow" class="headerlink" title="安裝 Git Flow"></a>安裝 Git Flow</h2><p>如果想要使用 <code>git flow</code> 工具，需要先依照以下步驟來安裝。</p>
+<p>我們的開發環境是在 Windows 10 上使用 VS code，所以接下來的安裝及使用方式都是以此環境為範例，其他環境的安裝方式可以參考 <a target="_blank" rel="noopener" href="https://github.com/nvie/gitflow">Git flow GitHub 專案</a> 中的說明。</p>
+<p>建議安裝 <a target="_blank" rel="noopener" href="https://cygwin.com/install.html">Cygwin</a> , 在安裝時需選擇安裝 <code>git</code>, <code>util-linux</code> and <code>wget</code> tools.</p>
+<p>完成安裝後，在 Cygwin shell 執行以下指令即可安裝 git flow:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ wget -q -O - --no-check-certificate https://github.com/nvie/gitflow/raw/develop/contrib/gitflow-installer.sh | bash</span><br></pre></td></tr></table></figure>
+
+<h3 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h3><p>先初始化 git repo</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git init</span><br></pre></td></tr></table></figure>
+
+<p>Initialize repository for git flow</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git flow init -d  <span class="comment"># -d: 使用所有預設值</span></span><br></pre></td></tr></table></figure>
+
+<p>依照提示設定即可完成初始設定。</p>
+<h2 id="建立分支"><a href="#建立分支" class="headerlink" title="建立分支"></a>建立分支</h2><h3 id="建立-Feature-分支"><a href="#建立-Feature-分支" class="headerlink" title="建立 Feature 分支"></a>建立 Feature 分支</h3><p>如果一個功能有很多人一起進行，可以開多個 <code>feature/myFeature</code> 分支，例如: <code>feature/myFeature/user1</code>, <code>feature/myFeature/user2</code>, 最後 merge 回 <code>feature/myFeature</code>, 整個功能完全完成後再 merge 回 <code>develop</code>.</p>
+<h4 id="使用-git-flow"><a href="#使用-git-flow" class="headerlink" title="使用 git flow"></a>使用 git flow</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ git flow feature                              <span class="comment"># 顯示 feature 分支</span></span><br><span class="line">$ git flow feature start &lt;name&gt; [&lt;base&gt;]        <span class="comment"># 建立新的 feature 分支</span></span><br><span class="line"></span><br><span class="line">$ git flow feature publish &lt;name&gt;               <span class="comment"># push feature branch to remote repo.</span></span><br><span class="line">$ git flow feature pull &lt;remote&gt; &lt;name&gt;         <span class="comment"># pull feature branch to remote repo.</span></span><br></pre></td></tr></table></figure>
+
+<p>For feature branches, the <code>&lt;base&gt;</code> arg must be a commit on <code>develop</code>.</p>
+<h4 id="使用-git"><a href="#使用-git" class="headerlink" title="使用 git"></a>使用 git</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git checkout -b feature/myFeature develop</span><br></pre></td></tr></table></figure>
+
+<p><code>feature</code> 分支的名稱通常會加上 prefix: <code>feature/</code>, <code>base</code> 則是 <code>develop</code>.</p>
+<h3 id="建立-Release-分支"><a href="#建立-Release-分支" class="headerlink" title="建立 Release 分支"></a>建立 Release 分支</h3><h4 id="使用-git-flow-1"><a href="#使用-git-flow-1" class="headerlink" title="使用 git flow"></a>使用 git flow</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ git flow release                              <span class="comment"># 顯示 release 分支</span></span><br><span class="line">$ git flow release start &lt;name&gt; [&lt;base&gt;]        <span class="comment"># 建立新的 release 分支</span></span><br></pre></td></tr></table></figure>
+
+<p>For release branches, the <code>&lt;base&gt;</code> arg must be a commit on <code>develop</code>.</p>
+<h4 id="使用-git-1"><a href="#使用-git-1" class="headerlink" title="使用 git"></a>使用 git</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git checkout -b release/1.0.0 develop</span><br></pre></td></tr></table></figure>
+
+<p><code>release</code> 分支的名稱通常會加上 prefix: <code>release/</code>, 後面通常是加上版本號, <code>base</code> 則是 <code>develop</code>.</p>
+<h3 id="建立-Hotfix-分支"><a href="#建立-Hotfix-分支" class="headerlink" title="建立 Hotfix 分支"></a>建立 Hotfix 分支</h3><h4 id="使用-git-flow-2"><a href="#使用-git-flow-2" class="headerlink" title="使用 git flow"></a>使用 git flow</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ git flow hotfix                               <span class="comment"># 顯示 hotfix 分支</span></span><br><span class="line">$ git flow hotfix start &lt;name&gt; [&lt;base&gt;]         <span class="comment"># 建立新的 hotfix 分支</span></span><br></pre></td></tr></table></figure>
+
+<p>For hotfix branches, the <code>&lt;base&gt;</code> arg must be a commit on <code>master</code>.</p>
+<h4 id="使用-git-2"><a href="#使用-git-2" class="headerlink" title="使用 git"></a>使用 git</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git checkout -b hotfix/1.0.1</span><br></pre></td></tr></table></figure>
+
+<p><code>hotfix</code> 分支的名稱通常會加上 prefix: <code>hotfix/</code>, 後面通常是加上修改的版本號.</p>
+<h2 id="完成分支任務"><a href="#完成分支任務" class="headerlink" title="完成分支任務"></a>完成分支任務</h2><p>最後，執行以下指令來完成分支任務:</p>
+<h4 id="使用-git-flow-3"><a href="#使用-git-flow-3" class="headerlink" title="使用 git flow"></a>使用 git flow</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ git flow feature finish &lt;name&gt;</span><br><span class="line">$ git flow release finish &lt;name&gt;</span><br><span class="line">$ git flow hotfix finish &lt;name&gt;</span><br></pre></td></tr></table></figure>
+
+<h4 id="使用-git-3"><a href="#使用-git-3" class="headerlink" title="使用 git"></a>使用 git</h4><p>合併分支時，<code>release</code> 和 <code>hotfix</code> 分支記得要合併到 <code>master</code> 和 <code>develop</code>，合併可以使用 <code>merge</code> 或 <code>rebase</code> 指令:</p>
+<p><strong>merge</strong><br>  修改內容的歷史記錄會維持原狀，但是合併後的歷史紀錄會變得更複雜。</p>
+<p>  切換到要合併的<strong>主要分支</strong></p>
+  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git checkout &lt;main_branch&gt;  <span class="comment"># &lt;main_branch&gt;: 要合併到的主要分支 (develop or master)</span></span><br></pre></td></tr></table></figure>
+
+<p>  Merge:</p>
+  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git merge --no-ff &lt;name&gt;    <span class="comment"># &lt;name&gt;: 要合併的分支名稱, ex. feature/myFeature</span></span><br></pre></td></tr></table></figure>
+
+<p>  <code>--no-ff</code> 不要做 fast-forward 的動作。 Fast-forward 是指當被 merge 對象 (ex. feature&#x2F;myFeature) 是目前分支 (ex. develop) 的 child 時， merge 後會完全看不出來有 merge 過。</p>
+<p><strong>rebase</strong><br>  修改內容的歷史記錄會接在要合併的分支後面，合併後的歷史記錄會比較清楚簡單，但是比使用 merge 更容易發生衝突。<br>  <strong>注意: 只能用在還沒有 push 的情況下。</strong></p>
+<p>  切換到要 rebase 的<strong>次要分支</strong><br>  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git checkout feature/myFeature</span><br></pre></td></tr></table></figure></p>
+<p>  Rebase:<br>  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git pull --rebase origin &lt;main_branch&gt;  <span class="comment"># &lt;main_branch&gt;: 要 rebase 到的主要分支 (develop or master)</span></span><br></pre></td></tr></table></figure></p>
+<p>  如果有先把 <code>feature/myFeature</code> 分支 pull 到本地, 可以直接執行:</p>
+  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git rebase &lt;main_branch&gt;</span><br></pre></td></tr></table></figure>
+
+<p>  當發生衝突的時候，需要去修改衝突的地方，修改好之後，如果要繼續 rebase 就加上 –continue，如果要取消 rebase 的話，則加上–abort.</p>
+  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ git add file.txt        <span class="comment"># file.txt 為發生衝突的檔案, 修改好之後再加入</span></span><br><span class="line">$ git rebase --<span class="built_in">continue</span>   <span class="comment"># 繼續 rebase</span></span><br><span class="line">$ git rebase --abort      <span class="comment"># 取消 rebase</span></span><br></pre></td></tr></table></figure>
+
+<p>最後記得要刪除次要分支:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git branch -d &lt;name&gt;  <span class="comment"># &lt;name&gt;: 已合併到主要分支的次要分支名稱, ex. feature/myFeature</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="參考資料"><a href="#參考資料" class="headerlink" title="參考資料"></a>參考資料</h1><ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/nvie/gitflow">Git flow Github專案</a></li>
+<li><a target="_blank" rel="noopener" href="http://blog.hellojcc.tw/2015/04/27/understanding-git-flow/">了解 Git Flow</a></li>
+<li><a target="_blank" rel="noopener" href="https://gitbook.tw/chapters/gitflow/why-need-git-flow.html">Git Flow 是什麼？為什麼需要這種東西？</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Git/" rel="tag"># Git</a>
+              <a href="/tags/Git-Flow/" rel="tag"># Git Flow</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/34fe70a2/" rel="prev" title="[Hexo] 增加 Disqus 評論功能">
+      <i class="fa fa-chevron-left"></i> [Hexo] 增加 Disqus 評論功能
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/posts/654d6d96/" rel="next" title="[Redis] Redis 安裝及使用">
+      [Redis] Redis 安裝及使用 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Git-Flow"><span class="nav-number">1.</span> <span class="nav-text">Git Flow</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%86%E6%94%AF"><span class="nav-number">2.</span> <span class="nav-text">分支</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BB%E8%A6%81%E5%88%86%E6%94%AF"><span class="nav-number">2.1.</span> <span class="nav-text">主要分支</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Master"><span class="nav-number">2.1.1.</span> <span class="nav-text">Master</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Develop"><span class="nav-number">2.1.2.</span> <span class="nav-text">Develop</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AC%A1%E8%A6%81%E5%88%86%E6%94%AF"><span class="nav-number">2.2.</span> <span class="nav-text">次要分支</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Feature"><span class="nav-number">2.2.1.</span> <span class="nav-text">Feature</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Release"><span class="nav-number">2.2.2.</span> <span class="nav-text">Release</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Hotfix"><span class="nav-number">2.2.3.</span> <span class="nav-text">Hotfix</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%96%8B%E5%A7%8B%E4%BD%BF%E7%94%A8-Git-Flow-%E9%96%8B%E7%99%BC%E6%B5%81%E7%A8%8B"><span class="nav-number">3.</span> <span class="nav-text">開始使用 Git Flow 開發流程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%9D-Git-Flow"><span class="nav-number">3.1.</span> <span class="nav-text">安裝 Git Flow</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="nav-number">3.1.1.</span> <span class="nav-text">初始化</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BB%BA%E7%AB%8B%E5%88%86%E6%94%AF"><span class="nav-number">3.2.</span> <span class="nav-text">建立分支</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BB%BA%E7%AB%8B-Feature-%E5%88%86%E6%94%AF"><span class="nav-number">3.2.1.</span> <span class="nav-text">建立 Feature 分支</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8-git-flow"><span class="nav-number">3.2.1.1.</span> <span class="nav-text">使用 git flow</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8-git"><span class="nav-number">3.2.1.2.</span> <span class="nav-text">使用 git</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BB%BA%E7%AB%8B-Release-%E5%88%86%E6%94%AF"><span class="nav-number">3.2.2.</span> <span class="nav-text">建立 Release 分支</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8-git-flow-1"><span class="nav-number">3.2.2.1.</span> <span class="nav-text">使用 git flow</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8-git-1"><span class="nav-number">3.2.2.2.</span> <span class="nav-text">使用 git</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BB%BA%E7%AB%8B-Hotfix-%E5%88%86%E6%94%AF"><span class="nav-number">3.2.3.</span> <span class="nav-text">建立 Hotfix 分支</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8-git-flow-2"><span class="nav-number">3.2.3.1.</span> <span class="nav-text">使用 git flow</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8-git-2"><span class="nav-number">3.2.3.2.</span> <span class="nav-text">使用 git</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%8C%E6%88%90%E5%88%86%E6%94%AF%E4%BB%BB%E5%8B%99"><span class="nav-number">3.3.</span> <span class="nav-text">完成分支任務</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8-git-flow-3"><span class="nav-number">3.3.0.1.</span> <span class="nav-text">使用 git flow</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8-git-3"><span class="nav-number">3.3.0.2.</span> <span class="nav-text">使用 git</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%83%E8%80%83%E8%B3%87%E6%96%99"><span class="nav-number">4.</span> <span class="nav-text">參考資料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Szu-Hsuan, Wu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">61</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">57</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/wshs0713" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;wshs0713" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:shuan0713@gmail.com" title="E-Mail → mailto:shuan0713@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="http://linkedin.com/in/wshs0713" title="LinkedIn → http:&#x2F;&#x2F;linkedin.com&#x2F;in&#x2F;wshs0713" rel="noopener" target="_blank"><i class="fab fa-linkedin fa-fw"></i>LinkedIn</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/wshs0713" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;wshs0713" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Szu-Hsuan, Wu</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://wshs0713.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "https://wshs0713.github.io/posts/96228b34/";
+    this.page.identifier = "posts/96228b34/";
+    this.page.title = "[Git] Git Flow 開發流程";
+    };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://wshs0713.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+</body>
+</html>

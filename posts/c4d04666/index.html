@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en,zh-tw,default">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/favicon-180x180.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-32x32.png">
+  <link rel="mask-icon" href="/img/favicon-180x180.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"wshs0713.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="前言 這一篇文章是《Fluent Python》- 第一章「資料模型」的閱讀筆記。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[Python] 《Fluent Python》 - 資料模型 閱讀筆記">
+<meta property="og:url" content="https://wshs0713.github.io/posts/c4d04666/">
+<meta property="og:site_name" content="wshs0713&#39;s blog">
+<meta property="og:description" content="前言 這一篇文章是《Fluent Python》- 第一章「資料模型」的閱讀筆記。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://cf-assets1.tenlong.com.tw/images/99559/original/A422.jpg">
+<meta property="og:image" content="https://i.imgur.com/GRjVWlk.png">
+<meta property="og:image" content="https://i.imgur.com/weehm4H.png">
+<meta property="og:image" content="https://i.imgur.com/zs88dGJ.png">
+<meta property="og:image" content="https://i.imgur.com/pzLdvq1.png">
+<meta property="article:published_time" content="2023-04-09T08:10:14.000Z">
+<meta property="article:modified_time" content="2023-04-09T08:10:14.000Z">
+<meta property="article:author" content="Szu-Hsuan, Wu">
+<meta property="article:tag" content="Python">
+<meta property="article:tag" content="Fluent Python">
+<meta property="article:tag" content="資料模型">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cf-assets1.tenlong.com.tw/images/99559/original/A422.jpg">
+
+<link rel="canonical" href="https://wshs0713.github.io/posts/c4d04666/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>[Python] 《Fluent Python》 - 資料模型 閱讀筆記 | wshs0713's blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-8XTKEMPTGC"></script>
+    <script>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-8XTKEMPTGC');
+      }
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">wshs0713's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Programming notes</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-projects">
+
+    <a href="/projects/" rel="section"><i class="fa fa-folder fa-fw"></i>Projects</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://wshs0713.github.io/posts/c4d04666/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Szu-Hsuan, Wu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="wshs0713's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          [Python] 《Fluent Python》 - 資料模型 閱讀筆記
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2023-04-09 16:10:14" itemprop="dateCreated datePublished" datetime="2023-04-09T16:10:14+08:00">2023-04-09</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/" itemprop="url" rel="index"><span itemprop="name">Python</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus: </span>
+    
+    <a title="disqus" href="/posts/c4d04666/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="posts/c4d04666/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>7k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>6 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p><img src="https://cf-assets1.tenlong.com.tw/images/99559/original/A422.jpg" alt="Fluent Python"></p>
+<p>這一篇文章是《Fluent Python》- 第一章「資料模型」的閱讀筆記。</p>
+<span id="more"></span>
+
+<h2 id="Ch1-Python-資料模型"><a href="#Ch1-Python-資料模型" class="headerlink" title="Ch1. Python 資料模型"></a>Ch1. Python 資料模型</h2><ul>
+<li>可以將資料模型想像成 Python 描述成框架的東西，他決定這個語言本身 building blocks 的接口，像是 sequences, functions, iterators, coroutines, classes, context managers…等。</li>
+<li>當我們使用任何框架來編寫程式時，會花許多時間來撰寫要被框架呼叫的方法，在使用 Python data model 也是如此，Python interpreter(解譯器)會呼叫特殊的方法來執行基本的物件操作，通常是由特殊的語法觸發。</li>
+<li>特殊方法的名稱是以雙底線 “__” 作為開頭與結尾，例如： <code>__getitem__</code>, <code>obj[key]</code> 語法是 <code>__getitem__</code> 特殊方法提供的。</li>
+<li>當我們希望物件可以支持基本的語言結構並對它做操作時，我們可以實作特殊方法，例如：<ul>
+<li>Iteration (including asynchronous iteration using async for) 迭代</li>
+<li>Collections 集合</li>
+<li>存取 Attribute</li>
+<li>Operator overloading 運算子多載</li>
+<li>Function and method invocation 函式與方法呼叫</li>
+<li>String representation and formatting 字串字串表示與格式化</li>
+<li>Object creation and destruction 物件的建構與解構</li>
+<li>Managed contexts using the with or async with statements 受管理的情境（即with區塊）</li>
+</ul>
+</li>
+<li>特殊方法俗稱魔術方法，也稱 dunder 方法，例如： <code>__getitem__</code> 讀成 “dunder-getitem”.</li>
+</ul>
+<h3 id="Python-風格的撲克牌組"><a href="#Python-風格的撲克牌組" class="headerlink" title="Python 風格的撲克牌組"></a>Python 風格的撲克牌組</h3><p>Example 1-1. 撲克牌序列</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> collections</span><br><span class="line"></span><br><span class="line">Card = collections.namedtuple(<span class="string">&#x27;Card&#x27;</span>, [<span class="string">&#x27;rank&#x27;</span>, <span class="string">&#x27;suit&#x27;</span>])</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">FrenchDeck</span>:</span><br><span class="line">    ranks = [<span class="built_in">str</span>(n) <span class="keyword">for</span> n <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">2</span>, <span class="number">11</span>)] + <span class="built_in">list</span>(<span class="string">&#x27;JQKA&#x27;</span>)</span><br><span class="line">    suits = <span class="string">&#x27;spades diamonds clubs hearts&#x27;</span>.split()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self</span>):</span><br><span class="line">        self._cards = [Card(rank, suit) <span class="keyword">for</span> suit <span class="keyword">in</span> self.suits</span><br><span class="line">                                        <span class="keyword">for</span> rank <span class="keyword">in</span> self.ranks]</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__len__</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">len</span>(self._cards)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__getitem__</span>(<span class="params">self, position</span>):</span><br><span class="line">        <span class="keyword">return</span> self._cards[position]</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>使用 <code>collections.namedtuple</code> 來建立簡單的類別，並使用它來表示每張卡牌<ul>
+<li><code>namedtuple</code> 是 <code>tuple</code> 的擴展<ul>
+<li><code>tuple</code> 是 immutable, 建立後就不可更改</li>
+<li>在使用 <code>tuple</code> 時，我們可以利用 index 來存取 tuple 中指定位置的值，但這個 index 只是代表位置，沒有實質的意義，當欄位越來越多時，可讀性也會越來越差，而透過 <code>namedtuple</code> 讓我們可以利用名稱來取代 index 值，增加可讀性</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; beer_card = Card(<span class="string">&#x27;7&#x27;</span>, <span class="string">&#x27;diamonds&#x27;</span>)</span><br><span class="line">&gt;&gt;&gt; beer_card</span><br><span class="line">Card(rank=<span class="string">&#x27;7&#x27;</span>, suit=<span class="string">&#x27;diamonds&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>範例的重點是 FrenchDeck class, 我們可以使用 <code>len</code> 來取得牌組中的卡片數量：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; deck = FrenchDeck()</span><br><span class="line">&gt;&gt;&gt; len(deck)</span><br><span class="line">52</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>讀取牌組中的特定卡牌，也正是 <code>__getitem__</code> 特殊方法提供的功能：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; deck[0]</span><br><span class="line">Card(rank=<span class="string">&#x27;2&#x27;</span>, suit=<span class="string">&#x27;spades&#x27;</span>)</span><br><span class="line">&gt;&gt;&gt; deck[-1]</span><br><span class="line">Card(rank=<span class="string">&#x27;A&#x27;</span>, suit=<span class="string">&#x27;hearts&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>隨機選取卡牌： <code>random.choice</code></li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; from random import choice</span><br><span class="line">&gt;&gt;&gt; choice(deck)</span><br><span class="line">Card(rank=<span class="string">&#x27;3&#x27;</span>, suit=<span class="string">&#x27;hearts&#x27;</span>)</span><br><span class="line">&gt;&gt;&gt; choice(deck)</span><br><span class="line">Card(rank=<span class="string">&#x27;K&#x27;</span>, suit=<span class="string">&#x27;spades&#x27;</span>)</span><br><span class="line">&gt;&gt;&gt; choice(deck)</span><br><span class="line">Card(rank=<span class="string">&#x27;2&#x27;</span>, suit=<span class="string">&#x27;clubs&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>Python data model 優點：</p>
+<ul>
+<li>類別的使用者不需要去記各種標準動作的方法名稱<ul>
+<li>如何取得項目數量？ <code>.size()</code> , <code>.length()</code> or … ?</li>
+</ul>
+</li>
+<li>有豐富的 Python 標準函式庫，避免重複造輪子</li>
+</ul>
+<p>但他有更多好處。</p>
+<p>以上的 <code>__getitem__</code> 代表 <code>self._cards</code> 的 <code>[]</code> 運算子，所以牌組會自動支援 slicing, for example:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 取得最上面三張牌</span></span><br><span class="line">&gt;&gt;&gt; deck[:3]</span><br><span class="line">[Card(rank=<span class="string">&#x27;2&#x27;</span>, suit=<span class="string">&#x27;spades&#x27;</span>), Card(rank=<span class="string">&#x27;3&#x27;</span>, suit=<span class="string">&#x27;spades&#x27;</span>), Card(rank=<span class="string">&#x27;4&#x27;</span>, suit=<span class="string">&#x27;spades&#x27;</span>)]</span><br><span class="line"></span><br><span class="line"><span class="comment"># 從 index 為 12 開始取 ACE, 並跳過 13 張牌</span></span><br><span class="line">&gt;&gt;&gt; deck[12::13]</span><br><span class="line">[Card(rank=<span class="string">&#x27;A&#x27;</span>, suit=<span class="string">&#x27;spades&#x27;</span>), Card(rank=<span class="string">&#x27;A&#x27;</span>, suit=<span class="string">&#x27;diamonds&#x27;</span>), Card(rank=<span class="string">&#x27;A&#x27;</span>, suit=<span class="string">&#x27;clubs&#x27;</span>), Card(rank=<span class="string">&#x27;A&#x27;</span>, suit=<span class="string">&#x27;hearts&#x27;</span>)]</span><br></pre></td></tr></table></figure>
+
+<p>只要實作 <code>__getitem__</code> 就可以讓牌組變成可迭代的：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; <span class="keyword">for</span> card <span class="keyword">in</span> deck: <span class="comment"># doctest: +ELLIPSIS </span></span><br><span class="line">...     <span class="built_in">print</span>(card)</span><br><span class="line">Card(rank=<span class="string">&#x27;2&#x27;</span>, suit=<span class="string">&#x27;spades&#x27;</span>)</span><br><span class="line">Card(rank=<span class="string">&#x27;3&#x27;</span>, suit=<span class="string">&#x27;spades&#x27;</span>)</span><br><span class="line">Card(rank=<span class="string">&#x27;4&#x27;</span>, suit=<span class="string">&#x27;spades&#x27;</span>)</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<p>反向迭代：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; <span class="keyword">for</span> card <span class="keyword">in</span> reversed(deck): <span class="comment"># doctest: +ELLIPSIS</span></span><br><span class="line">...     <span class="built_in">print</span>(card)</span><br><span class="line">Card(rank=<span class="string">&#x27;A&#x27;</span>, suit=<span class="string">&#x27;hearts&#x27;</span>)</span><br><span class="line">Card(rank=<span class="string">&#x27;K&#x27;</span>, suit=<span class="string">&#x27;hearts&#x27;</span>)</span><br><span class="line">Card(rank=<span class="string">&#x27;Q&#x27;</span>, suit=<span class="string">&#x27;hearts&#x27;</span>)</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<p>如果某個集合沒有 <code>__contains__</code> 方法， <code>in</code> 運算子就會進行循序掃描。我們可以在 FrenchDeck 中使用 <code>in</code> :</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; Card(<span class="string">&#x27;Q&#x27;</span>, <span class="string">&#x27;hearts&#x27;</span>) <span class="keyword">in</span> deck</span><br><span class="line">True</span><br><span class="line">&gt;&gt;&gt; Card(<span class="string">&#x27;7&#x27;</span>, <span class="string">&#x27;beasts&#x27;</span>) <span class="keyword">in</span> deck</span><br><span class="line">False</span><br></pre></td></tr></table></figure>
+
+<p>排序：以下範例是按照規則定義撲克牌大小</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">suit_values = <span class="built_in">dict</span>(spades=<span class="number">3</span>, hearts=<span class="number">2</span>, diamonds=<span class="number">1</span>, clubs=<span class="number">0</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">spades_high</span>(<span class="params">card</span>):</span><br><span class="line">	rank_value = FrenchDeck.ranks.index(card.rank)</span><br><span class="line">	<span class="keyword">return</span> rank_value * <span class="built_in">len</span>(suit_values) + suit_values[card.suit]</span><br></pre></td></tr></table></figure>
+
+<p>按照大小依序列出牌組：(遞增)</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">for</span> card <span class="keyword">in</span> <span class="built_in">sorted</span>(deck, key=spades_high): <span class="comment"># doctest: +ELLIPSIS</span></span><br><span class="line"><span class="meta">... </span>    <span class="built_in">print</span>(card)</span><br><span class="line">Card(rank=<span class="string">&#x27;2&#x27;</span>, suit=<span class="string">&#x27;clubs&#x27;</span>)</span><br><span class="line">Card(rank=<span class="string">&#x27;2&#x27;</span>, suit=<span class="string">&#x27;diamonds&#x27;</span>)</span><br><span class="line">Card(rank=<span class="string">&#x27;2&#x27;</span>, suit=<span class="string">&#x27;hearts&#x27;</span>)</span><br><span class="line"><span class="meta">... </span>(<span class="number">46</span> cards omitted)</span><br><span class="line">Card(rank=<span class="string">&#x27;A&#x27;</span>, suit=<span class="string">&#x27;diamonds&#x27;</span>)</span><br><span class="line">Card(rank=<span class="string">&#x27;A&#x27;</span>, suit=<span class="string">&#x27;hearts&#x27;</span>)</span><br><span class="line">Card(rank=<span class="string">&#x27;A&#x27;</span>, suit=<span class="string">&#x27;spades&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="特殊方法的用法"><a href="#特殊方法的用法" class="headerlink" title="特殊方法的用法"></a>特殊方法的用法</h3><ul>
+<li>特殊方法是要讓 Python 解譯器呼叫的，而不是開發者，所以不能寫 <code>my_obj.__len__()</code>，而是要用 <code>len(my_obj)</code>. 如果 <code>my_obj</code> 是自定義的類別，Python會呼叫你寫的 <code>__len__</code> 方法.</li>
+<li>一般情況下，不應該直接呼叫特殊方法，而是呼叫相關的內建函式比較好(例如：len, iter, str 等)。通常開發者比較常呼叫的只有 <code>__init__</code>, 目的是呼叫自己寫的 initializer.</li>
+<li>解譯器會對內建的型態採取較簡便的做法(例如：list, str, bytearray…等)，CPython 的 <code>len()</code> 會回傳 PyVarObject C結構內的 ob_size, 表示記憶體中變數大小的所有內建物件，比呼叫方法快很多。</li>
+<li>特殊方法通常是私下呼叫的，例如： <code>for i in x</code> 其實會呼叫 <code>iter(x)</code>, 接著可以的話會呼叫 <code>x.__iter__()</code>。</li>
+<li>要避免使用 dunder function 來任意建立自訂的屬性，因為雖然目前他不是保留字，但未來有可能具有特殊含義。</li>
+</ul>
+<h4 id="模擬數值型態"><a href="#模擬數值型態" class="headerlink" title="模擬數值型態"></a>模擬數值型態</h4><p>首先定義一個 Vector class:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> math <span class="keyword">import</span> hypot</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Vector</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, x=<span class="number">0</span>, y=<span class="number">0</span></span>):</span><br><span class="line">        self.x = x</span><br><span class="line">        self.y = y</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__repr__</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&#x27;Vector(%r, %r)&#x27;</span> % (self.x, self.y)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__abs__</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="keyword">return</span> hypot(self.x, self.y)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__bool__</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">bool</span>(<span class="built_in">abs</span>(self))</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__add__</span>(<span class="params">self, other</span>):</span><br><span class="line">        x = self.x + other.x</span><br><span class="line">        y = self.y + other.y</span><br><span class="line">        <span class="keyword">return</span> Vector(x, y)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__mul__</span>(<span class="params">self, scalar</span>):</span><br><span class="line">        <span class="keyword">return</span> Vector(self.x * scalar, self.y * scalar)</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://i.imgur.com/GRjVWlk.png" alt=" vector"></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; v1 = Vector(2, 4)</span><br><span class="line">&gt;&gt;&gt; v2 = Vector(2, 1)</span><br><span class="line">&gt;&gt;&gt; v1 + v2 </span><br><span class="line">Vector(4, 5)</span><br></pre></td></tr></table></figure>
+
+<p>這裡使用 + 運算子，Python 解譯器會去呼叫 <code>__add__()</code>.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; v = Vector(3, 4)</span><br><span class="line">&gt;&gt;&gt; abs(v)</span><br><span class="line">5.0</span><br></pre></td></tr></table></figure>
+
+<p>這裡使用 <code>abs()</code>, Python 解譯器會去呼叫 <code>__abs__()</code>.</p>
+<p>也可以使用 * 來執行向量乘法，Python 解譯器會呼叫 <code>__mul__()</code>.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; v * 3</span><br><span class="line">Vector(9, 12)</span><br><span class="line"></span><br><span class="line">&gt;&gt;&gt; abs(v * 3)</span><br><span class="line">15.0</span><br></pre></td></tr></table></figure>
+
+<h4 id="字串表示方式"><a href="#字串表示方式" class="headerlink" title="字串表示方式"></a>字串表示方式</h4><ul>
+<li><code>__repr__</code> 特殊方法是讓內建 <code>repr</code> 呼叫的，取得物件的字串表示方式，如果沒有實作這個方法，console 中會顯示成 <code>&lt;Vector object at 0x10e100070&gt;</code>.</li>
+<li>互動式的 console 或 debug 程式會對運算式的結果呼叫 <code>repr</code>, 這裡使用 <code>%r</code> 來 format string.</li>
+<li><code>__str__</code> 則是讓 <code>str()</code> 呼叫的，並讓 <code>print()</code> 私下使用，他會回傳方便觀看的格式。</li>
+<li>如果只想實作其中一種，可以選擇 <code>__repr__</code>, 因為如果沒有自訂的 <code>__str__</code>, Python 會呼叫 <code>__repr__</code> 來提供結果。</li>
+</ul>
+<h4 id="算術運算子"><a href="#算術運算子" class="headerlink" title="算術運算子"></a>算術運算子</h4><ul>
+<li>上面的範例使用到 + and *, 以展示 <code>__add__</code> 和 <code>__mul__</code> 的基本用法。在這個情況下，方法會回傳新的 Vector instance, 不會修改他們的運算元。</li>
+<li>在上面的範例中，我們可以將 Vector 乘上數字，但無法將數字乘上 Vector, 這違法乘法的交換特性，會在第十三章的特殊方法 <code>__rmul__</code> 修正這個問題。</li>
+</ul>
+<h4 id="自訂類型的布林值"><a href="#自訂類型的布林值" class="headerlink" title="自訂類型的布林值"></a>自訂類型的布林值</h4><ul>
+<li>Python 有 bool type, 但他接受任何 Boolean context 的任何 object, 像是控制 if 或 while 的 expression, 或 and, or, not 運算元。</li>
+<li><code>bool(x)</code> 只會回傳 True or False.</li>
+<li>預設情況下，使用者自訂的 class instance 都會被視為 True, 除非他實作了 <code>__bool__</code> 或 <code>__len__</code>.<ul>
+<li><code>bool(x)</code> 會呼叫 <code>x.__bool__()</code> 並使用它的結果，如果沒有實作 <code>__bool__</code>, Python 就會試著呼叫 <code>x.__len__()</code>, 如果它回傳 0, bool 就會回傳 False.</li>
+</ul>
+</li>
+</ul>
+<h3 id="特殊方法概觀"><a href="#特殊方法概觀" class="headerlink" title="特殊方法概觀"></a>特殊方法概觀</h3><p>The Python Language Reference 的 Data model (<a target="_blank" rel="noopener" href="https://docs.python.org/3/reference/datamodel.html">https://docs.python.org/3/reference/datamodel.html</a>) 中列出了 83 個特殊方法名稱，其中有 47 個的用途是實作算術、位元及比較運算子。</p>
+<p><img src="https://i.imgur.com/weehm4H.png" alt="magic_method_1"></p>
+<p><img src="https://i.imgur.com/zs88dGJ.png" alt="magic_method_2"></p>
+<p><img src="https://i.imgur.com/pzLdvq1.png" alt="magic_method_3"></p>
+<h3 id="為什麼-len-不是一種方法？"><a href="#為什麼-len-不是一種方法？" class="headerlink" title="為什麼 len 不是一種方法？"></a>為什麼 len 不是一種方法？</h3><ul>
+<li>在前面的「特殊方法的用法」有提到：如果 x 是內建的型態，CPython 不需要呼叫任何方法，只需要從 C 結構內的欄位讀取。取得集合的長度是蠻常見的動作，因此必須要有效率的操作這種基本類型或其他類型，例如：str, list 或 memoryview.</li>
+<li><code>len</code> 不會被當成方法來呼叫，因為他身為 Python 資料模型的一部份，會受到特殊對待， <code>abs</code> 也是一樣的原理。但是拜特殊方法 <code>__len__</code> 所賜，我們也可以讓自訂的物件使用 <code>len</code>.</li>
+</ul>
+<h3 id="本章摘要"><a href="#本章摘要" class="headerlink" title="本章摘要"></a>本章摘要</h3><ul>
+<li>藉由實作特殊方法，讓我們的物件的行為可以像內建類型一樣，讓我們的程式撰寫風格被認為符合 Python 慣例。</li>
+<li>特殊方法 <code>__repr__</code> and <code>__str__</code>, 一個用來進行 debug 和記錄，另一個用來顯示給使用者看，是 Python 物件的基本需求。</li>
+</ul>
+<h2 id="References"><a href="#References" class="headerlink" title="References"></a>References</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/fluentpython/example-code-2e">https://github.com/fluentpython/example-code-2e</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Python/" rel="tag"># Python</a>
+              <a href="/tags/Fluent-Python/" rel="tag"># Fluent Python</a>
+              <a href="/tags/%E8%B3%87%E6%96%99%E6%A8%A1%E5%9E%8B/" rel="tag"># 資料模型</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/5793cee/" rel="prev" title="[Go] Testify 單元測試">
+      <i class="fa fa-chevron-left"></i> [Go] Testify 單元測試
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Ch1-Python-%E8%B3%87%E6%96%99%E6%A8%A1%E5%9E%8B"><span class="nav-number">2.</span> <span class="nav-text">Ch1. Python 資料模型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Python-%E9%A2%A8%E6%A0%BC%E7%9A%84%E6%92%B2%E5%85%8B%E7%89%8C%E7%B5%84"><span class="nav-number">2.1.</span> <span class="nav-text">Python 風格的撲克牌組</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%89%B9%E6%AE%8A%E6%96%B9%E6%B3%95%E7%9A%84%E7%94%A8%E6%B3%95"><span class="nav-number">2.2.</span> <span class="nav-text">特殊方法的用法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A8%A1%E6%93%AC%E6%95%B8%E5%80%BC%E5%9E%8B%E6%85%8B"><span class="nav-number">2.2.1.</span> <span class="nav-text">模擬數值型態</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AD%97%E4%B8%B2%E8%A1%A8%E7%A4%BA%E6%96%B9%E5%BC%8F"><span class="nav-number">2.2.2.</span> <span class="nav-text">字串表示方式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AE%97%E8%A1%93%E9%81%8B%E7%AE%97%E5%AD%90"><span class="nav-number">2.2.3.</span> <span class="nav-text">算術運算子</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%87%AA%E8%A8%82%E9%A1%9E%E5%9E%8B%E7%9A%84%E5%B8%83%E6%9E%97%E5%80%BC"><span class="nav-number">2.2.4.</span> <span class="nav-text">自訂類型的布林值</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%89%B9%E6%AE%8A%E6%96%B9%E6%B3%95%E6%A6%82%E8%A7%80"><span class="nav-number">2.3.</span> <span class="nav-text">特殊方法概觀</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%82%BA%E4%BB%80%E9%BA%BC-len-%E4%B8%8D%E6%98%AF%E4%B8%80%E7%A8%AE%E6%96%B9%E6%B3%95%EF%BC%9F"><span class="nav-number">2.4.</span> <span class="nav-text">為什麼 len 不是一種方法？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%AC%E7%AB%A0%E6%91%98%E8%A6%81"><span class="nav-number">2.5.</span> <span class="nav-text">本章摘要</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#References"><span class="nav-number">3.</span> <span class="nav-text">References</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Szu-Hsuan, Wu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">61</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">57</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/wshs0713" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;wshs0713" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:shuan0713@gmail.com" title="E-Mail → mailto:shuan0713@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="http://linkedin.com/in/wshs0713" title="LinkedIn → http:&#x2F;&#x2F;linkedin.com&#x2F;in&#x2F;wshs0713" rel="noopener" target="_blank"><i class="fab fa-linkedin fa-fw"></i>LinkedIn</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/wshs0713" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;wshs0713" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Szu-Hsuan, Wu</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://wshs0713.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "https://wshs0713.github.io/posts/c4d04666/";
+    this.page.identifier = "posts/c4d04666/";
+    this.page.title = "[Python] 《Fluent Python》 - 資料模型 閱讀筆記";
+    };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://wshs0713.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+</body>
+</html>

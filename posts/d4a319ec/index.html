@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en,zh-tw,default">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/favicon-180x180.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-32x32.png">
+  <link rel="mask-icon" href="/img/favicon-180x180.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"wshs0713.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="我們可以透過以下兩個網站申請免費的 SSL 憑證:  Let′s encrypt: 是一個提供免費 SSL 服務的網站，可以手動申請 SSL 憑證，也可以串接它的 API，讓申請憑證的流程自動化，詳細的內容可以參考官方網站。 CloudFlare: 主要提供 CDN 的服務，多了一層的代理，可以保護網站受到攻擊，同時也能提升網站效能，另外 CloudFlare 也有提供免費的 SSL 服務。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[SSL] Nginx + Let&#39;s encrypt SSL 憑證">
+<meta property="og:url" content="https://wshs0713.github.io/posts/d4a319ec/">
+<meta property="og:site_name" content="wshs0713&#39;s blog">
+<meta property="og:description" content="我們可以透過以下兩個網站申請免費的 SSL 憑證:  Let′s encrypt: 是一個提供免費 SSL 服務的網站，可以手動申請 SSL 憑證，也可以串接它的 API，讓申請憑證的流程自動化，詳細的內容可以參考官方網站。 CloudFlare: 主要提供 CDN 的服務，多了一層的代理，可以保護網站受到攻擊，同時也能提升網站效能，另外 CloudFlare 也有提供免費的 SSL 服務。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://media.sustatu.eus/media/argazkiak/doa/kandadoa.png">
+<meta property="article:published_time" content="2018-10-19T17:13:04.000Z">
+<meta property="article:modified_time" content="2018-10-19T17:13:04.000Z">
+<meta property="article:author" content="Szu-Hsuan, Wu">
+<meta property="article:tag" content="Nginx">
+<meta property="article:tag" content="SSL">
+<meta property="article:tag" content="Let&#39;s Encrypt">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://media.sustatu.eus/media/argazkiak/doa/kandadoa.png">
+
+<link rel="canonical" href="https://wshs0713.github.io/posts/d4a319ec/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>[SSL] Nginx + Let's encrypt SSL 憑證 | wshs0713's blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-8XTKEMPTGC"></script>
+    <script>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-8XTKEMPTGC');
+      }
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">wshs0713's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Programming notes</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-projects">
+
+    <a href="/projects/" rel="section"><i class="fa fa-folder fa-fw"></i>Projects</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://wshs0713.github.io/posts/d4a319ec/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Szu-Hsuan, Wu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="wshs0713's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          [SSL] Nginx + Let's encrypt SSL 憑證
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-10-20 01:13:04" itemprop="dateCreated datePublished" datetime="2018-10-20T01:13:04+08:00">2018-10-20</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/SSL/" itemprop="url" rel="index"><span itemprop="name">SSL</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus: </span>
+    
+    <a title="disqus" href="/posts/d4a319ec/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="posts/d4a319ec/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>5.2k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>5 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><img src="https://media.sustatu.eus/media/argazkiak/doa/kandadoa.png" alt="https"></p>
+<p>我們可以透過以下兩個網站申請免費的 SSL 憑證:</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://letsencrypt.org/" title="Let′s encrypt">Let′s encrypt</a>: 是一個提供免費 SSL 服務的網站，可以手動申請 SSL 憑證，也可以串接它的 API，讓申請憑證的流程自動化，詳細的內容可以參考<a target="_blank" rel="noopener" href="https://letsencrypt.org/">官方網站</a>。</li>
+<li><a target="_blank" rel="noopener" href="https://www.cloudflare.com/" title="CloudFlare">CloudFlare</a>: 主要提供 CDN 的服務，多了一層的代理，可以保護網站受到攻擊，同時也能提升網站效能，另外 CloudFlare 也有提供免費的 SSL 服務。</li>
+</ul>
+<span id="more"></span>
+
+<h2 id="前置作業"><a href="#前置作業" class="headerlink" title="前置作業"></a>前置作業</h2><p>在申請 SSL 憑證之前，需要先有自己的 domain，如果是使用 Heroku 的話，他預設有提供免費的 domain: <code>&lt;app_name&gt;.herokuapp.com</code>，如果服務是在其他地方的話，網路上也有很多地方有提供免費申請網域的網站(例如: <a target="_blank" rel="noopener" href="https://freenom.com/">freenom</a>、<a target="_blank" rel="noopener" href="https://www.noip.com/">No-IP</a>)，或是也可以付費購買自己喜歡的 domain.</p>
+<p>不過要注意的是：如果是想要申請 CloudFlare 的 SSL 憑證，domain 不能是以下幾個:</p>
+<ul>
+<li>example.tumblr.com</li>
+<li>example.appspot.com</li>
+<li>example.wordpress.com</li>
+<li>example.weebly.com</li>
+<li>example.herokuapp.com</li>
+<li>example.webs.com</li>
+<li>example.blogspot.com</li>
+<li>example.webs.com</li>
+<li>example.ning.com</li>
+<li>example.no-ip.com</li>
+</ul>
+<p>詳細的說明可以參考: <a target="_blank" rel="noopener" href="https://support.cloudflare.com/hc/en-us/articles/200167926-What-does-ERROR-Unfortunately-you-can-not-add-that-domain-to-Cloudflare-mean-">What does “ERROR Unfortunately, you can not add that domain to Cloudflare” mean?</a></p>
+<p>這裡就預設我們已經有自己的 domain 了，接下來主要記錄如何申請 Let′s encrypt 的 SSL 憑證並搭配 Nginx 做設定。</p>
+<p>我們的執行環境是 Ubuntu 16.04，搭配 Nginx 做設定，如果是要搭配 Apache 或是其他 Web server，取得憑證的步驟會不太一樣，可以參考<a target="_blank" rel="noopener" href="https://certbot.eff.org/lets-encrypt/ubuntuxenial-other" title="Certbot">官方網站</a>.</p>
+<h3 id="安裝-Nginx"><a href="#安裝-Nginx" class="headerlink" title="安裝 Nginx"></a>安裝 Nginx</h3><p>首先，需要先安裝 Nginx，可以選擇使用 <code>apt-get</code> 來安裝，或是自行編譯:</p>
+<h4 id="使用-apt-get-安裝"><a href="#使用-apt-get-安裝" class="headerlink" title="使用 apt-get 安裝"></a>使用 apt-get 安裝</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get install -y nginx</span><br></pre></td></tr></table></figure>
+
+<p>啟動 Nginx:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo nginx -c /etc/nginx/nginx.conf</span><br></pre></td></tr></table></figure>
+
+<h4 id="自行編譯-Nginx"><a href="#自行編譯-Nginx" class="headerlink" title="自行編譯 Nginx"></a>自行編譯 Nginx</h4><p>下載 Nginx:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">wget http://nginx.org/download/nginx-1.18.0.tar.gz</span><br><span class="line">tar zxf nginx-1.18.0.tar.gz</span><br></pre></td></tr></table></figure>
+
+<p>安裝 with-http_ssl_module 所需要的 OpenSSL Library:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install -y openssl openssl-devel</span><br></pre></td></tr></table></figure>
+
+<p>加上 SSL Module:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 進入 NGINX 原始碼目錄</span></span><br><span class="line"><span class="built_in">cd</span> nginx-1.18.0</span><br><span class="line"></span><br><span class="line"><span class="comment"># 設定要添加的 module</span></span><br><span class="line">./configure --prefix=/home/&lt;user&gt;/nginx --with-http_ssl_module</span><br><span class="line"></span><br><span class="line"><span class="comment"># 開始編譯</span></span><br><span class="line">make &amp;&amp; make install</span><br></pre></td></tr></table></figure>
+
+<p>啟動 Nginx:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">home/&lt;user&gt;/nginx/sbin/nginx -c home/&lt;user&gt;/nginx/nginx.conf</span><br></pre></td></tr></table></figure>
+
+<h3 id="安裝-certbot"><a href="#安裝-certbot" class="headerlink" title="安裝 certbot"></a>安裝 certbot</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo add-apt-repository ppa:certbot/certbot   <span class="comment"># 載入 certbot 的 ppa</span></span><br><span class="line">sudo apt-get update                           <span class="comment"># 更新 apt-get</span></span><br><span class="line">sudo apt-get install -y python-certbot-nginx  <span class="comment"># 安裝 python 的 certbot for nginx</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="設定-Nginx"><a href="#設定-Nginx" class="headerlink" title="設定 Nginx"></a>設定 Nginx</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># file: /etc/nginx/nginx.conf</span><br><span class="line"></span><br><span class="line">http &#123;</span><br><span class="line">    # ...</span><br><span class="line">    </span><br><span class="line">    include /etc/nginx/sites-enabled/*;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># file: /etc/nginx/sites-available/web-ssl.conf</span><br><span class="line"></span><br><span class="line">server &#123;</span><br><span class="line">    server_name  mydomain.com;</span><br><span class="line">    # ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Create link to <code>/etc/nginx/sites-available/web-ssl.conf</code>:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /etc/nginx/sites-enabled</span><br><span class="line">sudo <span class="built_in">ln</span> -s ../sites-available/web-ssl.conf .</span><br></pre></td></tr></table></figure>
+
+<p>Reload Nginx:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo nginx -s reload</span><br></pre></td></tr></table></figure>
+
+<h2 id="申請-Let′s-encrypt-SSL-憑證"><a href="#申請-Let′s-encrypt-SSL-憑證" class="headerlink" title="申請 Let′s encrypt SSL 憑證"></a>申請 Let′s encrypt SSL 憑證</h2><p>以上前置作業都完成後，就可以來申請憑證:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo certbot --nginx -d mydomain.com</span><br></pre></td></tr></table></figure>
+
+<p>接著可以選擇要不要自動轉址:</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Please choose whether or not to redirect HTTP traffic to HTTPS, removing HTTP access.</span><br><span class="line">- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -</span><br><span class="line">1: No redirect - Make no further changes to the webserver configuration.</span><br><span class="line">2: Redirect - Make all requests redirect to secure HTTPS access. Choose this for</span><br><span class="line">new sites, or if you&#x27;re confident your site works on HTTPS. You can undo this</span><br><span class="line">change by editing your web server&#x27;s configuration.</span><br><span class="line">- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -</span><br><span class="line">Select the appropriate number [1-2] then [enter] (press &#x27;c&#x27; to cancel):</span><br></pre></td></tr></table></figure>
+
+<p>如果還沒設定 http 自動轉 https 可以選 2.</p>
+<p>最後出現以下訊息就是完成了:</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -</span><br><span class="line">Congratulations! You have successfully enabled https://mydomain.com</span><br><span class="line"></span><br><span class="line">You should test your configuration at:</span><br><span class="line">https://www.ssllabs.com/ssltest/analyze.html?d=mydomain.com</span><br><span class="line">- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -</span><br><span class="line"></span><br><span class="line">IMPORTANT NOTES:</span><br><span class="line"> - Congratulations! Your certificate and chain have been saved at:</span><br><span class="line">   /etc/letsencrypt/live/mydomain.com/fullchain.pem</span><br><span class="line">   Your key file has been saved at:</span><br><span class="line">   /etc/letsencrypt/live/mydomain.com/privkey.pem</span><br><span class="line">   Your cert will expire on 2021-06-30. To obtain a new or tweaked</span><br><span class="line">   version of this certificate in the future, simply run certbot again</span><br><span class="line">   with the &quot;certonly&quot; option. To non-interactively renew *all* of</span><br><span class="line">   your certificates, run &quot;certbot renew&quot;</span><br><span class="line"> - If you like Certbot, please consider supporting our work by:</span><br><span class="line"></span><br><span class="line">   Donating to ISRG / Let&#x27;s Encrypt:   https://letsencrypt.org/donate</span><br><span class="line">   Donating to EFF:                    https://eff.org/donate-le</span><br></pre></td></tr></table></figure>
+
+<h2 id="檢查-config-是否有被自動添加內容"><a href="#檢查-config-是否有被自動添加內容" class="headerlink" title="檢查 config 是否有被自動添加內容"></a>檢查 config 是否有被自動添加內容</h2><p>檢查 Nginx config 是否有被自動增加 listen 443 及憑證:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">listen 443 ssl; # managed by Certbot</span><br><span class="line">ssl_certificate /etc/letsencrypt/live/mydomain.com/fullchain.pem; # managed by Certbot</span><br><span class="line">ssl_certificate_key /etc/letsencrypt/live/mydomain.com/privkey.pem; # managed by Certbot</span><br><span class="line">include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot</span><br><span class="line">ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot</span><br></pre></td></tr></table></figure>
+
+<p>如果申請憑證時有選擇自動轉址，再檢查以下內容是否有被設定:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">if ($host = mydomain.com) &#123;</span><br><span class="line">    return 301 https://$host$request_uri;</span><br><span class="line">&#125; # managed by Certbot</span><br><span class="line">listen       80;</span><br><span class="line">server_name  mydomain.com;</span><br><span class="line">return 404; # managed by Certbot</span><br></pre></td></tr></table></figure>
+
+<p>如果沒有選擇自動轉址，也可以自行設定:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># file: /etc/nginx/site-available/default-http-to-https.conf</span><br><span class="line"></span><br><span class="line">server &#123;</span><br><span class="line">    listen  80;</span><br><span class="line">    server_name mydomain.com;</span><br><span class="line">    return 301 https://$host$request_uri;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="重啟-Nginx"><a href="#重啟-Nginx" class="headerlink" title="重啟 Nginx"></a>重啟 Nginx</h2><p>確認完後，只要再重啟 Nginx, 就可以囉!</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo nginx -s stop</span><br><span class="line">sudo nginx -c /etc/nginx/nginx.conf</span><br></pre></td></tr></table></figure>
+
+<p>最後就可以測試看看 <a target="_blank" rel="noopener" href="https://mydomain.com/">https://mydomain.com</a> 是否可以使用~</p>
+<h2 id="更新憑證"><a href="#更新憑證" class="headerlink" title="更新憑證"></a>更新憑證</h2><p>要注意的是，Let’s encrypt 憑證的有效期限只有 90 天，可以使用以下指令更新憑證:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># --dry-run: For testing</span></span><br><span class="line">sudo certbot renew --nginx [--dry-run]</span><br><span class="line"></span><br><span class="line"><span class="comment"># 過期的話, 要使用以下指令來強制更新已過期的憑證</span></span><br><span class="line">sudo certbot --nginx --force-renew</span><br></pre></td></tr></table></figure>
+
+<p>也可以透過排程設定自動更新憑證:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo crontab -e</span><br></pre></td></tr></table></figure>
+
+<p>加上以下內容即可:</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">SHELL=/bin/sh</span><br><span class="line">PATH=/bin:/sbin:/usr/bin:/usr/sbin</span><br><span class="line"></span><br><span class="line">@daily /usr/bin/certbot renew --nginx --quiet</span><br></pre></td></tr></table></figure>
+
+<h2 id="參考資料"><a href="#參考資料" class="headerlink" title="參考資料"></a>參考資料</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://letsencrypt.org/" title="Let′s encrypt">Let′s encrypt</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.cloudflare.com/" title="CloudFlare">CloudFlare</a></li>
+<li><a target="_blank" rel="noopener" href="https://certbot.eff.org/lets-encrypt/ubuntuxenial-other" title="Certbot">Certbot</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.hellojcc.tw/setup-https-with-letsencrypt-on-nginx/">設定 Let’s Encrypt HTTPS nginx certbot SSL 憑證自動更新 教學</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-16-04">How To Secure Nginx with Let’s Encrypt on Ubuntu 16.04</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Nginx/" rel="tag"># Nginx</a>
+              <a href="/tags/SSL/" rel="tag"># SSL</a>
+              <a href="/tags/Let-s-Encrypt/" rel="tag"># Let's Encrypt</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/6e4169a2/" rel="prev" title="[Hexo] 將 Hexo 網站佈署到 Heroku">
+      <i class="fa fa-chevron-left"></i> [Hexo] 將 Hexo 網站佈署到 Heroku
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/posts/6a171975/" rel="next" title="[Nginx] Nginx 安裝及設定">
+      [Nginx] Nginx 安裝及設定 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E7%BD%AE%E4%BD%9C%E6%A5%AD"><span class="nav-number">1.</span> <span class="nav-text">前置作業</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%89%E8%A3%9D-Nginx"><span class="nav-number">1.1.</span> <span class="nav-text">安裝 Nginx</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8-apt-get-%E5%AE%89%E8%A3%9D"><span class="nav-number">1.1.1.</span> <span class="nav-text">使用 apt-get 安裝</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%87%AA%E8%A1%8C%E7%B7%A8%E8%AD%AF-Nginx"><span class="nav-number">1.1.2.</span> <span class="nav-text">自行編譯 Nginx</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%89%E8%A3%9D-certbot"><span class="nav-number">1.2.</span> <span class="nav-text">安裝 certbot</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A8%AD%E5%AE%9A-Nginx"><span class="nav-number">1.3.</span> <span class="nav-text">設定 Nginx</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%94%B3%E8%AB%8B-Let%E2%80%B2s-encrypt-SSL-%E6%86%91%E8%AD%89"><span class="nav-number">2.</span> <span class="nav-text">申請 Let′s encrypt SSL 憑證</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AA%A2%E6%9F%A5-config-%E6%98%AF%E5%90%A6%E6%9C%89%E8%A2%AB%E8%87%AA%E5%8B%95%E6%B7%BB%E5%8A%A0%E5%85%A7%E5%AE%B9"><span class="nav-number">3.</span> <span class="nav-text">檢查 config 是否有被自動添加內容</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%87%8D%E5%95%9F-Nginx"><span class="nav-number">4.</span> <span class="nav-text">重啟 Nginx</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9B%B4%E6%96%B0%E6%86%91%E8%AD%89"><span class="nav-number">5.</span> <span class="nav-text">更新憑證</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%83%E8%80%83%E8%B3%87%E6%96%99"><span class="nav-number">6.</span> <span class="nav-text">參考資料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Szu-Hsuan, Wu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">61</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">57</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/wshs0713" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;wshs0713" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:shuan0713@gmail.com" title="E-Mail → mailto:shuan0713@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="http://linkedin.com/in/wshs0713" title="LinkedIn → http:&#x2F;&#x2F;linkedin.com&#x2F;in&#x2F;wshs0713" rel="noopener" target="_blank"><i class="fab fa-linkedin fa-fw"></i>LinkedIn</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/wshs0713" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;wshs0713" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Szu-Hsuan, Wu</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://wshs0713.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "https://wshs0713.github.io/posts/d4a319ec/";
+    this.page.identifier = "posts/d4a319ec/";
+    this.page.title = "[SSL] Nginx + Let's encrypt SSL 憑證";
+    };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://wshs0713.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+</body>
+</html>

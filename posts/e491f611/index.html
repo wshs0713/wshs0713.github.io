@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en,zh-tw,default">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/favicon-180x180.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-32x32.png">
+  <link rel="mask-icon" href="/img/favicon-180x180.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"wshs0713.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="前言這一篇文章主要紀錄 Linux 上常用的指令，方便之後查詢~ 包含:   前言 Linux 常用指令 壓縮 &amp; 解壓縮 .tar .gz .tar.gz &#x2F; .tgz &#x2F; .tar.tgz zip   檔案傳輸 scp rsync   檔案處理 (分割、合併、字串處理) sed split grep awk 刪除目錄下的空檔案   vim 常用指令 檔案編碼 檔案權">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[Linux] Linux 常用指令">
+<meta property="og:url" content="https://wshs0713.github.io/posts/e491f611/">
+<meta property="og:site_name" content="wshs0713&#39;s blog">
+<meta property="og:description" content="前言這一篇文章主要紀錄 Linux 上常用的指令，方便之後查詢~ 包含:   前言 Linux 常用指令 壓縮 &amp; 解壓縮 .tar .gz .tar.gz &#x2F; .tgz &#x2F; .tar.tgz zip   檔案傳輸 scp rsync   檔案處理 (分割、合併、字串處理) sed split grep awk 刪除目錄下的空檔案   vim 常用指令 檔案編碼 檔案權">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2018-02-02T03:10:04.000Z">
+<meta property="article:modified_time" content="2018-02-02T03:10:04.000Z">
+<meta property="article:author" content="Szu-Hsuan, Wu">
+<meta property="article:tag" content="Linux">
+<meta property="article:tag" content="commands">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://wshs0713.github.io/posts/e491f611/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>[Linux] Linux 常用指令 | wshs0713's blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-8XTKEMPTGC"></script>
+    <script>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-8XTKEMPTGC');
+      }
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">wshs0713's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Programming notes</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-projects">
+
+    <a href="/projects/" rel="section"><i class="fa fa-folder fa-fw"></i>Projects</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://wshs0713.github.io/posts/e491f611/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Szu-Hsuan, Wu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="wshs0713's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          [Linux] Linux 常用指令
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-02-02 11:10:04" itemprop="dateCreated datePublished" datetime="2018-02-02T11:10:04+08:00">2018-02-02</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus: </span>
+    
+    <a title="disqus" href="/posts/e491f611/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="posts/e491f611/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>3.3k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>3 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>這一篇文章主要紀錄 Linux 上常用的指令，方便之後查詢~</p>
+<p>包含: </p>
+<ul>
+<li><a href="#%E5%89%8D%E8%A8%80">前言</a></li>
+<li><a href="#linux-%E5%B8%B8%E7%94%A8%E6%8C%87%E4%BB%A4">Linux 常用指令</a><ul>
+<li><a href="#%E5%A3%93%E7%B8%AE--%E8%A7%A3%E5%A3%93%E7%B8%AE">壓縮 &amp; 解壓縮</a><ul>
+<li><a href="#tar">.tar</a></li>
+<li><a href="#gz">.gz</a></li>
+<li><a href="#targz--tgz--tartgz">.tar.gz &#x2F; .tgz &#x2F; .tar.tgz</a></li>
+<li><a href="#zip">zip</a></li>
+</ul>
+</li>
+<li><a href="#%E6%AA%94%E6%A1%88%E5%82%B3%E8%BC%B8">檔案傳輸</a><ul>
+<li><a href="#scp">scp</a></li>
+<li><a href="#rsync">rsync</a></li>
+</ul>
+</li>
+<li><a href="#%E6%AA%94%E6%A1%88%E8%99%95%E7%90%86-%E5%88%86%E5%89%B2%E5%90%88%E4%BD%B5%E5%AD%97%E4%B8%B2%E8%99%95%E7%90%86">檔案處理 (分割、合併、字串處理)</a><ul>
+<li><a href="#sed">sed</a></li>
+<li><a href="#split">split</a></li>
+<li><a href="#grep">grep</a></li>
+<li><a href="#awk">awk</a></li>
+<li><a href="#%E5%88%AA%E9%99%A4%E7%9B%AE%E9%8C%84%E4%B8%8B%E7%9A%84%E7%A9%BA%E6%AA%94%E6%A1%88">刪除目錄下的空檔案</a></li>
+</ul>
+</li>
+<li><a href="#vim-%E5%B8%B8%E7%94%A8%E6%8C%87%E4%BB%A4">vim 常用指令</a></li>
+<li><a href="#%E6%AA%94%E6%A1%88%E7%B7%A8%E7%A2%BC">檔案編碼</a></li>
+<li><a href="#%E6%AA%94%E6%A1%88%E6%AC%8A%E9%99%90%E8%A8%AD%E5%AE%9A">檔案權限設定</a></li>
+<li><a href="#process">Process</a></li>
+<li><a href="#system">System</a></li>
+</ul>
+</li>
+<li><a href="#%E5%8F%83%E8%80%83%E8%B3%87%E6%96%99">參考資料</a></li>
+</ul>
+<span id="more"></span>
+
+<h1 id="Linux-常用指令"><a href="#Linux-常用指令" class="headerlink" title="Linux 常用指令"></a>Linux 常用指令</h1><h2 id="壓縮-amp-解壓縮"><a href="#壓縮-amp-解壓縮" class="headerlink" title="壓縮 &amp; 解壓縮"></a>壓縮 &amp; 解壓縮</h2><h3 id="tar"><a href="#tar" class="headerlink" title=".tar"></a>.tar</h3><p>只有打包，沒有壓縮。</p>
+<p><strong>打包</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ tar cvf &lt;fileName.tar&gt; &lt;files&gt;</span><br></pre></td></tr></table></figure>
+
+<p><strong>解包</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ tar xvf &lt;fileName.tar&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="gz"><a href="#gz" class="headerlink" title=".gz"></a>.gz</h3><p><strong>壓縮</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ gzip &lt;fileName&gt;</span><br></pre></td></tr></table></figure>
+
+<p><strong>解壓縮</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ gunzip &lt;fileName.gz&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment"># or:</span></span><br><span class="line">$ gzip -d &lt;fileName.gz&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="tar-gz-x2F-tgz-x2F-tar-tgz"><a href="#tar-gz-x2F-tgz-x2F-tar-tgz" class="headerlink" title=".tar.gz &#x2F; .tgz &#x2F; .tar.tgz"></a>.tar.gz &#x2F; .tgz &#x2F; .tar.tgz</h3><p><strong>壓縮</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ tar zcvf &lt;fileName&gt; &lt;files&gt;	<span class="comment"># --exclude=file: 略過特定檔案</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>解壓縮</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ tar zxvf &lt;fileName&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="zip"><a href="#zip" class="headerlink" title="zip"></a>zip</h3><p>如果檔案名稱有中文, 要使用 zip 壓縮</p>
+<p><strong>壓縮</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ zip -r &lt;fileName.zip&gt; &lt;files&gt;</span><br></pre></td></tr></table></figure>
+
+<p><strong>解壓縮</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ unzip &lt;fileName.zip&gt;</span><br></pre></td></tr></table></figure>
+
+<h2 id="檔案傳輸"><a href="#檔案傳輸" class="headerlink" title="檔案傳輸"></a>檔案傳輸</h2><h3 id="scp"><a href="#scp" class="headerlink" title="scp"></a>scp</h3><p>傳送 local file 到遠端</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ scp &lt;<span class="built_in">local</span> file&gt; &lt;username&gt;@&lt;remote IP&gt;:&lt;path&gt;</span><br></pre></td></tr></table></figure>
+
+<p>從遠端傳檔案到 local</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ scp &lt;username&gt;@&lt;remote IP&gt;:&lt;file path&gt; &lt;<span class="built_in">local</span> directory&gt;</span><br></pre></td></tr></table></figure>
+
+<p>如果想要不輸入密碼就可以使用 ssh, scp, rsync 到遠端主機，可參考: <a href="/posts/69b8a25e/">[Linux] 設定 SSH 免密碼登入</a></p>
+<h3 id="rsync"><a href="#rsync" class="headerlink" title="rsync"></a>rsync</h3><p>傳送 local file 到遠端</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ rsync -avh &lt;<span class="built_in">local</span> file&gt; &lt;username&gt;@&lt;remote host&gt;:&lt;file path&gt; --progress</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>-a</code>: 封裝備份模式，相當於 -rlptgoD，遞迴備份所有子目錄下的目錄與檔案，保留連結檔、檔案的擁有者、群組、權限以及時間戳記</li>
+<li><code>-v</code>: verbose mode，輸出較詳細的訊息</li>
+<li><code>-h</code>: 將數字轉為易讀的格式</li>
+<li><code>-z</code>: 啟用壓縮模式</li>
+<li><code>--progress</code>: 顯示傳輸進度</li>
+<li><code>--partial</code>: 連線中斷時，保留不完整的檔案</li>
+<li><code>--append</code>: 續傳不完整的檔案</li>
+</ul>
+<h2 id="檔案處理-分割、合併、字串處理"><a href="#檔案處理-分割、合併、字串處理" class="headerlink" title="檔案處理 (分割、合併、字串處理)"></a>檔案處理 (分割、合併、字串處理)</h2><h3 id="sed"><a href="#sed" class="headerlink" title="sed"></a>sed</h3><p>將第 1 ~ 1000 行輸出</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sed -n 1,1000p inputFile &gt; outputFile</span><br></pre></td></tr></table></figure>
+
+<p>去除空行</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sed <span class="string">&#x27;/^$/d&#x27;</span> inputFile &gt; outputFile</span><br></pre></td></tr></table></figure>
+
+<p>去除 pattern 開頭的行</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sed <span class="string">&#x27;/^pattern/d&#x27;</span> inputFile &gt; outputFile</span><br></pre></td></tr></table></figure>
+
+<p>去除行首空格</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sed <span class="string">&#x27;s/^[ \t]*//g&#x27;</span> inputFile &gt; outputFile</span><br></pre></td></tr></table></figure>
+
+<p>去除行尾空格</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sed <span class="string">&#x27;s/[ \t]*$//g&#x27;</span> inputFile &gt; outputFile</span><br></pre></td></tr></table></figure>
+
+<p>合併符合 pattern 的行及其下一行</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sed <span class="string">&#x27;/PATTERN/&#123;N;s/\n/\t/&#125;&#x27;</span> inputFile &gt; outputFile</span><br></pre></td></tr></table></figure>
+
+<h3 id="split"><a href="#split" class="headerlink" title="split"></a>split</h3><p>將檔案分割成多個 n bytes的檔案</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">split</span> -b &lt;nBytes&gt; &lt;inputFile&gt;</span><br></pre></td></tr></table></figure>
+
+<p>將檔案分割成多個 n 行的檔案</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">split</span> -l &lt;nLine&gt; &lt;inputFile&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="grep"><a href="#grep" class="headerlink" title="grep"></a>grep</h3><p>-Bx: 輸出符合條件的前x行<br>-Ax: 輸出符合條件的後x行</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ grep -Ax -Bx <span class="string">&quot;pattern&quot;</span> inputFile</span><br></pre></td></tr></table></figure>
+
+<h3 id="awk"><a href="#awk" class="headerlink" title="awk"></a>awk</h3><p>將字串由長到短排序</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ awk <span class="string">&#x27;&#123;print length($0) &quot; &quot; $0; &#125;&#x27;</span> &lt;inputFile&gt; | <span class="built_in">sort</span> -r -n | <span class="built_in">cut</span> -d <span class="string">&#x27; &#x27;</span> -f 2- &gt; &lt;outputFile&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="刪除目錄下的空檔案"><a href="#刪除目錄下的空檔案" class="headerlink" title="刪除目錄下的空檔案"></a>刪除目錄下的空檔案</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ find directory/ -size 0 -print0 | xargs -0 <span class="built_in">rm</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="vim-常用指令"><a href="#vim-常用指令" class="headerlink" title="vim 常用指令"></a>vim 常用指令</h2><p>自動排版</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gg=G</span><br></pre></td></tr></table></figure>
+
+<p>設定檔案結尾不自動換行</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">:<span class="built_in">set</span> binary</span><br><span class="line">:<span class="built_in">set</span> noeol</span><br></pre></td></tr></table></figure>
+
+<p>檢查&amp;去除\r</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">:<span class="built_in">set</span> ff=unix</span><br><span class="line">:wq</span><br></pre></td></tr></table></figure>
+
+<p>取代字串</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">:%s/pattern/replace/g</span><br></pre></td></tr></table></figure>
+
+<h2 id="檔案編碼"><a href="#檔案編碼" class="headerlink" title="檔案編碼"></a>檔案編碼</h2><p>查看檔案編碼</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ file &lt;fileName&gt;</span><br></pre></td></tr></table></figure>
+
+<p>檔案編碼轉換</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ iconv -f &lt;input encoding&gt; -t &lt;output encoding&gt; &lt;inputFile&gt; &gt; &lt;outputFile&gt;</span><br></pre></td></tr></table></figure>
+
+<p>簡轉繁</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ cconv -f utf8 -t utf8-tw &lt;inputFile&gt; -o &lt;outputFile&gt;</span><br></pre></td></tr></table></figure>
+
+<h2 id="檔案權限設定"><a href="#檔案權限設定" class="headerlink" title="檔案權限設定"></a>檔案權限設定</h2><p>更改檔案owner</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">chown</span> -R &lt;user&gt;:&lt;group&gt; &lt;directory&gt;	<span class="comment"># -R: recursive, 改變目錄底下所有檔案的owner</span></span><br></pre></td></tr></table></figure>
+
+<p>更改檔案權限</p>
+<ul>
+<li>Linux 檔案的基本權限有 9 個，分別是 owner, group, other 各自的 read&#x2F;write&#x2F;execute 的權限，例如: <code>-rwxrwxrwx</code>, 三個為一組，依序為: owner, group, other 的權限，每組的三個字元分別代表: r (read), w (write), x (execute). 其對應的數字分別是: r &#x3D; 4, w &#x3D; 2, x &#x3D; 1.</li>
+<li>檔案權限的數字代表 3 種身分(owner, group, other) 的權限各自加總，例如: owner 可以 read, write and execute, group 可以 read and execute, other 可以 read, 檔案權限的數字就是 <code>754</code>.</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">chmod</span> &lt;permission&gt; &lt;fileName&gt;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Process"><a href="#Process" class="headerlink" title="Process"></a>Process</h2><p>查看 Process</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ps aux | grep &lt;precess name&gt;</span><br></pre></td></tr></table></figure>
+
+<p>終止 Process</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">kill</span> [options] &lt;pid&gt;</span><br></pre></td></tr></table></figure>
+
+<p>options:</p>
+<ul>
+<li><code>-1</code>: signal <code>HUP</code>, 控制中的程序中斷</li>
+<li><code>-2</code>: signal <code>INT</code>, 等同於 <code>Ctrl+C</code></li>
+<li><code>-3</code>: signal <code>QUIT</code>, 等同於 <code>Ctrl+\</code></li>
+<li><code>-15</code>: signal <code>TERM</code>, 程序終止指令</li>
+<li><code>-9</code>: 強制終止程序</li>
+<li><code>-19</code>: signal <code>STOP</code>, 程序的停止指令，等同於 <code>Ctrl+Z</code></li>
+</ul>
+<h2 id="System"><a href="#System" class="headerlink" title="System"></a>System</h2><p>查詢系統版本</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ lsb_release -a</span><br></pre></td></tr></table></figure>
+
+<p>查看記憶體</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ free</span><br><span class="line"></span><br><span class="line">$ free -m</span><br><span class="line"></span><br><span class="line">$ <span class="built_in">cat</span> /proc/meminfo</span><br></pre></td></tr></table></figure>
+
+<h1 id="參考資料"><a href="#參考資料" class="headerlink" title="參考資料"></a>參考資料</h1><ul>
+<li><a target="_blank" rel="noopener" href="http://note.drx.tw/2008/04/command.html">GNU &#x2F; Linux 各種壓縮與解壓縮指令</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.gtwang.org/linux/rsync-local-remote-file-synchronization-commands/">Linux 使用 rsync 遠端檔案同步與備份工具教學與範例</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Linux/" rel="tag"># Linux</a>
+              <a href="/tags/commands/" rel="tag"># commands</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/654d6d96/" rel="prev" title="[Redis] Redis 安裝及使用">
+      <i class="fa fa-chevron-left"></i> [Redis] Redis 安裝及使用
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/posts/c6c40ce1/" rel="next" title="[Node.js] 使用 nvm 建立 Node.js 開發環境">
+      [Node.js] 使用 nvm 建立 Node.js 開發環境 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Linux-%E5%B8%B8%E7%94%A8%E6%8C%87%E4%BB%A4"><span class="nav-number">2.</span> <span class="nav-text">Linux 常用指令</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A3%93%E7%B8%AE-amp-%E8%A7%A3%E5%A3%93%E7%B8%AE"><span class="nav-number">2.1.</span> <span class="nav-text">壓縮 &amp; 解壓縮</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#tar"><span class="nav-number">2.1.1.</span> <span class="nav-text">.tar</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#gz"><span class="nav-number">2.1.2.</span> <span class="nav-text">.gz</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#tar-gz-x2F-tgz-x2F-tar-tgz"><span class="nav-number">2.1.3.</span> <span class="nav-text">.tar.gz &#x2F; .tgz &#x2F; .tar.tgz</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#zip"><span class="nav-number">2.1.4.</span> <span class="nav-text">zip</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AA%94%E6%A1%88%E5%82%B3%E8%BC%B8"><span class="nav-number">2.2.</span> <span class="nav-text">檔案傳輸</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#scp"><span class="nav-number">2.2.1.</span> <span class="nav-text">scp</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#rsync"><span class="nav-number">2.2.2.</span> <span class="nav-text">rsync</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AA%94%E6%A1%88%E8%99%95%E7%90%86-%E5%88%86%E5%89%B2%E3%80%81%E5%90%88%E4%BD%B5%E3%80%81%E5%AD%97%E4%B8%B2%E8%99%95%E7%90%86"><span class="nav-number">2.3.</span> <span class="nav-text">檔案處理 (分割、合併、字串處理)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#sed"><span class="nav-number">2.3.1.</span> <span class="nav-text">sed</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#split"><span class="nav-number">2.3.2.</span> <span class="nav-text">split</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#grep"><span class="nav-number">2.3.3.</span> <span class="nav-text">grep</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#awk"><span class="nav-number">2.3.4.</span> <span class="nav-text">awk</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%AA%E9%99%A4%E7%9B%AE%E9%8C%84%E4%B8%8B%E7%9A%84%E7%A9%BA%E6%AA%94%E6%A1%88"><span class="nav-number">2.3.5.</span> <span class="nav-text">刪除目錄下的空檔案</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#vim-%E5%B8%B8%E7%94%A8%E6%8C%87%E4%BB%A4"><span class="nav-number">2.4.</span> <span class="nav-text">vim 常用指令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AA%94%E6%A1%88%E7%B7%A8%E7%A2%BC"><span class="nav-number">2.5.</span> <span class="nav-text">檔案編碼</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AA%94%E6%A1%88%E6%AC%8A%E9%99%90%E8%A8%AD%E5%AE%9A"><span class="nav-number">2.6.</span> <span class="nav-text">檔案權限設定</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Process"><span class="nav-number">2.7.</span> <span class="nav-text">Process</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#System"><span class="nav-number">2.8.</span> <span class="nav-text">System</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%83%E8%80%83%E8%B3%87%E6%96%99"><span class="nav-number">3.</span> <span class="nav-text">參考資料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Szu-Hsuan, Wu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">61</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">57</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/wshs0713" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;wshs0713" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:shuan0713@gmail.com" title="E-Mail → mailto:shuan0713@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="http://linkedin.com/in/wshs0713" title="LinkedIn → http:&#x2F;&#x2F;linkedin.com&#x2F;in&#x2F;wshs0713" rel="noopener" target="_blank"><i class="fab fa-linkedin fa-fw"></i>LinkedIn</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/wshs0713" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;wshs0713" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Szu-Hsuan, Wu</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://wshs0713.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "https://wshs0713.github.io/posts/e491f611/";
+    this.page.identifier = "posts/e491f611/";
+    this.page.title = "[Linux] Linux 常用指令";
+    };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://wshs0713.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+</body>
+</html>

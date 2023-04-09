@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="en,zh-tw,default">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/favicon-180x180.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-32x32.png">
+  <link rel="mask-icon" href="/img/favicon-180x180.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"wshs0713.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="前言 這一篇文章是《精通 Go 程式設計》(The Go Programming Language) - 第三章「基本資料型別」的閱讀筆記。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[Go] 《精通 Go 程式設計》- 基本資料型別 閱讀筆記">
+<meta property="og:url" content="https://wshs0713.github.io/posts/21f37274/">
+<meta property="og:site_name" content="wshs0713&#39;s blog">
+<meta property="og:description" content="前言 這一篇文章是《精通 Go 程式設計》(The Go Programming Language) - 第三章「基本資料型別」的閱讀筆記。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://cf-assets1.tenlong.com.tw/images/111035/original/ACL047300.jpg">
+<meta property="og:image" content="https://i.imgur.com/Z239YrD.png">
+<meta property="og:image" content="https://i.imgur.com/9seMKVZ.png">
+<meta property="article:published_time" content="2022-10-21T18:39:49.000Z">
+<meta property="article:modified_time" content="2022-10-21T18:39:49.000Z">
+<meta property="article:author" content="Szu-Hsuan, Wu">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="Golang">
+<meta property="article:tag" content="精通Go程式設計">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cf-assets1.tenlong.com.tw/images/111035/original/ACL047300.jpg">
+
+<link rel="canonical" href="https://wshs0713.github.io/posts/21f37274/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>[Go] 《精通 Go 程式設計》- 基本資料型別 閱讀筆記 | wshs0713's blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-8XTKEMPTGC"></script>
+    <script>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-8XTKEMPTGC');
+      }
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">wshs0713's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Programming notes</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-projects">
+
+    <a href="/projects/" rel="section"><i class="fa fa-folder fa-fw"></i>Projects</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://wshs0713.github.io/posts/21f37274/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Szu-Hsuan, Wu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="wshs0713's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          [Go] 《精通 Go 程式設計》- 基本資料型別 閱讀筆記
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2022-10-22 02:39:49" itemprop="dateCreated datePublished" datetime="2022-10-22T02:39:49+08:00">2022-10-22</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Go/" itemprop="url" rel="index"><span itemprop="name">Go</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus: </span>
+    
+    <a title="disqus" href="/posts/21f37274/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="posts/21f37274/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>23k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>21 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p><img src="https://cf-assets1.tenlong.com.tw/images/111035/original/ACL047300.jpg" alt="The Go Programming Language"></p>
+<p>這一篇文章是《精通 Go 程式設計》(The Go Programming Language) - 第三章「基本資料型別」的閱讀筆記。</p>
+<span id="more"></span>
+
+<h2 id="Ch3-基本資料型別"><a href="#Ch3-基本資料型別" class="headerlink" title="Ch3. 基本資料型別"></a>Ch3. 基本資料型別</h2><p>包含：數字、字串和布林。</p>
+<h3 id="3-1-整數"><a href="#3-1-整數" class="headerlink" title="3.1 整數"></a>3.1 整數</h3><ul>
+<li>帶正負號的整數有四種大小：8, 16, 32 和 64 位元，分別是 <code>int8</code>, <code>int16</code>, <code>int32</code> 和 <code>int64</code>，對應的無正負號型別是 <code>uint8</code>, <code>uint16</code>, <code>uint32</code> 和 <code>uint64</code>. 另外還有 <code>int</code> 和 <code>uint</code> 是特定平台上自然且大小最有效率的有正負號及無正負號整數。</li>
+<li><code>rune</code> 是 <code>int32</code> 的同義詞，用來只是該值為 Unicode, 兩者名稱可以交換使用。</li>
+<li><code>byte</code> 為 <code>uint8</code> 同義詞，強調該值為原始資料而非數值。</li>
+<li>無正負號型別 <code>uintptr</code>, 它的大小並未指定，但足夠保存指標值的所有位元。只用於低階程式設計，例如 Go 和 C library 或 OS 的介接。</li>
+<li>帶正負號的數字以 2 補位的形式表示，其最高位元保留給正負號且 n 位元數字值的範圍是 -2<sup>n-1</sup> ~ 2<sup>n-1</sup>-1, Ex.<ul>
+<li><code>int8</code>: -128 ~ 127</li>
+<li><code>uint8</code>: 0 ~ 255</li>
+</ul>
+</li>
+</ul>
+<h4 id="運算子"><a href="#運算子" class="headerlink" title="運算子"></a>運算子</h4><p>二進位運算子只有五層優先順序，同一層的運算子以左邊優先：</p>
+<ol>
+<li><code>*</code>, <code>/</code>, <code>%</code>, <code>&lt;&lt;</code>, <code>&gt;&gt;</code>, <code>&amp;</code>, <code>&amp;^</code></li>
+<li><code>+</code>, <code>-</code>, <code>|</code>, <code>^</code></li>
+<li><code>==</code>, <code>!=</code>, <code>&lt;</code>, <code>&lt;=</code>, <code>&gt;</code>, <code>&gt;=</code></li>
+<li><code>&amp;&amp;</code></li>
+<li><code>||</code></li>
+</ol>
+<ul>
+<li><p><code>+</code>, <code>-</code>, <code>*</code>, <code>/</code> 等數學運算子可以用在整數、浮點數和複數，但 <code>%</code> 只能用在整數。</p>
+</li>
+<li><p>在 Go 中，餘數的正負號和被除數相同，例如：<code>-5%3</code> 和 <code>-5%-3</code> 都是 -2.</p>
+</li>
+<li><p><code>/</code> 的行為視運算子是否為整數而定，例如：<code>5.0/4.0 = 1.25</code>, 但 <code>5/4 = 1</code>.</p>
+</li>
+<li><p>Overflow: 若數學運算的結果超過結果型別的範圍，則為 Overflow, 容不下的最高位元會被拋棄。如果原始數值是有正負號的型別，則最左為元為1時會變為負數，範例：</p>
+  <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> u <span class="type">uint8</span> = <span class="number">255</span></span><br><span class="line">fmt.Println(u, u+<span class="number">1</span>, u*u)    <span class="comment">// 255 0 1</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> i <span class="type">int8</span> = <span class="number">127</span></span><br><span class="line">fmt.Println(i, i+<span class="number">1</span>, i*i)    <span class="comment">// 127 -128 1</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<h5 id="比較運算子"><a href="#比較運算子" class="headerlink" title="比較運算子"></a>比較運算子</h5><table>
+<thead>
+<tr>
+<th>Operator</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>&#x3D;&#x3D;</td>
+<td>相等</td>
+</tr>
+<tr>
+<td>!&#x3D;</td>
+<td>不相等</td>
+</tr>
+<tr>
+<td>&lt;</td>
+<td>小於</td>
+</tr>
+<tr>
+<td>&lt;&#x3D;</td>
+<td>小於或等於</td>
+</tr>
+<tr>
+<td>&gt;</td>
+<td>大於</td>
+</tr>
+<tr>
+<td>&gt;&#x3D;</td>
+<td>大於或等於</td>
+</tr>
+</tbody></table>
+<ul>
+<li>相同型別的基本型別（布林、數字與字串）都是可以比較的</li>
+<li>比較運算式的型別為布林</li>
+</ul>
+<h5 id="二進位運算子"><a href="#二進位運算子" class="headerlink" title="二進位運算子"></a>二進位運算子</h5><table>
+<thead>
+<tr>
+<th>Operator</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>&amp;</td>
+<td>位元 AND</td>
+</tr>
+<tr>
+<td>|</td>
+<td>位元 OR</td>
+</tr>
+<tr>
+<td>^</td>
+<td>位元 XOR</td>
+</tr>
+<tr>
+<td>&amp;^</td>
+<td>位元清除 (AND NOT)</td>
+</tr>
+<tr>
+<td>&lt;&lt;</td>
+<td>左位移</td>
+</tr>
+<tr>
+<td>&gt;&gt;</td>
+<td>右位移</td>
+</tr>
+</tbody></table>
+<p>範例： <code>uint8</code> 位元操作，使用 <code>Printf</code> <code>%b</code> 來顯示二進位</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> x <span class="type">uint8</span> = <span class="number">1</span>&lt;&lt;<span class="number">1</span> | <span class="number">1</span>&lt;&lt;<span class="number">5</span></span><br><span class="line"><span class="keyword">var</span> y <span class="type">uint8</span> = <span class="number">1</span>&lt;&lt;<span class="number">1</span> | <span class="number">1</span>&lt;&lt;<span class="number">2</span></span><br><span class="line"></span><br><span class="line">fmt.Printf(<span class="string">&quot;%08b\n&quot;</span>, x)		<span class="comment">// 00100010, &#123;1,5&#125; 的集合</span></span><br><span class="line">fmt.Printf(<span class="string">&quot;%08b\n&quot;</span>, y)		<span class="comment">// 00000110, &#123;1,2&#125; 的集合</span></span><br><span class="line"></span><br><span class="line">fmt.Printf(<span class="string">&quot;%08b\n&quot;</span>, x&amp;y)	<span class="comment">// 00000010, 交集</span></span><br><span class="line">fmt.Printf(<span class="string">&quot;%08b\n&quot;</span>, x|y)	<span class="comment">// 00100110, 聯集</span></span><br><span class="line">fmt.Printf(<span class="string">&quot;%08b\n&quot;</span>, x^y)	<span class="comment">// 00100100, 對稱差 &#123;2,5&#125;</span></span><br><span class="line">fmt.Printf(<span class="string">&quot;%08b\n&quot;</span>, x&amp;^y)	<span class="comment">// 00100000, 差 &#123;5&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i:= <span class="type">uint</span>(<span class="number">0</span>); i &lt; <span class="number">8</span>; i++ &#123;</span><br><span class="line">    <span class="keyword">if</span> x&amp;(<span class="number">1</span>&lt;&lt;i) != <span class="number">0</span> &#123;	<span class="comment">// 成員測試</span></span><br><span class="line">        fmt.Println(i)	<span class="comment">// 1 5</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">fmt.Printf(<span class="string">&quot;%08b\n&quot;</span>, x&lt;&lt;<span class="number">1</span>)	<span class="comment">// 01000100, &#123;2,6&#125; 的集合</span></span><br><span class="line">fmt.Printf(<span class="string">&quot;%08b\n&quot;</span>, x&gt;&gt;<span class="number">1</span>)	<span class="comment">// 00010001, &#123;0,4&#125; 的集合</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="Others"><a href="#Others" class="headerlink" title="Others"></a>Others</h4><ul>
+<li>不同型別必須有明確的轉換</li>
+<li>數學與邏輯（除了位移之外）的二進位運算子的運算元必須是相同型別</li>
+</ul>
+<p>範例：</p>
+<ul>
+<li><p>Compile error</p>
+  <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> apples <span class="type">int32</span> = <span class="number">1</span></span><br><span class="line"><span class="keyword">var</span> oranges <span class="type">int16</span> = <span class="number">2</span></span><br><span class="line"><span class="keyword">var</span> compote <span class="type">int</span> = apples + oranges <span class="comment">// Compile error</span></span><br></pre></td></tr></table></figure>
+
+<p>  Solution:</p>
+  <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> compote <span class="type">int</span> = <span class="type">int</span>(apples) + <span class="type">int</span>(oranges)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>浮點數轉換</p>
+  <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">f := <span class="number">3.141</span>  <span class="comment">// float64</span></span><br><span class="line">i := <span class="type">int</span>(f)</span><br><span class="line">fmt.Println(f, i)   <span class="comment">// 3.141 3</span></span><br><span class="line"></span><br><span class="line">f = <span class="number">1.99</span></span><br><span class="line">fmt.Println(<span class="type">int</span>(f)) <span class="comment">// 1</span></span><br></pre></td></tr></table></figure>
+
+<p>  要避免超過目標型別的轉換，因為他的結果會取決於實作：</p>
+  <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">f := <span class="number">1e100</span></span><br><span class="line">i := <span class="type">int</span>(f)  <span class="comment">// 結果視實作而定</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>十進位、八進位、十六進位</p>
+<ul>
+<li><p>八進位數字以0開頭，十六進位以0x或0X開頭</p>
+</li>
+<li><p>可以使用 <code>%d</code>, <code>%o</code> 或 <code>%x</code> 控制底數與格式</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">o := <span class="number">0666</span></span><br><span class="line">fmt.Printf(<span class="string">&quot;%d %[1]o %#[1]o\n&quot;</span>, o)      <span class="comment">// 438 666 0666</span></span><br><span class="line"></span><br><span class="line">x := <span class="type">int64</span>(<span class="number">0xdeadbeef</span>)</span><br><span class="line">fmt.Printf(<span class="string">&quot;%d %[1]x %#[1]x %#[1]X&quot;</span>, x) <span class="comment">// 3735928559 deadbeef 0xdeadbeef 0XDEADBEEF</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p><code>rune</code></p>
+<ul>
+<li><p>單引號字元，ex. <code>&#39;a&#39;</code></p>
+</li>
+<li><p>以 <code>%c</code> 或 <code>%q</code>（加引號）輸出</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">ascii := <span class="string">&#x27;a&#x27;</span></span><br><span class="line">unicode := <span class="string">&#x27;国&#x27;</span></span><br><span class="line">newline := <span class="string">&#x27;\n&#x27;</span></span><br><span class="line"></span><br><span class="line">fmt.Printf(<span class="string">&quot;%d %[1]c %[1]q\n&quot;</span>, ascii)   <span class="comment">// 97 a &#x27;a&#x27;</span></span><br><span class="line">fmt.Printf(<span class="string">&quot;%d %[1]c %[1]q\n&quot;</span>, unicode) <span class="comment">// 22269 国 &#x27;国&#x27;</span></span><br><span class="line">fmt.Printf(<span class="string">&quot;%d %[1]q\n&quot;</span>, newline)       <span class="comment">// 10 &#x27;\n&#x27;</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+<h3 id="3-2-浮點數"><a href="#3-2-浮點數" class="headerlink" title="3.2 浮點數"></a>3.2 浮點數</h3><p>包含 <code>float32</code> 和 <code>float64</code>.</p>
+<ul>
+<li><p><code>float32</code></p>
+<ul>
+<li>最大值約為 3.4e48, 最小值約為 1.4e-45</li>
+<li>提供小數點以下六位數的精確度</li>
+</ul>
+</li>
+<li><p><code>float64</code></p>
+<ul>
+<li>最大值約為 1.8e038, 最小值約為 4.9e324</li>
+<li>提供小數點以下15位數的精確度</li>
+<li>適合大部分用途</li>
+</ul>
+</li>
+<li><p>非常大或非常小的數值建議以科學記號表示，ex. <code>6.02214129e23</code>, <code>6.62606957e-34</code></p>
+</li>
+<li><p>通常以 <code>%g</code> 輸出，他會選擇適合精確度的最精簡表示，也可以使用 <code>%e</code> (指數)或 <code>%f</code> (無指數)，這三種修飾詞可以控制欄寬與數值精確度</p>
+  <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> x := <span class="number">0</span>; x &lt; <span class="number">8</span>; x++ &#123;</span><br><span class="line">    fmt.Printf(<span class="string">&quot;x = %d e^x = %8.3f\n&quot;</span>, x, math.Exp(<span class="type">float64</span>(x)))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>  Output:</p>
+  <figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">x = 0 e^x =    1.000</span><br><span class="line">x = 1 e^x =    2.718</span><br><span class="line">x = 2 e^x =    7.389</span><br><span class="line">x = 3 e^x =   20.086</span><br><span class="line">x = 4 e^x =   54.598</span><br><span class="line">x = 5 e^x =  148.413</span><br><span class="line">x = 6 e^x =  403.429</span><br><span class="line">x = 7 e^x = 1096.633</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>特殊值</p>
+<ul>
+<li><p><code>+Inf</code>: 正無限大</p>
+</li>
+<li><p><code>-Inf</code>: 負無限大</p>
+</li>
+<li><p><code>NaN</code>: Not a number</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> z <span class="type">float64</span></span><br><span class="line">fmt.Println(z, -z, <span class="number">1</span>/z, <span class="number">-1</span>/z, z/z)  <span class="comment">// 0 -0 +Inf -Inf NaN</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>math.IsNaN</code> 測試參數是否不是數字，<code>math.NaN</code> 回傳這樣的值，但測試特定運算結果是否等於 NaN 是很危險的事，因為與 NaN 的比較永遠是 false:</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">nan := math.NaN()</span><br><span class="line">fmt.Println(nan == nan, nan &lt; nan, nan &gt; nan)   <span class="comment">// false false false</span></span><br></pre></td></tr></table></figure>
+
+<p>如果回傳浮點數結果的函式有可能失敗，最好獨立回傳該失敗。</p>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="範例-浮點數圖形運算"><a href="#範例-浮點數圖形運算" class="headerlink" title="範例: 浮點數圖形運算"></a>範例: 浮點數圖形運算</h4><p>以 SVG 繪製 3D 圖：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;math&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> (</span><br><span class="line">	width, height = <span class="number">600</span>, <span class="number">320</span>            <span class="comment">// 畫布尺寸</span></span><br><span class="line">	cells         = <span class="number">100</span>                 <span class="comment">// 格數量</span></span><br><span class="line">	xyrange       = <span class="number">30.0</span>                <span class="comment">// 軸範圍 (-xyrange..+xyrange)</span></span><br><span class="line">	xyscale       = width / <span class="number">2</span> / xyrange <span class="comment">// x 或 y 單位像素</span></span><br><span class="line">	zscale        = height * <span class="number">0.4</span>        <span class="comment">// z 單位像素</span></span><br><span class="line">	angle         = math.Pi / <span class="number">6</span>         <span class="comment">// x, y 角度(30°)</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> sin30, cos30 = math.Sin(angle), math.Cos(angle) <span class="comment">// sin(30°), cos(30°)</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	fmt.Printf(<span class="string">&quot;&lt;svg xmlns=&#x27;http://www.w3.org/2000/svg&#x27; &quot;</span>+</span><br><span class="line">		<span class="string">&quot;style=&#x27;stroke: grey; fill: white; stroke-width: 0.7&#x27; &quot;</span>+</span><br><span class="line">		<span class="string">&quot;width=&#x27;%d&#x27; height=&#x27;%d&#x27;&gt;&quot;</span>, width, height)</span><br><span class="line">	<span class="keyword">for</span> i := <span class="number">0</span>; i &lt; cells; i++ &#123;</span><br><span class="line">		<span class="keyword">for</span> j := <span class="number">0</span>; j &lt; cells; j++ &#123;</span><br><span class="line">			ax, ay := corner(i+<span class="number">1</span>, j)</span><br><span class="line">			bx, by := corner(i, j)</span><br><span class="line">			cx, cy := corner(i, j+<span class="number">1</span>)</span><br><span class="line">			dx, dy := corner(i+<span class="number">1</span>, j+<span class="number">1</span>)</span><br><span class="line">			fmt.Printf(<span class="string">&quot;&lt;polygon points=&#x27;%g,%g %g,%g %g,%g %g,%g&#x27;/&gt;\n&quot;</span>,</span><br><span class="line">				ax, ay, bx, by, cx, cy, dx, dy)</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	fmt.Println(<span class="string">&quot;&lt;/svg&gt;&quot;</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">corner</span><span class="params">(i, j <span class="type">int</span>)</span></span> (<span class="type">float64</span>, <span class="type">float64</span>) &#123;</span><br><span class="line">	<span class="comment">// 找出(i,j)格的點(x,y)</span></span><br><span class="line">	x := xyrange * (<span class="type">float64</span>(i)/cells - <span class="number">0.5</span>)</span><br><span class="line">	y := xyrange * (<span class="type">float64</span>(j)/cells - <span class="number">0.5</span>)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 計算 z 高度</span></span><br><span class="line">	z := f(x, y)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 投射 (x,y,z) 到 2D 畫布 (sx, sy)</span></span><br><span class="line">	sx := width/<span class="number">2</span> + (x-y)*cos30*xyscale</span><br><span class="line">	sy := height/<span class="number">2</span> + (x+y)*sin30*xyscale - z*zscale</span><br><span class="line">	<span class="keyword">return</span> sx, sy</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">f</span><span class="params">(x, y <span class="type">float64</span>)</span></span> <span class="type">float64</span> &#123;</span><br><span class="line">	r := math.Hypot(x, y) <span class="comment">// 與(0,0)的距離</span></span><br><span class="line">	<span class="keyword">return</span> math.Sin(r) / r</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Output:</p>
+<p><img src="https://i.imgur.com/Z239YrD.png" alt="3-2"></p>
+<h3 id="3-3-複數"><a href="#3-3-複數" class="headerlink" title="3.3 複數"></a>3.3 複數</h3><p>包含 <code>complex64</code> 和 <code>complex128</code>.</p>
+<ul>
+<li><p>內建的 complex 函式從實數與虛數建構出複數，而內建的 real 和 imag 函式提取這些元件：</p>
+  <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> x <span class="type">complex128</span> = <span class="built_in">complex</span>(<span class="number">1</span>, <span class="number">2</span>)    <span class="comment">// 1+2i</span></span><br><span class="line"><span class="keyword">var</span> y <span class="type">complex128</span> = <span class="built_in">complex</span>(<span class="number">3</span>, <span class="number">4</span>)    <span class="comment">// 3+4i</span></span><br><span class="line"></span><br><span class="line">fmt.Println(x*y)                    <span class="comment">// -5+10i</span></span><br><span class="line">fmt.Println(<span class="built_in">real</span>(x*y))              <span class="comment">// -5</span></span><br><span class="line">fmt.Println(<span class="built_in">imag</span>(x*y))              <span class="comment">// 10</span></span><br></pre></td></tr></table></figure>
+
+<p>  上面的宣告也可以簡化為：</p>
+  <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">x := <span class="number">1</span> + <span class="number">2i</span></span><br><span class="line">y := <span class="number">3</span> + <span class="number">4i</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>複數可以使用 <code>==</code> 或 <code>!=</code> 進行比較，如果兩個複數的實數和虛數都相等，則兩複數相等。</p>
+</li>
+<li><p><code>math/cmplx</code> 提供操作複數的函式，例如：</p>
+  <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fmt.Println(cmplx.Sqrt(<span class="number">-1</span>)) <span class="comment">// 0+1i</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="範例-產生曼德博碎形-PNG-圖"><a href="#範例-產生曼德博碎形-PNG-圖" class="headerlink" title="範例: 產生曼德博碎形 PNG 圖"></a>範例: 產生曼德博碎形 PNG 圖</h4><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;image&quot;</span></span><br><span class="line">	<span class="string">&quot;image/color&quot;</span></span><br><span class="line">	<span class="string">&quot;image/png&quot;</span></span><br><span class="line">	<span class="string">&quot;math/cmplx&quot;</span></span><br><span class="line">	<span class="string">&quot;os&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="keyword">const</span> (</span><br><span class="line">		xmin, ymin, xmax, ymax = <span class="number">-2</span>, <span class="number">-2</span>, +<span class="number">2</span>, +<span class="number">2</span></span><br><span class="line">		width, height          = <span class="number">1024</span>, <span class="number">1024</span></span><br><span class="line">	)</span><br><span class="line"></span><br><span class="line">	img := image.NewRGBA(image.Rect(<span class="number">0</span>, <span class="number">0</span>, width, height))</span><br><span class="line">	<span class="keyword">for</span> py := <span class="number">0</span>; py &lt; height; py++ &#123;</span><br><span class="line">		y := <span class="type">float64</span>(py)/height*(ymax-ymin) + ymin</span><br><span class="line">		<span class="keyword">for</span> px := <span class="number">0</span>; px &lt; width; px++ &#123;</span><br><span class="line">			x := <span class="type">float64</span>(px)/width*(xmax-xmin) + xmin</span><br><span class="line">			z := <span class="built_in">complex</span>(x, y)</span><br><span class="line">			<span class="comment">// Image point (px, py) represents complex value z.</span></span><br><span class="line">			img.Set(px, py, mandelbrot(z))</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	png.Encode(os.Stdout, img) <span class="comment">// <span class="doctag">NOTE:</span> ignoring errors</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">mandelbrot</span><span class="params">(z <span class="type">complex128</span>)</span></span> color.Color &#123;</span><br><span class="line">	<span class="keyword">const</span> iterations = <span class="number">200</span></span><br><span class="line">	<span class="keyword">const</span> contrast = <span class="number">15</span></span><br><span class="line"></span><br><span class="line">	<span class="keyword">var</span> v <span class="type">complex128</span></span><br><span class="line">	<span class="keyword">for</span> n := <span class="type">uint8</span>(<span class="number">0</span>); n &lt; iterations; n++ &#123;</span><br><span class="line">		v = v*v + z</span><br><span class="line">		<span class="keyword">if</span> cmplx.Abs(v) &gt; <span class="number">2</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> color.Gray&#123;<span class="number">255</span> - contrast*n&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> color.Black</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//!-</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// Some other interesting functions:</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">acos</span><span class="params">(z <span class="type">complex128</span>)</span></span> color.Color &#123;</span><br><span class="line">	v := cmplx.Acos(z)</span><br><span class="line">	blue := <span class="type">uint8</span>(<span class="built_in">real</span>(v)*<span class="number">128</span>) + <span class="number">127</span></span><br><span class="line">	red := <span class="type">uint8</span>(<span class="built_in">imag</span>(v)*<span class="number">128</span>) + <span class="number">127</span></span><br><span class="line">	<span class="keyword">return</span> color.YCbCr&#123;<span class="number">192</span>, blue, red&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">sqrt</span><span class="params">(z <span class="type">complex128</span>)</span></span> color.Color &#123;</span><br><span class="line">	v := cmplx.Sqrt(z)</span><br><span class="line">	blue := <span class="type">uint8</span>(<span class="built_in">real</span>(v)*<span class="number">128</span>) + <span class="number">127</span></span><br><span class="line">	red := <span class="type">uint8</span>(<span class="built_in">imag</span>(v)*<span class="number">128</span>) + <span class="number">127</span></span><br><span class="line">	<span class="keyword">return</span> color.YCbCr&#123;<span class="number">128</span>, blue, red&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// f(x) = x^4 - 1</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// z&#x27; = z - f(z)/f&#x27;(z)</span></span><br><span class="line"><span class="comment">//    = z - (z^4 - 1) / (4 * z^3)</span></span><br><span class="line"><span class="comment">//    = z - (z - 1/z^3) / 4</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">newton</span><span class="params">(z <span class="type">complex128</span>)</span></span> color.Color &#123;</span><br><span class="line">	<span class="keyword">const</span> iterations = <span class="number">37</span></span><br><span class="line">	<span class="keyword">const</span> contrast = <span class="number">7</span></span><br><span class="line">	<span class="keyword">for</span> i := <span class="type">uint8</span>(<span class="number">0</span>); i &lt; iterations; i++ &#123;</span><br><span class="line">		z -= (z - <span class="number">1</span>/(z*z*z)) / <span class="number">4</span></span><br><span class="line">		<span class="keyword">if</span> cmplx.Abs(z*z*z*z<span class="number">-1</span>) &lt; <span class="number">1e-6</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> color.Gray&#123;<span class="number">255</span> - contrast*i&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> color.Black</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Output:</p>
+<p><img src="https://i.imgur.com/9seMKVZ.png" alt="3-3"></p>
+<h3 id="3-4-布林"><a href="#3-4-布林" class="headerlink" title="3.4 布林"></a>3.4 布林</h3><ul>
+<li><p>布林值只有兩種可能的值：<code>true</code> or <code>false</code>.</p>
+</li>
+<li><p><code>if</code> 和 <code>for</code> 陳述的條件為布林，<code>==</code> 與 <code>&lt;</code> 等比較運算子也產生布林結果。</p>
+</li>
+<li><p>布林值可以與 <code>&amp;&amp;</code> (AND) 和 <code>||</code> (OR) 組合，它具有<strong>短路</strong>行為，如果答案已由左運算元決定，則不會進行右運算式，讓如下運算式可安全撰寫：</p>
+  <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">s != <span class="string">&quot;&quot;</span> &amp;&amp; s[<span class="number">0</span>] == <span class="string">&#x27;x&#x27;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>由於 <code>&amp;&amp;</code> 的優先序比 <code>||</code> 高，下列形式的條件式不需要括號：</p>
+  <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> <span class="string">&#x27;a&#x27;</span> &lt;= c &amp;&amp; c &lt;= <span class="string">&#x27;z&#x27;</span> ||</span><br><span class="line">    <span class="string">&#x27;A&#x27;</span> &lt;= c &amp;&amp; c &lt;= <span class="string">&#x27;Z&#x27;</span> ||</span><br><span class="line">    <span class="string">&#x27;0&#x27;</span> &lt;= c &amp;&amp; c &lt;= <span class="string">&#x27;9&#x27;</span> &#123;</span><br><span class="line">    <span class="comment">// do something...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="3-5-字串"><a href="#3-5-字串" class="headerlink" title="3.5 字串"></a>3.5 字串</h3><ul>
+<li><p>字串是不可變的一系列位元組，可以帶有任何資料，包括值為 0 的位元組，但通常會帶有可讀的文字。</p>
+</li>
+<li><p><code>len</code> 函式回傳字串中位元組數量，索引操作 <code>s[i]</code> 讀取字串 s 的第 i 個位元組 (<code>0 &lt;= i &lt; len(s)</code>)</p>
+  <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">s := <span class="string">&quot;hello, world&quot;</span></span><br><span class="line">fmt.Println(<span class="built_in">len</span>(s))     <span class="comment">// 12</span></span><br><span class="line">fmt.Println(s[<span class="number">0</span>], s[<span class="number">7</span>]) <span class="comment">// 104 119 (&#x27;h&#x27; and &#x27;w&#x27;)</span></span><br><span class="line"></span><br><span class="line">c := s[<span class="built_in">len</span>(s)]          <span class="comment">// panic</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>字串的第 i 個位元組不一定是第 i 字元，因為 UTF-8 編碼對非 ASCII 碼位需要兩個或以上的位元組。</p>
+</li>
+<li><p>子字串 <code>s[i:j]</code> 可產生從原始字串index i 到 j (不含 j)之間的位元組，結果帶有 j-i 個位元組。若超出範圍或 j &lt; i 則會引發 panic.</p>
+  <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fmt.Println(s[<span class="number">0</span>:<span class="number">5</span>]) <span class="comment">// hello</span></span><br></pre></td></tr></table></figure>
+
+<p>  i, j 運算元省略時，會以預設值 0 和 <code>len(s)</code> 代替：</p>
+  <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">fmt.Println(s[:<span class="number">5</span>])  <span class="comment">// hello</span></span><br><span class="line">fmt.Println(s[<span class="number">7</span>:])  <span class="comment">// world</span></span><br><span class="line">fmt.Println(s[:])   <span class="comment">// hello, world</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>可用 <code>+</code> 連接兩字串以產生新字串</p>
+  <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fmt.Println(<span class="string">&quot;goodbye&quot;</span> + s[<span class="number">5</span>:]) <span class="comment">// goodbye, world</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>可用 <code>==</code>, <code>&lt;</code> 等運算子進行比較，比較是逐位元組進行。</p>
+</li>
+<li><p>字串值不可變：字串值的位元組序不可改變，但可以指派新值給字串變數</p>
+  <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">s := <span class="string">&quot;left foot&quot;</span></span><br><span class="line">t := s</span><br><span class="line">s += <span class="string">&quot;, right foot&quot;</span></span><br><span class="line"></span><br><span class="line">fmt.Println(s)  <span class="comment">// left foot, right foot</span></span><br><span class="line">fmt.Println(t)  <span class="comment">// left foot</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 不可直接修改字串中的位元組</span></span><br><span class="line">s[<span class="number">0</span>] = <span class="string">&#x27;L&#x27;</span>      <span class="comment">// Error</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="3-5-1-字串實字"><a href="#3-5-1-字串實字" class="headerlink" title="3.5.1 字串實字"></a>3.5.1 字串實字</h4><ul>
+<li><p>字串值可以寫成<strong>字串實字</strong>, Ex. <code>&quot;Hello, 世界&quot;</code></p>
+</li>
+<li><p>Go 以 UTF-8 編碼，且字串通常以 UTF-8 解譯，我們可以在字串中用 Unicode 碼位，以反斜線 <code>\</code> 開頭的跳脫字符可以用來插入任意位元組值。</p>
+<p>  常見的 ASCII 控制碼：</p>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>\a</td>
+<td>警告或響鈴</td>
+</tr>
+<tr>
+<td>\b</td>
+<td>後退</td>
+</tr>
+<tr>
+<td>\f</td>
+<td>跳頁</td>
+</tr>
+<tr>
+<td>\n</td>
+<td>換行</td>
+</tr>
+<tr>
+<td>\r</td>
+<td>carriage return</td>
+</tr>
+<tr>
+<td>\t</td>
+<td>Tab</td>
+</tr>
+<tr>
+<td>\v</td>
+<td>垂直 Tab</td>
+</tr>
+<tr>
+<td>\‘</td>
+<td>單引號</td>
+</tr>
+<tr>
+<td>\“</td>
+<td>雙引號</td>
+</tr>
+<tr>
+<td>\\</td>
+<td>反斜線</td>
+</tr>
+</tbody></table>
+<p>  也可以用八進位或十六進位跳脫引入任意字元組：</p>
+<ul>
+<li><code>\ooo</code>: 八進位數字，包含三個八進位數字 (0~7)，但不能超過 <code>\377</code> (對應一個字元的範圍)</li>
+<li><code>\xhh</code>: 十六進位數字，h 表示十六進位數字</li>
+</ul>
+</li>
+<li><p>使用 &#96; 反引號取代雙引號，跳脫字符不會被處理，會採用實際內容，也可以將字串分多行。</p>
+</li>
+</ul>
+<h4 id="3-5-2-Unicode"><a href="#3-5-2-Unicode" class="headerlink" title="3.5.2 Unicode"></a>3.5.2 Unicode</h4><ul>
+<li>檔案是 Unicode, 它集合世上所有撰寫系統，加上各種符號與控制碼，並為每一個字符指派一個 Unicode 碼位，在 Go 中稱為 <code>rune</code>.</li>
+<li>第八版定義 100 個以上的語言超過 120,000 個字元碼位，保存單一 <code>rune</code> 的自然資料型別為 <code>int32</code>, Go 也是使用它。我們也可以將一系列的 <code>rune</code> 以一系列的 <code>int32</code> 值來表示。</li>
+<li>在這種被稱為 UTF-32 或 UCS-4 的表示中，每個 Unicode 碼位的大小均為 32 位元，但由於大部分電腦上可讀的文字都是每個字元只要 8 位元或一個位元組的 ASCII 而比所需佔用了更多。</li>
+</ul>
+<h4 id="3-5-3-UTF-8"><a href="#3-5-3-UTF-8" class="headerlink" title="3.5.3 UTF-8"></a>3.5.3 UTF-8</h4><ul>
+<li><p>UTF-8 是 Unicode 碼位的可變長度位元組編碼。</p>
+</li>
+<li><p>它使用 1 ~ 4 個位元組來表示每個 rune, 但對於 ASCII 字元只使用一個位元，一般的 rune 也只使用 2 或 3 個位元組。</p>
+</li>
+<li><p>此編碼的 rune 的第一個位元組的高位位元表示後面有多少個位元組</p>
+<ul>
+<li><p>高位 0 表示 7 位元的 ASCII, 每個 rune 只佔用一個位元組，與傳統 ASCII 相同</p>
+</li>
+<li><p>高位 110 表示該 rune 佔用 2 個位元組，第二個位元組以 10 開頭</p>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0xxxxxxx</td>
+<td>runes 0-127 (ASCII)</td>
+</tr>
+<tr>
+<td>110xxxxx 10xxxxxx</td>
+<td>128-2047 (值 &lt; 128 未使用)</td>
+</tr>
+<tr>
+<td>1110xxxx 10xxxxxx 10xxxxxx</td>
+<td>2048-65535 (值 &lt; 2048 未使用)</td>
+</tr>
+<tr>
+<td>11110xxx 10xxxxxx 10xxxxxx 10xxxxxx</td>
+<td>65536-0x10ffff (其他值未使用)</td>
+</tr>
+</tbody></table>
+</li>
+</ul>
+</li>
+<li><p>可變長度編碼使得字串的第 n 個字元無法直接以索引存取，但 UTF-8 有許多特性可以補償。</p>
+<ul>
+<li>它的編碼緊湊，與 ASCII 相容，並自我同步：不超過三個位元組就可以找到字元的開頭位置。</li>
+<li>它也是前綴碼，所以可以從左邊開始解碼而沒有混編或前置作業。</li>
+<li>rune 的編碼不會有其他子串列或其他序列，所以可以只靠搜尋位元組來找尋 rune, 不用擔心前面的內容。</li>
+<li>字典位元組排序與 Unicode 碼位順序相同，因此 UTF-8 的排序一樣自然。</li>
+<li>它沒有嵌入 NUL 位元組，對使用 NUL 借數字串的程式語言很方便。</li>
+</ul>
+</li>
+<li><p>Go 原始檔是以 UTF-8 編碼，且 UTF-8 是 Go 程式偏好的文字操作編碼。</p>
+</li>
+<li><p>Go 的字串實字的 Unicode 跳脫讓我們可以用數值碼位值來指定，有兩種形式：(h 代表十六進位數字)</p>
+<ul>
+<li><p><code>\uhhhh</code>: 16 位元值</p>
+</li>
+<li><p><code>\Uhhhhhhhh</code>: 32 位元值 (較罕見)</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 以下值都相同</span></span><br><span class="line"><span class="string">&quot;世界&quot;</span></span><br><span class="line"><span class="string">&quot;\xe4\xb8\x96\xe7\x95\x8c&quot;</span></span><br><span class="line"><span class="string">&quot;\u4e16\u754c&quot;</span></span><br><span class="line"><span class="string">&quot;\U00004e16\U0000754c&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="string">&#x27;世&#x27;</span></span><br><span class="line"><span class="string">&#x27;\u4e16&#x27;</span></span><br><span class="line"><span class="string">&#x27;\U00004e16&#x27;</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p>因為 UTF-8 的特性，在許多字串操作時不需要解碼，以下範例：</p>
+<ul>
+<li><p>檢查 Prefix:</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">HasPrefix</span><span class="params">(s, prefix <span class="type">string</span>)</span></span> <span class="type">bool</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">len</span>(s) &gt;= <span class="built_in">len</span>(prefix) &amp;&amp; s[:<span class="built_in">len</span>(prefix)] == prefix</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>檢查 Suffix:</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">HasPrefix</span><span class="params">(s, suffix <span class="type">string</span>)</span></span> <span class="type">bool</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">len</span>(s) &gt;= <span class="built_in">len</span>(suffix) &amp;&amp; s[<span class="built_in">len</span>(s) - <span class="built_in">len</span>(suffix):] == suffix</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>檢查子字串:</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Contains</span><span class="params">(s, substr <span class="type">string</span>)</span></span> <span class="type">bool</span> &#123;</span><br><span class="line">    <span class="keyword">for</span> i := <span class="number">0</span>; i &lt; <span class="built_in">len</span>(s); i++ &#123;</span><br><span class="line">        <span class="keyword">if</span> HasPrefix(s[i:], substr) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p>若真的關心個別 Unicode 字元，則可以使用其他處理方式</p>
+  <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="string">&quot;unicode/utf8&quot;</span></span><br><span class="line"></span><br><span class="line">s := <span class="string">&quot;Hello, 世界&quot;</span></span><br><span class="line">fmt.Println(<span class="built_in">len</span>(s))                     <span class="comment">// 13</span></span><br><span class="line">fmt.Println(utf8.RuneCountInString(s))  <span class="comment">// 9</span></span><br></pre></td></tr></table></figure>
+
+  <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> i := <span class="number">0</span>; i &lt; <span class="built_in">len</span>(s); &#123;</span><br><span class="line">    r, size := utf8.DecodeRuneInString(s[i:])   <span class="comment">// r: rune, size: UTF-8 所佔的位元組數量</span></span><br><span class="line">    fmt.Println(<span class="string">&quot;%d\t%c\n&quot;</span>, i, r)</span><br><span class="line">    i += size</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>  不過 Go 的 range 迴圈在套用於字串時會解決執行 UTF-8 解碼。</p>
+  <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> i, r := <span class="keyword">range</span> s &#123;</span><br><span class="line">    fmt.Printf(<span class="string">&quot;%d\t%q\t%d\n&quot;</span>, i, r, r)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* Output:</span></span><br><span class="line"><span class="comment">0	&#x27;H&#x27;	72</span></span><br><span class="line"><span class="comment">1	&#x27;e&#x27;	101</span></span><br><span class="line"><span class="comment">2	&#x27;l&#x27;	108</span></span><br><span class="line"><span class="comment">3	&#x27;l&#x27;	108</span></span><br><span class="line"><span class="comment">4	&#x27;o&#x27;	111</span></span><br><span class="line"><span class="comment">5	&#x27;,&#x27;	44</span></span><br><span class="line"><span class="comment">6	&#x27; &#x27;	32</span></span><br><span class="line"><span class="comment">7	&#x27;世&#x27;	19990</span></span><br><span class="line"><span class="comment">10	&#x27;界&#x27;	30028</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<p>  計算 rune 數量：</p>
+  <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">n := <span class="number">0</span></span><br><span class="line"><span class="keyword">for</span> _, _ = <span class="keyword">range</span> s &#123;</span><br><span class="line">    n++</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 省略不需要的變數</span></span><br><span class="line">n = <span class="number">0</span></span><br><span class="line"><span class="keyword">for</span> <span class="keyword">range</span> s &#123;</span><br><span class="line">    n ++</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 也能呼叫 utf8.RuneCountInString(s)</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="3-5-4-字串與位元組-slice"><a href="#3-5-4-字串與位元組-slice" class="headerlink" title="3.5.4 字串與位元組 slice"></a>3.5.4 字串與位元組 slice</h4><p>操作字串的四個重要套件：bytes, strings, strconv 和 unicode.</p>
+<ul>
+<li>strings: 提供許多搜尋、替換、比較、截空白、分割與連接字串的函式。</li>
+<li>bytes: 有類似的函式來操作 <code>[]bytes</code> 的位元組 slice, 它與字串有些相同的特性。</li>
+<li>strconv: 提供布林、整數以及浮點數值與字串間的轉換，還有加引號和去引號的函式。</li>
+<li>unicode: 提供 <code>IsDigit</code>, <code>IsLetter</code>, <code>IsUpper</code> 和 <code>IsLower</code> 等函式。<ul>
+<li><code>ToUpper</code> 和 <code>ToLower</code> 將 rune 轉換大小寫。(strings 套件也有類似的函式，也稱為 <code>ToUpper</code> 和 <code>ToLower</code>, 將原始字串的每個字元都做相應的轉換，然後回傳新的字串)</li>
+</ul>
+</li>
+</ul>
+<h5 id="範例-Basename"><a href="#範例-Basename" class="headerlink" title="範例: Basename"></a>範例: Basename</h5><p>此範例是實作移除路徑與副檔名，第一版為未使用 library:</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">&quot;bufio&quot;</span></span><br><span class="line">    <span class="string">&quot;fmt&quot;</span></span><br><span class="line">    <span class="string">&quot;os&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    input := bufio.NewScanner(os.Stdin)</span><br><span class="line">    <span class="keyword">for</span> input.Scan() &#123;</span><br><span class="line">        fmt.Println(basename(input.Text()))</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// <span class="doctag">NOTE:</span> ignoring potential errors from input.Err()</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 移除路徑與副檔名</span></span><br><span class="line"><span class="comment">// e.g., a =&gt; a, a.go =&gt; a, a/b/c.go =&gt; c, a/b.c.go =&gt; b.c</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">basename</span><span class="params">(s <span class="type">string</span>)</span></span> <span class="type">string</span> &#123;</span><br><span class="line">    <span class="comment">// 移除最後一個 &#x27;/&#x27; 與之前的所有東西</span></span><br><span class="line">    <span class="keyword">for</span> i := <span class="built_in">len</span>(s) - <span class="number">1</span>; i &gt;= <span class="number">0</span>; i-- &#123;</span><br><span class="line">        <span class="keyword">if</span> s[i] == <span class="string">&#x27;/&#x27;</span> &#123;</span><br><span class="line">            s = s[i+<span class="number">1</span>:]</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 保留最後一個 &#x27;.&#x27; 之前的所有東西</span></span><br><span class="line">    <span class="keyword">for</span> i := <span class="built_in">len</span>(s) - <span class="number">1</span>; i &gt;= <span class="number">0</span>; i-- &#123;</span><br><span class="line">        <span class="keyword">if</span> s[i] == <span class="string">&#x27;.&#x27;</span> &#123;</span><br><span class="line">            s = s[:i]</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> s</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>使用 strings library:</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;bufio&quot;</span></span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;os&quot;</span></span><br><span class="line">	<span class="string">&quot;strings&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	input := bufio.NewScanner(os.Stdin)</span><br><span class="line">	<span class="keyword">for</span> input.Scan() &#123;</span><br><span class="line">		fmt.Println(basename(input.Text()))</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// <span class="doctag">NOTE:</span> ignoring potential errors from input.Err()</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// basename removes directory components and a trailing .suffix.</span></span><br><span class="line"><span class="comment">// e.g., a =&gt; a, a.go =&gt; a, a/b/c.go =&gt; c, a/b.c.go =&gt; b.c</span></span><br><span class="line"><span class="comment">//!+</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">basename</span><span class="params">(s <span class="type">string</span>)</span></span> <span class="type">string</span> &#123;</span><br><span class="line">	slash := strings.LastIndex(s, <span class="string">&quot;/&quot;</span>) <span class="comment">// -1 if &quot;/&quot; not found</span></span><br><span class="line">	s = s[slash+<span class="number">1</span>:]</span><br><span class="line">	<span class="keyword">if</span> dot := strings.LastIndex(s, <span class="string">&quot;.&quot;</span>); dot &gt;= <span class="number">0</span> &#123;</span><br><span class="line">		s = s[:dot]</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> s</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="範例-插入逗號"><a href="#範例-插入逗號" class="headerlink" title="範例: 插入逗號"></a>範例: 插入逗號</h5><p>將整數字串每三個插入逗號：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;os&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="keyword">for</span> i := <span class="number">1</span>; i &lt; <span class="built_in">len</span>(os.Args); i++ &#123;</span><br><span class="line">		fmt.Printf(<span class="string">&quot;  %s\n&quot;</span>, comma(os.Args[i]))</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// comma inserts commas in a non-negative decimal integer string.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">comma</span><span class="params">(s <span class="type">string</span>)</span></span> <span class="type">string</span> &#123;</span><br><span class="line">	n := <span class="built_in">len</span>(s)</span><br><span class="line">	<span class="keyword">if</span> n &lt;= <span class="number">3</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> s</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> comma(s[:n<span class="number">-3</span>]) + <span class="string">&quot;,&quot;</span> + s[n<span class="number">-3</span>:]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="範例-Printints"><a href="#範例-Printints" class="headerlink" title="範例: Printints"></a>範例: Printints</h5><ul>
+<li><p>字串創建後不可變，相對的 byte slice 可以自由修改。</p>
+</li>
+<li><p>字串和 byte slice 之間可以互相轉換：</p>
+  <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">s := <span class="string">&quot;abc&quot;</span></span><br><span class="line">b := []<span class="type">byte</span>(s)</span><br><span class="line">s2 := <span class="type">string</span>(b)</span><br></pre></td></tr></table></figure>
+
+<p>概念上，[]byte(s)轉換會分配保存 s 的位元組拷貝的新位元組陣列並產生參考該陣列的 slice。最佳化的編譯器或許能夠在某些情況下避免分配與複製，但一般來說複製是必要的，以確保 s 的位元組在之後 b 被修改時還能維持不變。使用 string(b) 將 byte slice 轉換回字串也會製作拷貝，以確保結果 s2 不可變。</p>
+<p>為了避免轉換與不必要的記憶體分配，bytes 套件和 strings 套件同時提供了許多實用函數。下面是strings包中的六個函式：</p>
+  <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Contains</span><span class="params">(s, substr <span class="type">string</span>)</span></span> <span class="type">bool</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Count</span><span class="params">(s, sep <span class="type">string</span>)</span></span> <span class="type">int</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Fields</span><span class="params">(s <span class="type">string</span>)</span></span> []<span class="type">string</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">HasPrefix</span><span class="params">(s, prefix <span class="type">string</span>)</span></span> <span class="type">bool</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Index</span><span class="params">(s, sep <span class="type">string</span>)</span></span> <span class="type">int</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Join</span><span class="params">(a []<span class="type">string</span>, sep <span class="type">string</span>)</span></span> <span class="type">string</span></span><br></pre></td></tr></table></figure>
+
+<p>bytes 套件中也有相對應的函式：</p>
+  <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Contains</span><span class="params">(b, subslice []<span class="type">byte</span>)</span></span> <span class="type">bool</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Count</span><span class="params">(s, sep []<span class="type">byte</span>)</span></span> <span class="type">int</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Fields</span><span class="params">(s []<span class="type">byte</span>)</span></span> [][]<span class="type">byte</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">HasPrefix</span><span class="params">(s, prefix []<span class="type">byte</span>)</span></span> <span class="type">bool</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Index</span><span class="params">(s, sep []<span class="type">byte</span>)</span></span> <span class="type">int</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Join</span><span class="params">(s [][]<span class="type">byte</span>, sep []<span class="type">byte</span>)</span></span> []<span class="type">byte</span></span><br></pre></td></tr></table></figure>
+
+<p>它們之間唯一差別是字串被轉換為 byte slice.</p>
+</li>
+</ul>
+<p>bytes 套件提供 Buffer 型別以有效率的操控位元組 slice, 一開始 Buffer 開是空的，但是隨著 string, byte 或 []byte 等型別資料的寫入可以動態增長，<code>bytes.Buffer</code> 變數不需要初始化，因為它的零值可用：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Printints demonstrates the use of bytes.Buffer to format a string.</span></span><br><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;bytes&quot;</span></span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 類似 fmt.Sprint(values) 但加上逗號</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">intsToString</span><span class="params">(values []<span class="type">int</span>)</span></span> <span class="type">string</span> &#123;</span><br><span class="line">	<span class="keyword">var</span> buf bytes.Buffer</span><br><span class="line">	buf.WriteByte(<span class="string">&#x27;[&#x27;</span>)</span><br><span class="line">	<span class="keyword">for</span> i, v := <span class="keyword">range</span> values &#123;</span><br><span class="line">		<span class="keyword">if</span> i &gt; <span class="number">0</span> &#123;</span><br><span class="line">			buf.WriteString(<span class="string">&quot;, &quot;</span>)</span><br><span class="line">		&#125;</span><br><span class="line">		fmt.Fprintf(&amp;buf, <span class="string">&quot;%d&quot;</span>, v)</span><br><span class="line">	&#125;</span><br><span class="line">	buf.WriteByte(<span class="string">&#x27;]&#x27;</span>)</span><br><span class="line">	<span class="keyword">return</span> buf.String()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	fmt.Println(intsToString([]<span class="type">int</span>&#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>&#125;)) <span class="comment">// &quot;[1, 2, 3]&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>將 rune 的 UTF-8 編碼加入到 <code>bytes.Buffer</code> 時，最好使用 <code>bytes.Buffer</code> 的 <code>WriteRune</code> 方法，但 <code>WriteByte</code> 對 <code>[</code> 和 <code>]</code> 等 ASCII 字元也沒問題。</p>
+<h4 id="3-5-5-字串與數字的轉換"><a href="#3-5-5-字串與數字的轉換" class="headerlink" title="3.5.5 字串與數字的轉換"></a>3.5.5 字串與數字的轉換</h4><ul>
+<li><p>數值和字串之間的轉換可透過 <code>strconv</code> 套件</p>
+</li>
+<li><p>將整數轉換成字串有以下方法：</p>
+<ul>
+<li><p>透過 <code>fmt.Sprintf</code></p>
+</li>
+<li><p>使用 <code>strconv.Itoa</code></p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">x := <span class="number">123</span></span><br><span class="line">y := fmt.Sprintf(<span class="string">&quot;%d&quot;</span>, x)</span><br><span class="line">fmt.Println(y, strconv.Itoa(x)) <span class="comment">// 123 123</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p><code>FormatInt</code> 和 <code>FormatUint</code> 可在不同的底數上格式化數字：(不同進制)</p>
+  <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fmt.Println(strconv.FormatInt(<span class="type">int64</span>(x), <span class="number">2</span>)) <span class="comment">// 1111011</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>fmt.Printf</code> 的 <code>%b</code>, <code>%d</code>, <code>%u</code> 和 <code>%x</code> 通常比 Format 函式更方便，特別是，特別是在需要包含其他資訊時：</p>
+  <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">s := fmt.Sprintf(<span class="string">&quot;x=%b&quot;</span>, x) <span class="comment">// x=1111011</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>要解析字串所代表的數字時，可以使用 <code>strconv</code> 的 <code>Atoi</code> 或 <code>ParseInt</code>, 或無正負號整數的 <code>ParseUint</code>:</p>
+  <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">x, err := strconv.Atoi(<span class="string">&quot;123&quot;</span>)             <span class="comment">// x 是整數</span></span><br><span class="line">y, err := strconv.ParseInt(<span class="string">&quot;123&quot;</span>, <span class="number">10</span>, <span class="number">64</span>) <span class="comment">// 10 進位，最多 64 位元</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>ParseInt</code> 的第三個參數指定結果必須符合的整數型別，例如：16 表示 <code>int16</code>, 0 表示 <code>int</code>; 上例表示 y 的型別是 <code>int64</code>.</li>
+</ul>
+</li>
+<li><p>有時候也會使用 <code>fmt.Scanf</code> 來解析單行中混合字串和數字的輸入，但它沒有彈性，特別是在處理不完整或不規律的輸入時。</p>
+</li>
+</ul>
+<h3 id="3-6-常數"><a href="#3-6-常數" class="headerlink" title="3.6 常數"></a>3.6 常數</h3><ul>
+<li><p>常數是編譯器已知值的運算式，其求值保證發生在編譯期而非執行期，每個常數的底層型別是基本型別：布林、字串或數字。</p>
+</li>
+<li><p>用 <code>const</code> 來宣告常數，其值不變，可防止在程式執行期間意外或蓄意修改。例如：常數比變數更適合圓周率等數學常數，因為他的值不會改變：</p>
+  <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> pi = <span class="number">3.14159</span>  <span class="comment">// 近似值, math.Pi 是更好的近似值</span></span><br></pre></td></tr></table></figure>
+
+<p>  也可以一次宣告多個常數：</p>
+  <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> (</span><br><span class="line">    e  = <span class="number">2.71828182845904523536028747135266249775724709369995957496696763</span></span><br><span class="line">    pi = <span class="number">3.14159265358979323846264338327950288419716939937510582097494459</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>許多長數計算可以完全在編譯期完成，減少執行期的工作，減少執行期的工作，也使其他編譯器最佳化得以執行。</p>
+</li>
+<li><p>運算元為常數時，除以零、字串索引超出範圍和任何會導致非有限值的浮點數運算等執行期的錯誤也能夠在編譯期被發現。</p>
+</li>
+<li><p>常數的數學、邏輯運算和比較運算的結果也數常數，轉換與呼叫 len, cap, real, imag, complex 和 unsafe.Sizeof 等特定內建函式的結果也是常數。</p>
+</li>
+<li><p>因為編譯器知道常數的值，所以常數運算式可以出現在型別，特別是陣列長度：</p>
+  <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> IPv4Len = <span class="number">4</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// parseIPv4 parses an IPv4 address (d.d.d.d).</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">parseIPv4</span><span class="params">(s <span class="type">string</span>)</span></span> IP &#123;</span><br><span class="line">    <span class="keyword">var</span> p [IPv4Len]<span class="type">byte</span></span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>常數宣告可以指定型別，但沒有明確指定型別時，其型別由運算式右邊決定。例如以下範例，<code>time.Duration</code> 是具名型別，其底層型別為 <code>int64</code>, 而 <code>time.Minute</code> 是該型別的常數，因此底下兩個常數的型別為 <code>time.Duration</code>:</p>
+  <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> noDelay time.Duration = <span class="number">0</span></span><br><span class="line"><span class="keyword">const</span> timeout = <span class="number">5</span> * time.Minute</span><br><span class="line">fmt.Printf(<span class="string">&quot;%T %[1]v\n&quot;</span>, noDelay)     <span class="comment">// &quot;time.Duration 0&quot;</span></span><br><span class="line">fmt.Printf(<span class="string">&quot;%T %[1]v\n&quot;</span>, timeout)     <span class="comment">// &quot;time.Duration 5m0s&quot;</span></span><br><span class="line">fmt.Printf(<span class="string">&quot;%T %[1]v\n&quot;</span>, time.Minute) <span class="comment">// &quot;time.Duration 1m0s&quot;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>當一系列的常數一起宣告時，除了第一個之外，右手邊的運算式可以省略，表示重複使用前一個運算式與它的型別：</p>
+  <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> (</span><br><span class="line">    a = <span class="number">1</span></span><br><span class="line">    b</span><br><span class="line">    c = <span class="number">2</span></span><br><span class="line">    d</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">fmt.Println(a, b, c, d) <span class="comment">// &quot;1 1 2 2&quot;</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="3-6-1-iota-常數產生器"><a href="#3-6-1-iota-常數產生器" class="headerlink" title="3.6.1 iota 常數產生器"></a>3.6.1 iota 常數產生器</h4><ul>
+<li><p><code>const</code> 宣告可以使用 iota 常數產生器，他建構一系列相關值而無需明確的指定。</p>
+</li>
+<li><p>在 <code>const</code> 宣告中，iota 值從零開始對序列中的每個元素遞增。以下範例是來自 time 套件，它從 Sunday 的零開始為一週的每一天定義 Weekday 型別的具名常數，這種型別通常稱為列舉 (enumeration), 簡稱 <code>enum</code>.</p>
+  <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Weekday <span class="type">int</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> (</span><br><span class="line">    Sunday Weekday = <span class="literal">iota</span></span><br><span class="line">    Monday</span><br><span class="line">    Tuesday</span><br><span class="line">    Wednesday</span><br><span class="line">    Thursday</span><br><span class="line">    Friday</span><br><span class="line">    Saturday</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>也可以在更複雜的運算式中使用 iota, 以下範例來自 net 套件，讓一個無正負號整數的 5 個啲位元指定不同的名稱與布林解譯：</p>
+  <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Flags <span class="type">uint</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> (</span><br><span class="line">    FlagUp Flags = <span class="number">1</span> &lt;&lt; <span class="literal">iota</span> <span class="comment">// 位移, 1 &lt;&lt; 0</span></span><br><span class="line">    FlagBroadcast            <span class="comment">// 1 &lt;&lt; 1, 支援 broadcast</span></span><br><span class="line">    FlagLoopback             <span class="comment">// 1 &lt;&lt; 2, loopback interface</span></span><br><span class="line">    FlagPointToPoint         <span class="comment">// 1 &lt;&lt; 3, belongs to a point-to-point link</span></span><br><span class="line">    FlagMulticast            <span class="comment">// 1 &lt;&lt; 4, 支援 multicast access capability</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p>  隨著 iota 遞增，每個常數被指派為 1 &lt;&lt; iota 的值，它求出乘以二的值，對應到每一個位元。我們可以在測試、設定或清除這些位元的函式中使用這些常數：</p>
+  <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">IsUp</span><span class="params">(v Flags)</span></span> <span class="type">bool</span>     &#123; <span class="keyword">return</span> v&amp;FlagUp == FlagUp &#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TurnDown</span><span class="params">(v *Flags)</span></span>     &#123; *v &amp;^= FlagUp &#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">SetBroadcast</span><span class="params">(v *Flags)</span></span> &#123; *v |= FlagBroadcast &#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">IsCast</span><span class="params">(v Flags)</span></span> <span class="type">bool</span>   &#123; <span class="keyword">return</span> v&amp;(FlagBroadcast|FlagMulticast) != <span class="number">0</span> &#125;</span><br><span class="line"></span><br><span class="line">unc main() &#123;</span><br><span class="line">    <span class="keyword">var</span> v Flags = FlagMulticast | FlagUp</span><br><span class="line">    fmt.Printf(<span class="string">&quot;%b %t\n&quot;</span>, v, IsUp(v)) <span class="comment">// &quot;10001 true&quot;</span></span><br><span class="line">    TurnDown(&amp;v)</span><br><span class="line">    fmt.Printf(<span class="string">&quot;%b %t\n&quot;</span>, v, IsUp(v)) <span class="comment">// &quot;10000 false&quot;</span></span><br><span class="line">    SetBroadcast(&amp;v)</span><br><span class="line">    fmt.Printf(<span class="string">&quot;%b %t\n&quot;</span>, v, IsUp(v))   <span class="comment">// &quot;10010 false&quot;</span></span><br><span class="line">    fmt.Printf(<span class="string">&quot;%b %t\n&quot;</span>, v, IsCast(v)) <span class="comment">// &quot;10010 true&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>  以下更複雜的 iota 宣告範例，每個常數都是 1024 的的冪次方：</p>
+  <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> (</span><br><span class="line">    _ = <span class="number">1</span> &lt;&lt; (<span class="number">10</span> * <span class="literal">iota</span>)</span><br><span class="line">    KiB <span class="comment">// 1024</span></span><br><span class="line">    MiB <span class="comment">// 1048576</span></span><br><span class="line">    GiB <span class="comment">// 1073741824</span></span><br><span class="line">    TiB <span class="comment">// 1099511627776             (exceeds 1 &lt;&lt; 32)</span></span><br><span class="line">    PiB <span class="comment">// 1125899906842624</span></span><br><span class="line">    EiB <span class="comment">// 1152921504606846976</span></span><br><span class="line">    ZiB <span class="comment">// 1180591620717411303424    (exceeds 1 &lt;&lt; 64)</span></span><br><span class="line">    YiB <span class="comment">// 1208925819614629174706176</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p>  不過 iota 有也限制，例如它不能產生 1000 的乘積，因為沒有指數運算子。</p>
+</li>
+</ul>
+<h4 id="3-6-2-無型別常數"><a href="#3-6-2-無型別常數" class="headerlink" title="3.6.2 無型別常數"></a>3.6.2 無型別常數</h4><p>Go 的常數有一點不尋常。雖然常數可以是任何基本資料型別，例如 <code>int</code> 或 <code>float64</code>, 包含 <code>time.Duration</code> 等具名基本型別，許多常數並不屬於特定型別。編譯器將這些無型別常數以比基本型別值更高的數值精確度表示，且對它們的數學運算比機器運算的精確度更高，可以假設致紹有 256 個位元精確度。</p>
+<ul>
+<li><p>無型別常數有六種：無型別布林、無型別整數、無型別浮點數、無型別複數和無型別字串。</p>
+</li>
+<li><p>藉由無歸屬型別，無型別常數不只維持高精確度，它還可以參與比有歸屬常數更多的運算式而不需要轉換。例如上面範例的 ZiB 和 YiB 值對任何整數型別來說都太大，但他們是合法的常數，可用於如下運算式：</p>
+  <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fmt.Println(YiB/ZiB) <span class="comment">// 1024</span></span><br></pre></td></tr></table></figure>
+
+<p>  另一個例子是浮點數常數 <code>math.Pi</code> 可用於任何需要浮點數或複數的地方：</p>
+  <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> x <span class="type">float32</span> = math.Pi</span><br><span class="line"><span class="keyword">var</span> y <span class="type">float64</span> = math.Pi</span><br><span class="line"><span class="keyword">var</span> z <span class="type">complex128</span> = math.Pi</span><br></pre></td></tr></table></figure>
+
+<p>  如果 <code>math.Pi</code> 屬於 <code>float64</code> 等特定型別，其結果可能不會有此精確度，且在需要 <code>float32</code> 或 <code>complex128</code> 時需要做型別轉換：</p>
+  <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> Pi64 <span class="type">float64</span> = math.Pi</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> x <span class="type">float32</span> = <span class="type">float32</span>(Pi64)</span><br><span class="line"><span class="keyword">var</span> y <span class="type">float64</span> = Pi64</span><br><span class="line"><span class="keyword">var</span> z <span class="type">complex128</span> = <span class="type">complex128</span>(Pi64)</span><br></pre></td></tr></table></figure>
+
+<p>  對實字來說，語法決定結果。0, 0.0, 0i 和 \u0000 都表示同一個值的常數，但結果不同：無型別整數、無型別浮點數、無型別複數、無型別 rune. 同樣的， true 和 false 是無型別布林，而字串實字是無型別字串。</p>
+</li>
+<li><p><code>/</code> 運算符會依據運算元的類型而產生相對應類型的結果，因此實字的選擇可影響常數除法運算式的結果：</p>
+  <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> f <span class="type">float64</span> = <span class="number">212</span></span><br><span class="line">fmt.Println((f - <span class="number">32</span>) * <span class="number">5</span> / <span class="number">9</span>)     <span class="comment">// &quot;100&quot;; (f - 32) * 5 is a float64</span></span><br><span class="line">fmt.Println(<span class="number">5</span> / <span class="number">9</span> * (f - <span class="number">32</span>))     <span class="comment">// &quot;0&quot;;   5/9 是無型別整數 0</span></span><br><span class="line">fmt.Println(<span class="number">5.0</span> / <span class="number">9.0</span> * (f - <span class="number">32</span>)) <span class="comment">// &quot;100&quot;; 5.0/9.0 是無型別浮點數</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>只有常數可以是無型別，如下方第一個陳述，無型別常數出現在直接宣告型別的變數的右手邊，或如其他陳述指派給變數時，常數會間接轉換成該變數的型別：</p>
+  <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> f <span class="type">float64</span> = <span class="number">3</span> + <span class="number">0i</span> <span class="comment">// untyped complex -&gt; float64</span></span><br><span class="line">f = <span class="number">2</span>                  <span class="comment">// untyped integer -&gt; float64</span></span><br><span class="line">f = <span class="number">1e123</span>              <span class="comment">// untyped floating-point -&gt; float64</span></span><br><span class="line">f = <span class="string">&#x27;a&#x27;</span>                <span class="comment">// untyped rune -&gt; float64</span></span><br></pre></td></tr></table></figure>
+
+<p>  上面的陳述相當於：</p>
+  <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> f <span class="type">float64</span> = <span class="type">float64</span>(<span class="number">3</span> + <span class="number">0i</span>)</span><br><span class="line">f = <span class="type">float64</span>(<span class="number">2</span>)</span><br><span class="line">f = <span class="type">float64</span>(<span class="number">1e123</span>)</span><br><span class="line">f = <span class="type">float64</span>(<span class="string">&#x27;a&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>  無論是直接或間接，常數從一個型別轉換成另一個型別，目標型別必須可以表示原始值。浮點實數和複數允許捨入：</p>
+  <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> (</span><br><span class="line">    deadbeef = <span class="number">0xdeadbeef</span> <span class="comment">// 無型別整數值 3735928559</span></span><br><span class="line">    a = <span class="type">uint32</span>(deadbeef)  <span class="comment">// uint32 值 3735928559</span></span><br><span class="line">    b = <span class="type">float32</span>(deadbeef) <span class="comment">// float32 值 3735928576 (rounded up)</span></span><br><span class="line">    c = <span class="type">float64</span>(deadbeef) <span class="comment">// float64 值 3735928559 (精確)</span></span><br><span class="line">    d = <span class="type">int32</span>(deadbeef)   <span class="comment">// compile error: constant overflows int32</span></span><br><span class="line">    e = <span class="type">float64</span>(<span class="number">1e309</span>)    <span class="comment">// compile error: constant overflows float64</span></span><br><span class="line">    f = <span class="type">uint</span>(<span class="number">-1</span>)          <span class="comment">// compile error: uint 常數低溢位</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>在沒有明確型別的變數宣告中（包括短變數宣告），無型別常數間接決定該變數的預設值，例如：</p>
+  <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">i := <span class="number">0</span>      <span class="comment">// untyped integer;        implicit int(0)</span></span><br><span class="line">r := <span class="string">&#x27;\000&#x27;</span> <span class="comment">// untyped rune;           implicit rune(&#x27;\000&#x27;)</span></span><br><span class="line">f := <span class="number">0.0</span>    <span class="comment">// untyped floating-point; implicit float64(0.0)</span></span><br><span class="line">c := <span class="number">0i</span>     <span class="comment">// untyped complex;        implicit complex128(0i)</span></span><br></pre></td></tr></table></figure>
+
+<p>  注意此不對稱：無型別整數轉換成 int, 其大小沒有保證，但無型別浮點數與複數轉換成明確大小的 float64 和 complex128. Go 語言本身沒有無大小的 float 和 complex 型別，因為不知道浮點數資料型別很難寫出正確的數學演算法。</p>
+</li>
+<li><p>為給變數不同的型別，我們必須明確轉換無型別常數成所需型別或在變數宣告中多表示所需型別，例如：</p>
+  <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> i = <span class="type">int8</span>(<span class="number">0</span>)</span><br><span class="line"><span class="keyword">var</span> i <span class="type">int8</span> = <span class="number">0</span></span><br></pre></td></tr></table></figure>
+
+<p>  這些預設在轉換無型別常數到介面值時特別重要，因為它們決定它的動態型別。</p>
+  <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">fmt.Printf(<span class="string">&quot;%T\n&quot;</span>, <span class="number">0</span>)      <span class="comment">// &quot;int&quot;</span></span><br><span class="line">fmt.Printf(<span class="string">&quot;%T\n&quot;</span>, <span class="number">0.0</span>)    <span class="comment">// &quot;float64&quot;</span></span><br><span class="line">fmt.Printf(<span class="string">&quot;%T\n&quot;</span>, <span class="number">0i</span>)     <span class="comment">// &quot;complex128&quot;</span></span><br><span class="line">fmt.Printf(<span class="string">&quot;%T\n&quot;</span>, <span class="string">&#x27;\000&#x27;</span>) <span class="comment">// &quot;int32&quot; (rune)</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="References"><a href="#References" class="headerlink" title="References"></a>References</h2><ul>
+<li><a target="_blank" rel="noopener" href="http://www.gopl.io/">The Go Programming Language</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/adonovan/gopl.io/">gopl.io source code</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Go/" rel="tag"># Go</a>
+              <a href="/tags/Golang/" rel="tag"># Golang</a>
+              <a href="/tags/%E7%B2%BE%E9%80%9AGo%E7%A8%8B%E5%BC%8F%E8%A8%AD%E8%A8%88/" rel="tag"># 精通Go程式設計</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/eb4b7b31/" rel="prev" title="[Go] log.Fatal v.s. panic">
+      <i class="fa fa-chevron-left"></i> [Go] log.Fatal v.s. panic
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/posts/5793cee/" rel="next" title="[Go] Testify 單元測試">
+      [Go] Testify 單元測試 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Ch3-%E5%9F%BA%E6%9C%AC%E8%B3%87%E6%96%99%E5%9E%8B%E5%88%A5"><span class="nav-number">2.</span> <span class="nav-text">Ch3. 基本資料型別</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-%E6%95%B4%E6%95%B8"><span class="nav-number">2.1.</span> <span class="nav-text">3.1 整數</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%81%8B%E7%AE%97%E5%AD%90"><span class="nav-number">2.1.1.</span> <span class="nav-text">運算子</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%AF%94%E8%BC%83%E9%81%8B%E7%AE%97%E5%AD%90"><span class="nav-number">2.1.1.1.</span> <span class="nav-text">比較運算子</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E4%BA%8C%E9%80%B2%E4%BD%8D%E9%81%8B%E7%AE%97%E5%AD%90"><span class="nav-number">2.1.1.2.</span> <span class="nav-text">二進位運算子</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Others"><span class="nav-number">2.1.2.</span> <span class="nav-text">Others</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-%E6%B5%AE%E9%BB%9E%E6%95%B8"><span class="nav-number">2.2.</span> <span class="nav-text">3.2 浮點數</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AF%84%E4%BE%8B-%E6%B5%AE%E9%BB%9E%E6%95%B8%E5%9C%96%E5%BD%A2%E9%81%8B%E7%AE%97"><span class="nav-number">2.2.1.</span> <span class="nav-text">範例: 浮點數圖形運算</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-%E8%A4%87%E6%95%B8"><span class="nav-number">2.3.</span> <span class="nav-text">3.3 複數</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AF%84%E4%BE%8B-%E7%94%A2%E7%94%9F%E6%9B%BC%E5%BE%B7%E5%8D%9A%E7%A2%8E%E5%BD%A2-PNG-%E5%9C%96"><span class="nav-number">2.3.1.</span> <span class="nav-text">範例: 產生曼德博碎形 PNG 圖</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-4-%E5%B8%83%E6%9E%97"><span class="nav-number">2.4.</span> <span class="nav-text">3.4 布林</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-5-%E5%AD%97%E4%B8%B2"><span class="nav-number">2.5.</span> <span class="nav-text">3.5 字串</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-5-1-%E5%AD%97%E4%B8%B2%E5%AF%A6%E5%AD%97"><span class="nav-number">2.5.1.</span> <span class="nav-text">3.5.1 字串實字</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-5-2-Unicode"><span class="nav-number">2.5.2.</span> <span class="nav-text">3.5.2 Unicode</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-5-3-UTF-8"><span class="nav-number">2.5.3.</span> <span class="nav-text">3.5.3 UTF-8</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-5-4-%E5%AD%97%E4%B8%B2%E8%88%87%E4%BD%8D%E5%85%83%E7%B5%84-slice"><span class="nav-number">2.5.4.</span> <span class="nav-text">3.5.4 字串與位元組 slice</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E7%AF%84%E4%BE%8B-Basename"><span class="nav-number">2.5.4.1.</span> <span class="nav-text">範例: Basename</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E7%AF%84%E4%BE%8B-%E6%8F%92%E5%85%A5%E9%80%97%E8%99%9F"><span class="nav-number">2.5.4.2.</span> <span class="nav-text">範例: 插入逗號</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E7%AF%84%E4%BE%8B-Printints"><span class="nav-number">2.5.4.3.</span> <span class="nav-text">範例: Printints</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-5-5-%E5%AD%97%E4%B8%B2%E8%88%87%E6%95%B8%E5%AD%97%E7%9A%84%E8%BD%89%E6%8F%9B"><span class="nav-number">2.5.5.</span> <span class="nav-text">3.5.5 字串與數字的轉換</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-6-%E5%B8%B8%E6%95%B8"><span class="nav-number">2.6.</span> <span class="nav-text">3.6 常數</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-6-1-iota-%E5%B8%B8%E6%95%B8%E7%94%A2%E7%94%9F%E5%99%A8"><span class="nav-number">2.6.1.</span> <span class="nav-text">3.6.1 iota 常數產生器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-6-2-%E7%84%A1%E5%9E%8B%E5%88%A5%E5%B8%B8%E6%95%B8"><span class="nav-number">2.6.2.</span> <span class="nav-text">3.6.2 無型別常數</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#References"><span class="nav-number">3.</span> <span class="nav-text">References</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Szu-Hsuan, Wu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">61</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">57</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/wshs0713" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;wshs0713" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:shuan0713@gmail.com" title="E-Mail → mailto:shuan0713@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="http://linkedin.com/in/wshs0713" title="LinkedIn → http:&#x2F;&#x2F;linkedin.com&#x2F;in&#x2F;wshs0713" rel="noopener" target="_blank"><i class="fab fa-linkedin fa-fw"></i>LinkedIn</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/wshs0713" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;wshs0713" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Szu-Hsuan, Wu</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://wshs0713.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "https://wshs0713.github.io/posts/21f37274/";
+    this.page.identifier = "posts/21f37274/";
+    this.page.title = "[Go] 《精通 Go 程式設計》- 基本資料型別 閱讀筆記";
+    };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://wshs0713.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en,zh-tw,default">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/favicon-180x180.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-32x32.png">
+  <link rel="mask-icon" href="/img/favicon-180x180.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"wshs0713.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="簡介Docker 是一種虛擬化技術，透過 container 的方式將應用程式和所需執行環境打包起來，方便佈署到其他伺服器上，避免因為系統環境不同而無法正確執行，也可以節省建立環境的繁瑣步驟。此外，Docker 也可以用來模擬不同環境下，程式是否能正確執行。 和 Virtual Machine 相比，Docker 的利用率更高，容量小、高效能、啟動速度快，一台伺服器上(Host)可以執行多個 c">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[Docker] 安裝及使用 Docker">
+<meta property="og:url" content="https://wshs0713.github.io/posts/ba763ef1/">
+<meta property="og:site_name" content="wshs0713&#39;s blog">
+<meta property="og:description" content="簡介Docker 是一種虛擬化技術，透過 container 的方式將應用程式和所需執行環境打包起來，方便佈署到其他伺服器上，避免因為系統環境不同而無法正確執行，也可以節省建立環境的繁瑣步驟。此外，Docker 也可以用來模擬不同環境下，程式是否能正確執行。 和 Virtual Machine 相比，Docker 的利用率更高，容量小、高效能、啟動速度快，一台伺服器上(Host)可以執行多個 c">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://www.docker.com/sites/default/files/social/docker_facebook_share.png">
+<meta property="og:image" content="https://i.imgur.com/2PnQTFu.png">
+<meta property="og:image" content="https://i.imgur.com/b7Yqlhk.png">
+<meta property="og:image" content="https://i.imgur.com/v78BxLO.png">
+<meta property="og:image" content="https://cdn-images-1.medium.com/max/1600/1*bKRHfz7unRA35WHd9SBOCA.png">
+<meta property="article:published_time" content="2019-05-24T09:12:44.000Z">
+<meta property="article:modified_time" content="2019-05-24T09:12:44.000Z">
+<meta property="article:author" content="Szu-Hsuan, Wu">
+<meta property="article:tag" content="Docker">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://www.docker.com/sites/default/files/social/docker_facebook_share.png">
+
+<link rel="canonical" href="https://wshs0713.github.io/posts/ba763ef1/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>[Docker] 安裝及使用 Docker | wshs0713's blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-8XTKEMPTGC"></script>
+    <script>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-8XTKEMPTGC');
+      }
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">wshs0713's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Programming notes</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-projects">
+
+    <a href="/projects/" rel="section"><i class="fa fa-folder fa-fw"></i>Projects</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://wshs0713.github.io/posts/ba763ef1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Szu-Hsuan, Wu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="wshs0713's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          [Docker] 安裝及使用 Docker
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-05-24 17:12:44" itemprop="dateCreated datePublished" datetime="2019-05-24T17:12:44+08:00">2019-05-24</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Docker/" itemprop="url" rel="index"><span itemprop="name">Docker</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus: </span>
+    
+    <a title="disqus" href="/posts/ba763ef1/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="posts/ba763ef1/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>3.7k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>3 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><a target="_blank" rel="noopener" href="https://www.docker.com/sites/default/files/social/docker_facebook_share.png"><img src="https://www.docker.com/sites/default/files/social/docker_facebook_share.png" alt="Docker"></a></p>
+<h2 id="簡介"><a href="#簡介" class="headerlink" title="簡介"></a>簡介</h2><p><a target="_blank" rel="noopener" href="https://www.docker.com/" title="Docker">Docker</a> 是一種虛擬化技術，透過 container 的方式將應用程式和所需執行環境打包起來，方便佈署到其他伺服器上，避免因為系統環境不同而無法正確執行，也可以節省建立環境的繁瑣步驟。此外，Docker 也可以用來模擬不同環境下，程式是否能正確執行。</p>
+<p>和 Virtual Machine 相比，Docker 的利用率更高，容量小、高效能、啟動速度快，一台伺服器上(Host)可以執行多個 container, 而每個 container 是獨立的，互不影響。</p>
+<p>接下來紀錄一下如何在 Linux 環境上安裝及使用 Docker，並且使用 Docker 將我們的應用程式及執行環境打包。</p>
+<span id="more"></span>
+
+<h2 id="安裝"><a href="#安裝" class="headerlink" title="安裝"></a>安裝</h2><p>這裡我們使用的系統環境是: Ubuntu 16.04</p>
+<h3 id="設定-Repository"><a href="#設定-Repository" class="headerlink" title="設定 Repository"></a>設定 Repository</h3><p>Update:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo apt-get update</span><br></pre></td></tr></table></figure>
+
+<p>安裝所需套件:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo apt-get install apt-transport-https  ca-certificates curl software-properties-common</span><br></pre></td></tr></table></figure>
+
+<p>新增 Docker GPG key:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -</span><br></pre></td></tr></table></figure>
+
+<p>Add repository:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ sudo add-apt-repository \</span><br><span class="line">   <span class="string">&quot;deb [arch=amd64] https://download.docker.com/linux/ubuntu \</span></span><br><span class="line"><span class="string">   <span class="subst">$(lsb_release -cs)</span> \</span></span><br><span class="line"><span class="string">   stable&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="Install-Docker-CE"><a href="#Install-Docker-CE" class="headerlink" title="Install Docker CE"></a>Install Docker CE</h3><p>Update:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo apt-get update</span><br></pre></td></tr></table></figure>
+
+<p>Install:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo apt-get install docker-ce</span><br></pre></td></tr></table></figure>
+
+<p>裝好之後，確認一下是否安裝成功:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker version</span><br></pre></td></tr></table></figure>
+
+<p>正常運作的話，可以看到以下畫面:</p>
+<p><img src="https://i.imgur.com/2PnQTFu.png" alt="Docker version"></p>
+<p>如果有出現 <code>Permission denied</code> 的錯誤訊息，將當前使用者加入 <code>docker</code> 群組即可解決:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo gpasswd -a <span class="variable">$&#123;USER&#125;</span> docker</span><br></pre></td></tr></table></figure>
+
+<p>設定好之後，記得要重新登入才會生效。</p>
+<h2 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h2><h3 id="Image"><a href="#Image" class="headerlink" title="Image"></a>Image</h3><p>映像檔，可以透過 Docker 將應用程式和執行環境打包成 image, 方便之後直接安裝到其他伺服器上。</p>
+<h3 id="Container"><a href="#Container" class="headerlink" title="Container"></a>Container</h3><p>Container 是利用 image 建立出來的，一個 Image 可以 create 多個 container, 每個 container 是獨立的，互不影響。</p>
+<h2 id="基本使用"><a href="#基本使用" class="headerlink" title="基本使用"></a>基本使用</h2><h3 id="搜尋及下載-Image"><a href="#搜尋及下載-Image" class="headerlink" title="搜尋及下載 Image"></a>搜尋及下載 Image</h3><p>在 <a target="_blank" rel="noopener" href="https://hub.docker.com/" title="Docker Hub">Docker Hub</a> 上有許多公開的 image, 可以使用以下指令來搜尋所需要的 image:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker search ubuntu</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://i.imgur.com/b7Yqlhk.png" alt="search"></p>
+<p>下載 image:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker pull ubuntu</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://i.imgur.com/v78BxLO.png" alt="pull"></p>
+<h3 id="查看所有-Image"><a href="#查看所有-Image" class="headerlink" title="查看所有 Image"></a>查看所有 Image</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker images</span><br></pre></td></tr></table></figure>
+
+<h3 id="刪除-Image"><a href="#刪除-Image" class="headerlink" title="刪除 Image"></a>刪除 Image</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker rmi [options] &lt;image&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="建立並啟動-Container"><a href="#建立並啟動-Container" class="headerlink" title="建立並啟動 Container"></a>建立並啟動 Container</h3><p>下載好 image 之後，執行以下指令就可以建立並啟動 container:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker run -it --name &lt;container_name&gt; &lt;image&gt; bash</span><br></pre></td></tr></table></figure>
+
+<p><code>-it</code> 是可以進入這個 container 的 shell 進行操作，如果要離開 container, 使用 <code>exit</code> 指令即可。</p>
+<p><code>--name</code> 設定 container 名稱。</p>
+<h3 id="查看-Container"><a href="#查看-Container" class="headerlink" title="查看 Container"></a>查看 Container</h3><p>查看目前運行的 container:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker ps</span><br></pre></td></tr></table></figure>
+
+<p>查看所有 container</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker ps -a</span><br></pre></td></tr></table></figure>
+
+<h3 id="進入-Container"><a href="#進入-Container" class="headerlink" title="進入 Container"></a>進入 Container</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker <span class="built_in">exec</span> -it &lt;container_id&gt; bash</span><br></pre></td></tr></table></figure>
+
+<h3 id="停止-Container"><a href="#停止-Container" class="headerlink" title="停止 Container"></a>停止 Container</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker stop [options] &lt;container_id&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="重新啟動-Container"><a href="#重新啟動-Container" class="headerlink" title="重新啟動 Container"></a>重新啟動 Container</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker restart [options] &lt;container_id&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="刪除-Container"><a href="#刪除-Container" class="headerlink" title="刪除 Container"></a>刪除 Container</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker <span class="built_in">rm</span> [options] &lt;container_id&gt;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Dockerize-應用程式"><a href="#Dockerize-應用程式" class="headerlink" title="Dockerize 應用程式"></a>Dockerize 應用程式</h2><p>了解基本概念以及簡單的操作指令之後，我們就可以將應用程式和執行環境打包，產生一個 image, 方便之後佈署到其他機器上。</p>
+<h3 id="建立並撰寫-Dockerfile"><a href="#建立並撰寫-Dockerfile" class="headerlink" title="建立並撰寫 Dockerfile"></a>建立並撰寫 Dockerfile</h3><p>Dockerfile 是用來記錄打包的步驟，我們先在專案目錄底下建立 <code>Dockerfile</code>，專案目錄架構如下:</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">application/</span><br><span class="line">├── Dockerfile</span><br><span class="line">├── README.md</span><br><span class="line">├── app.js</span><br><span class="line">├── node_modules/</span><br><span class="line">└── package.json</span><br></pre></td></tr></table></figure>
+
+<h4 id="選定-Base-image"><a href="#選定-Base-image" class="headerlink" title="選定 Base image"></a>選定 Base image</h4><p>Docker 的 image 是一層一層疊加，所以我們需要先從 <a target="_blank" rel="noopener" href="https://hub.docker.com/" title="Docker Hub">Docker Hub</a> 上找到適合的 base image, 再慢慢加上我們需要的東西。</p>
+<p><a target="_blank" rel="noopener" href="https://larrylu.blog/step-by-step-dockerize-your-app-ecd8940696f4"><img src="https://cdn-images-1.medium.com/max/1600/1*bKRHfz7unRA35WHd9SBOCA.png" alt="Docker"></a></p>
+<p>因為我們的專案是用 Node.js 寫的，所以這裡我們選擇 node 作為 base image，如果是 Python 或其他語言也可以找到對應的 image 作為 base image.</p>
+<p>使用 <code>FROM</code> 設定 base image:</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span> node:<span class="number">12.2</span>.<span class="number">0</span></span><br></pre></td></tr></table></figure>
+
+<p>指定 node 版本為 12.2.0，如果要用最新版也可以寫成 <code>node:latest</code>.</p>
+<h4 id="設定-Working-directory"><a href="#設定-Working-directory" class="headerlink" title="設定 Working directory"></a>設定 Working directory</h4><figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">WORKDIR</span><span class="language-bash"> /app</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="Copy-code"><a href="#Copy-code" class="headerlink" title="Copy code"></a>Copy code</h4><p>使用 copy 指令將程式碼複製到 <code>WORKDIR</code>, 這裡我們假設 <code>WORKDIR</code> 是 <code>/app/</code>:</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">COPY</span><span class="language-bash"> app.js package.json /app/</span></span><br></pre></td></tr></table></figure>
+
+<p>如果想要複製所有檔案，只排除特定檔案，可以建立 <code>.dockerignore</code>，裡面寫要排除檔案:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># Ignore files</span><br><span class="line">node_modules</span><br><span class="line">.git</span><br><span class="line">.circleci</span><br><span class="line">test</span><br><span class="line">*.txt</span><br></pre></td></tr></table></figure>
+
+<p>然後在 <code>Dockerfile</code> 就可以直接寫:</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">COPY</span><span class="language-bash"> . /app/</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="安裝所需套件"><a href="#安裝所需套件" class="headerlink" title="安裝所需套件"></a>安裝所需套件</h4><p>使用 <code>RUN</code> 執行安裝指令，清理 npm cache 是為了讓 build 出來的 image 小一點。</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">RUN</span><span class="language-bash"> npm i &amp;&amp; npm cache clean --force</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="設定-Port"><a href="#設定-Port" class="headerlink" title="設定 Port"></a>設定 Port</h4><p>設定 container 開放的 port:</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">EXPOSE</span> <span class="number">8080</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="設定環境變數"><a href="#設定環境變數" class="headerlink" title="設定環境變數"></a>設定環境變數</h4><figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ENV</span> NAME HelloWord</span><br></pre></td></tr></table></figure>
+
+<h4 id="設定-Initial-command"><a href="#設定-Initial-command" class="headerlink" title="設定 Initial command"></a>設定 Initial command</h4><p>最後就是執行程式的指令，使用 <code>CMD</code> 來設定這個 image run 起來之後要執行的預設指令:</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CMD</span><span class="language-bash"> node app.js</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="Build"><a href="#Build" class="headerlink" title="Build"></a>Build</h3><p>完成 Dockerfile 之後就可以開始建立 image, 執行:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker build -t &lt;image_name&gt;[:tag] &lt;path&gt;</span><br></pre></td></tr></table></figure>
+
+<p>建立完之後，執行 <code>docker images</code> 就可以看到多了剛才建立的 image 囉!</p>
+<h3 id="執行打包的應用程式"><a href="#執行打包的應用程式" class="headerlink" title="執行打包的應用程式"></a>執行打包的應用程式</h3><p>直接使用 <code>docker run &lt;image&gt;</code> 就可以啟動應用程式，並且預設會執行 <code>CMD</code> 設定的指令，這樣就成功了!</p>
+<p>如果想要在背景執行，可以加上 <code>-d</code> 參數，讓 container 在背景執行，如果想要看 log, 可以執行 <code>docker logs &lt;container_id&gt;</code>.</p>
+<p>另外可以使用 <code>-p</code> 將外部 Host 的 port 轉到 container 的 port, 例如: 將伺服器的 8080 port 轉到 container 的 8080 port:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -d -p 8080:8080 &lt;image&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="佈署到遠端-server"><a href="#佈署到遠端-server" class="headerlink" title="佈署到遠端 server"></a>佈署到遠端 server</h3><p>如果想要佈署到遠端 server, 有以下幾種方式:</p>
+<ol>
+<li>將 image 傳到遠端 server</li>
+<li>將 Dockerfile 和所有程式碼放在 git repo, 直接在遠端 pull repo 之後 build image</li>
+<li>將自己的 image push 到 Docker Hub</li>
+</ol>
+<p>第一點要將 image 傳到遠端 server 有點麻煩，第三點因為 Docker Hub 的 private repository 只能有一個，而 image 又包含自己的程式碼或是一些重要的 key, 不能把它設為 public repository, 所以建議用第二個方法，在遠端 server 重新 build image, 因為都是依照 Dockerfile 的步驟執行，所以不用擔心執行結果不同。</p>
+<h2 id="參考資料"><a href="#參考資料" class="headerlink" title="參考資料"></a>參考資料</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://larrylu.blog/step-by-step-dockerize-your-app-ecd8940696f4">Docker 實戰系列（一）：一步一步帶你 dockerize 你的應用</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/twtrubiks/docker-tutorial">docker-tutorial</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Docker/" rel="tag"># Docker</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/975fb730/" rel="prev" title="[Nginx] 解決 Too many open files error">
+      <i class="fa fa-chevron-left"></i> [Nginx] 解決 Too many open files error
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/posts/4c986e0c/" rel="next" title="[Nginx] 使用 Nginx 代理動態 IP 的服務">
+      [Nginx] 使用 Nginx 代理動態 IP 的服務 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B0%A1%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">簡介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%9D"><span class="nav-number">2.</span> <span class="nav-text">安裝</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A8%AD%E5%AE%9A-Repository"><span class="nav-number">2.1.</span> <span class="nav-text">設定 Repository</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Install-Docker-CE"><span class="nav-number">2.2.</span> <span class="nav-text">Install Docker CE</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="nav-number">3.</span> <span class="nav-text">基本概念</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Image"><span class="nav-number">3.1.</span> <span class="nav-text">Image</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Container"><span class="nav-number">3.2.</span> <span class="nav-text">Container</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8"><span class="nav-number">4.</span> <span class="nav-text">基本使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%90%9C%E5%B0%8B%E5%8F%8A%E4%B8%8B%E8%BC%89-Image"><span class="nav-number">4.1.</span> <span class="nav-text">搜尋及下載 Image</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8B%E6%89%80%E6%9C%89-Image"><span class="nav-number">4.2.</span> <span class="nav-text">查看所有 Image</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%AA%E9%99%A4-Image"><span class="nav-number">4.3.</span> <span class="nav-text">刪除 Image</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BB%BA%E7%AB%8B%E4%B8%A6%E5%95%9F%E5%8B%95-Container"><span class="nav-number">4.4.</span> <span class="nav-text">建立並啟動 Container</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8B-Container"><span class="nav-number">4.5.</span> <span class="nav-text">查看 Container</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%B2%E5%85%A5-Container"><span class="nav-number">4.6.</span> <span class="nav-text">進入 Container</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%81%9C%E6%AD%A2-Container"><span class="nav-number">4.7.</span> <span class="nav-text">停止 Container</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%87%8D%E6%96%B0%E5%95%9F%E5%8B%95-Container"><span class="nav-number">4.8.</span> <span class="nav-text">重新啟動 Container</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%AA%E9%99%A4-Container"><span class="nav-number">4.9.</span> <span class="nav-text">刪除 Container</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Dockerize-%E6%87%89%E7%94%A8%E7%A8%8B%E5%BC%8F"><span class="nav-number">5.</span> <span class="nav-text">Dockerize 應用程式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BB%BA%E7%AB%8B%E4%B8%A6%E6%92%B0%E5%AF%AB-Dockerfile"><span class="nav-number">5.1.</span> <span class="nav-text">建立並撰寫 Dockerfile</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%81%B8%E5%AE%9A-Base-image"><span class="nav-number">5.1.1.</span> <span class="nav-text">選定 Base image</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%A8%AD%E5%AE%9A-Working-directory"><span class="nav-number">5.1.2.</span> <span class="nav-text">設定 Working directory</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Copy-code"><span class="nav-number">5.1.3.</span> <span class="nav-text">Copy code</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%89%E8%A3%9D%E6%89%80%E9%9C%80%E5%A5%97%E4%BB%B6"><span class="nav-number">5.1.4.</span> <span class="nav-text">安裝所需套件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%A8%AD%E5%AE%9A-Port"><span class="nav-number">5.1.5.</span> <span class="nav-text">設定 Port</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%A8%AD%E5%AE%9A%E7%92%B0%E5%A2%83%E8%AE%8A%E6%95%B8"><span class="nav-number">5.1.6.</span> <span class="nav-text">設定環境變數</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%A8%AD%E5%AE%9A-Initial-command"><span class="nav-number">5.1.7.</span> <span class="nav-text">設定 Initial command</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Build"><span class="nav-number">5.2.</span> <span class="nav-text">Build</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%B7%E8%A1%8C%E6%89%93%E5%8C%85%E7%9A%84%E6%87%89%E7%94%A8%E7%A8%8B%E5%BC%8F"><span class="nav-number">5.3.</span> <span class="nav-text">執行打包的應用程式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%88%E7%BD%B2%E5%88%B0%E9%81%A0%E7%AB%AF-server"><span class="nav-number">5.4.</span> <span class="nav-text">佈署到遠端 server</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%83%E8%80%83%E8%B3%87%E6%96%99"><span class="nav-number">6.</span> <span class="nav-text">參考資料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Szu-Hsuan, Wu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">61</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">57</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/wshs0713" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;wshs0713" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:shuan0713@gmail.com" title="E-Mail → mailto:shuan0713@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="http://linkedin.com/in/wshs0713" title="LinkedIn → http:&#x2F;&#x2F;linkedin.com&#x2F;in&#x2F;wshs0713" rel="noopener" target="_blank"><i class="fab fa-linkedin fa-fw"></i>LinkedIn</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/wshs0713" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;wshs0713" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Szu-Hsuan, Wu</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://wshs0713.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "https://wshs0713.github.io/posts/ba763ef1/";
+    this.page.identifier = "posts/ba763ef1/";
+    this.page.title = "[Docker] 安裝及使用 Docker";
+    };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://wshs0713.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en,zh-tw,default">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/favicon-180x180.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-32x32.png">
+  <link rel="mask-icon" href="/img/favicon-180x180.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"wshs0713.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="簡介Elasticsearch 是一個以 Apache Lucene 為核心，分散式的 RESTful 風格的搜尋和數據分析引擎。它是以 JSON 的形式儲存資料，並提供即時的分析及搜尋。 Kibana 將 Elasticsearch 中的資料以視覺化的方式呈現，並提供操作 Elastic Stack 的 UI 介面。 ik analyzer 是一個 Elasticsearch 的中文分詞 pl">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[Elasticsearch] 使用 Elasticsearch + Kibana 實現中文全文檢索">
+<meta property="og:url" content="https://wshs0713.github.io/posts/e0cb3249/">
+<meta property="og:site_name" content="wshs0713&#39;s blog">
+<meta property="og:description" content="簡介Elasticsearch 是一個以 Apache Lucene 為核心，分散式的 RESTful 風格的搜尋和數據分析引擎。它是以 JSON 的形式儲存資料，並提供即時的分析及搜尋。 Kibana 將 Elasticsearch 中的資料以視覺化的方式呈現，並提供操作 Elastic Stack 的 UI 介面。 ik analyzer 是一個 Elasticsearch 的中文分詞 pl">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://blog.toright.com/wp-content/uploads/2017/07/elasticsearch-logo.png">
+<meta property="og:image" content="https://i.imgur.com/E6iiQTW.png">
+<meta property="og:image" content="https://i.imgur.com/eqTx39V.png">
+<meta property="article:published_time" content="2018-04-11T06:24:35.000Z">
+<meta property="article:modified_time" content="2018-04-11T06:24:35.000Z">
+<meta property="article:author" content="Szu-Hsuan, Wu">
+<meta property="article:tag" content="Elasticsearch">
+<meta property="article:tag" content="Kibana">
+<meta property="article:tag" content="ik分詞">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog.toright.com/wp-content/uploads/2017/07/elasticsearch-logo.png">
+
+<link rel="canonical" href="https://wshs0713.github.io/posts/e0cb3249/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>[Elasticsearch] 使用 Elasticsearch + Kibana 實現中文全文檢索 | wshs0713's blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-8XTKEMPTGC"></script>
+    <script>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-8XTKEMPTGC');
+      }
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">wshs0713's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Programming notes</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-projects">
+
+    <a href="/projects/" rel="section"><i class="fa fa-folder fa-fw"></i>Projects</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://wshs0713.github.io/posts/e0cb3249/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Szu-Hsuan, Wu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="wshs0713's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          [Elasticsearch] 使用 Elasticsearch + Kibana 實現中文全文檢索
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-04-11 14:24:35" itemprop="dateCreated datePublished" datetime="2018-04-11T14:24:35+08:00">2018-04-11</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ELK/" itemprop="url" rel="index"><span itemprop="name">ELK</span></a>
+                </span>
+                  , 
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ELK/Elasticsearch/" itemprop="url" rel="index"><span itemprop="name">Elasticsearch</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus: </span>
+    
+    <a title="disqus" href="/posts/e0cb3249/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="posts/e0cb3249/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>14k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>13 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><a target="_blank" rel="noopener" href="https://blog.toright.com/posts/5319/fulltext-search-elasticsearch-kibana-bigdata.html"><img src="https://blog.toright.com/wp-content/uploads/2017/07/elasticsearch-logo.png" alt="Elasticsearch"></a></p>
+<h2 id="簡介"><a href="#簡介" class="headerlink" title="簡介"></a>簡介</h2><p><a target="_blank" rel="noopener" href="https://www.elastic.co/cn/products/elasticsearch" title="Elasticsearch">Elasticsearch</a> 是一個以 <a target="_blank" rel="noopener" href="https://lucene.apache.org/core/">Apache Lucene</a> 為核心，分散式的 RESTful 風格的搜尋和數據分析引擎。它是以 JSON 的形式儲存資料，並提供即時的分析及搜尋。</p>
+<p><a target="_blank" rel="noopener" href="https://www.elastic.co/cn/products/kibana" title="Kibana">Kibana</a> 將 Elasticsearch 中的資料以視覺化的方式呈現，並提供操作 Elastic Stack 的 UI 介面。</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/medcl/elasticsearch-analysis-ik" title="ik analyzer">ik analyzer</a> 是一個 Elasticsearch 的中文分詞 plugin，由於 Elasticsearch 預設對於中文的分詞是一個字一個字切割，沒有分詞的話，中文搜尋的效果會比較差，所以我們需要加上中文分詞的 plugin, 讓搜尋的結果更好。</p>
+<span id="more"></span>
+
+<h2 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h2><p>Elasticsearch 和一般 RDBMS 的架構不同，所以在名詞上也不一樣，以下表格是 MySQL 和 Elasticsearch 名詞的對應關係:</p>
+<table>
+<thead>
+<tr>
+<th>MySQL</th>
+<th>Elasticsearch</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Server</td>
+<td>Node</td>
+</tr>
+<tr>
+<td>Database</td>
+<td>Index</td>
+</tr>
+<tr>
+<td>Table</td>
+<td>Type</td>
+</tr>
+<tr>
+<td>Row</td>
+<td>Document</td>
+</tr>
+<tr>
+<td>Column</td>
+<td>Field</td>
+</tr>
+</tbody></table>
+<p>在 Elasticsearch 中，Index 的名稱必須是小寫，而同一個 Index、同一個 Type 中的每筆 record 的資料欄位不需要相同 (NoSQL的概念)。另外，根據<a target="_blank" rel="noopener" href="https://www.elastic.co/blog/index-type-parent-child-join-now-future-in-elasticsearch">此文章</a>，在 Elasticsearch 6.x 版只允許每個 Index 包含一個 Type，在 7.x 版將會<strong>完全移除</strong> Type.</p>
+<h2 id="安裝及設定"><a href="#安裝及設定" class="headerlink" title="安裝及設定"></a>安裝及設定</h2><h3 id="安裝-amp-設定-Elasticsearch"><a href="#安裝-amp-設定-Elasticsearch" class="headerlink" title="安裝&amp;設定 Elasticsearch"></a>安裝&amp;設定 Elasticsearch</h3><p>在安裝 Elasticsearch 之前，需要先安裝 Java 環境:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ sudo apt-get update</span><br><span class="line">$ sudo apt-get install default-jre</span><br></pre></td></tr></table></figure>
+
+<p>安裝完 Java 後，就可以來安裝 Elasticsearch, 直接下載並解壓縮即可:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.7.2.tar.gz</span><br><span class="line">$ tar zxvf elasticsearch-6.7.2.tar.gz</span><br></pre></td></tr></table></figure>
+
+<p>設定 Elasticsearch (<code>&lt;ES_DIR&gt;/config/elasticsearch.yml</code>):</p>
+<p><strong>cluster name</strong><br>如果有多台 Elasticsearch node 要加入 cluster, 則必須定義相同的 cluster name.</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">cluster.name:</span> <span class="string">cluster_name</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>node.name</strong><br>自訂義 node name.</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">node.name:</span> <span class="string">node1</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>bootstrap.memory_lock</strong><br>設定為 true 是為了防止 swap 到 ES 的 memory.</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">bootstrap.memory_lock:</span> <span class="literal">true</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>network</strong></p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># ------------------------ Network ------------------------</span></span><br><span class="line"><span class="comment"># Set the bind address to a specific IP (IPv4 or IPv6):</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="attr">network.host:</span> <span class="string">host_ip</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># Set a custom port for HTTP:</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="attr">http.port:</span> <span class="string">port</span></span><br><span class="line"><span class="attr">http.cors.enabled:</span> <span class="literal">true</span></span><br><span class="line"><span class="attr">http.cors.allow-origin:</span> <span class="string">&#x27;*&#x27;</span></span><br><span class="line"><span class="attr">http.cors.allow-methods :</span> <span class="string">OPTIONS,</span> <span class="string">HEAD,</span> <span class="string">GET,</span> <span class="string">POST,</span> <span class="string">PUT,</span> <span class="string">DELETE</span></span><br><span class="line"><span class="attr">http.cors.allow-headers :</span> <span class="string">X-Requested-With,X-Auth-Token,Content-Type,</span> <span class="string">Content-Length</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>thread_pool</strong></p>
+<p>可以參考 <a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-threadpool.html">Elasticsearch官網</a></p>
+<p><code>index</code><br>  For index&#x2F;delete operations. Thread pool type is <code>fixed</code> with a size of <code># of available processors</code>, queue_size of 200. The maximum size of this pool is <code>1 + # of available processors</code>.</p>
+<p><code>write</code><br>For single-document index&#x2F;delete&#x2F;update and bulk requests. Thread pool type is fixed with a size of <code># of available processors</code>, queue_size of 200. The maximum size for this pool is <code>1 + # of available processors</code>.</p>
+<p>The <code>size</code> parameter controls the number of threads, and defaults to the number of cores times 5.</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Thread pool</span></span><br><span class="line"><span class="attr">thread_pool:</span></span><br><span class="line">    <span class="attr">index:</span></span><br><span class="line">        <span class="attr">size:</span> <span class="number">13</span></span><br><span class="line">        <span class="attr">queue_size:</span> <span class="number">1000</span></span><br><span class="line">    <span class="attr">write:</span></span><br><span class="line">        <span class="attr">size:</span> <span class="number">13</span></span><br><span class="line">        <span class="attr">queue_size:</span> <span class="number">1000</span></span><br></pre></td></tr></table></figure>
+
+<p>ps. 如果不知道機器的 available processors，可以使用 <code>nproc</code> 指令來查詢。</p>
+<p>接下來修改 JVM 的設定，Elasticsearch 預設的 JVM 大小為 1GB, 如果需要調整 memory 大小，可以在 <code>./elasticsearch-6.7.2/config/jvm.options</code> 做修改:</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Xms represents the initial size of total heap space</span></span><br><span class="line"><span class="comment"># Xmx represents the maximum size of total heap space</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Set the minimum heap size (Xms) and maximum heap size (Xmx) to be equal to each other</span></span><br><span class="line"><span class="string">-Xms4g</span></span><br><span class="line"><span class="string">-Xmx4g</span></span><br></pre></td></tr></table></figure>
+
+<p>ps. Elasticsearch 最多只會使用系統的 50% memory, 且不建議設定超過 32GB.</p>
+<p>設定好之後啟動 Elasticsearch:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">cd</span> elasticsearch-6.7.2/bin</span><br><span class="line">$ ./elasticsearch</span><br></pre></td></tr></table></figure>
+
+<p>啟動時可能會遇到一些問題，這裡列了目前有遇到的錯誤訊息和解決方式，如果啟動時有出現這些錯誤訊息可以參考以下解法:</p>
+<ul>
+<li><p>vm.max_map_count 太小<br>Error message:</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">max virtual memory areas vm.max_map_count [65530] is too low, increase to at least</span><br></pre></td></tr></table></figure>
+
+<p>解決方式: 增加 <code>vm.max_map_count</code> 的大小限制，<code>vm.max_map_count</code> 是用來限制 process 在 Virtual Memory Areas 擁有的最大數量。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo sysctl -w vm.max_map_count=262144</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>無法 lock memory<br>Error message:</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Unable to lock JVM Memory: error=12, reason=Cannot allocate memory</span><br></pre></td></tr></table></figure>
+
+<p>解決方式: 修改 <code>/etc/security/limits.conf</code> 設定</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># allow user &#x27;userA&#x27; mlockall</span><br><span class="line">userA soft memlock unlimited</span><br><span class="line">userA hard memlock unlimited</span><br></pre></td></tr></table></figure>
+
+<p>接著重新登入即可生效。</p>
+</li>
+<li><p>NullPointerException<br>Error message:</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[ERROR][o.e.b.Bootstrap ] Exception</span><br><span class="line">java.lang.NullPointerException: null</span><br></pre></td></tr></table></figure>
+
+<p>解決方式: 設定 cgroup</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">$ sudo mount -t cgroup -o rw,nosuid,nodev,noexec,relatime,cpu,cpuacct cgroup /sys/fs/cgroup/cpu,cpuacct </span><br><span class="line"></span><br><span class="line"><span class="comment"># 如果設定 line 1 的指令後，一樣無法啟動，請再試著設定以下內容:</span></span><br><span class="line"><span class="comment"># sudo mount -t cgroup -o rw,nosuid,nodev,noexec,relatime,freezer cgroup /sys/fs/cgroup/freezer</span></span><br><span class="line"><span class="comment"># sudo mount -t cgroup -o rw,nosuid,nodev,noexec,relatime,blkio cgroup /sys/fs/cgroup/blkio</span></span><br><span class="line"><span class="comment"># sudo mount -t cgroup -o rw,nosuid,nodev,noexec,relatime,hugetlb cgroup /sys/fs/cgroup/hugetlb</span></span><br><span class="line"><span class="comment"># sudo mount -t cgroup -o rw,nosuid,nodev,noexec,relatime,devices cgroup /sys/fs/cgroup/devices</span></span><br><span class="line"><span class="comment"># sudo mount -t cgroup -o rw,nosuid,nodev,noexec,relatime,net_cls,net_prio cgroup /sys/fs/cgroup/net_cls,net_prio</span></span><br><span class="line"><span class="comment"># sudo mount -t cgroup -o rw,nosuid,nodev,noexec,relatime,cpuset cgroup /sys/fs/cgroup/cpuset</span></span><br><span class="line"><span class="comment"># sudo mount -t cgroup -o rw,nosuid,nodev,noexec,relatime,memory cgroup /sys/fs/cgroup/memory</span></span><br><span class="line"><span class="comment"># sudo mount -t cgroup -o rw,nosuid,nodev,noexec,relatime,pids cgroup /sys/fs/cgroup/pids</span></span><br><span class="line"><span class="comment"># sudo mount -t cgroup -o rw,nosuid,nodev,noexec,relatime,perf_event cgroup /sys/fs/cgroup/perf_event</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="安裝-amp-設定-ik-analyzer"><a href="#安裝-amp-設定-ik-analyzer" class="headerlink" title="安裝&amp;設定 ik analyzer"></a>安裝&amp;設定 ik analyzer</h3><p>參考 <a target="_blank" rel="noopener" href="https://github.com/medcl/elasticsearch-analysis-ik" title="ik analyzer">ik analyzer</a>, 使用 elasticsearch-plugin 安裝 ik analyzer:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ./bin/elasticsearch-plugin install https://github.com/medcl/elasticsearch-analysis-ik/releases/download/v6.7.2/elasticsearch-analysis-ik-6.7.2.zip</span><br></pre></td></tr></table></figure>
+
+<p>NOTE: 將 <code>6.7.2</code> 替換為所使用的 Elasticsearch 版本。</p>
+<p>接著設定 Dictionary, 可以準備自定義的字典檔讓搜尋效果更好, 字典及設定檔可以放在 <code>&lt;ES_DIR&gt;/config/analysis-ik/</code> 或是 <code>&lt;ES_DIR&gt;/plugins/analysis-ik/config/</code> 底下，再來在 <code>IKAnalyzer.cfg.xml</code> 設定使用自定義的字典:</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=<span class="string">&quot;1.0&quot;</span> encoding=<span class="string">&quot;UTF-8&quot;</span>?&gt;</span></span><br><span class="line"><span class="meta">&lt;!DOCTYPE <span class="keyword">properties</span> <span class="keyword">SYSTEM</span> <span class="string">&quot;http://java.sun.com/dtd/properties.dtd&quot;</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">properties</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">comment</span>&gt;</span>IK Analyzer 扩展配置<span class="tag">&lt;/<span class="name">comment</span>&gt;</span></span><br><span class="line">  <span class="comment">&lt;!--用户可以在这里配置自己的扩展字典 --&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">entry</span> <span class="attr">key</span>=<span class="string">&quot;ext_dict&quot;</span>&gt;</span></span><br><span class="line">    custom/mydict.dic;</span><br><span class="line">    extra_main.dic;</span><br><span class="line">    extra_single_word_low_freq.dic;</span><br><span class="line">  <span class="tag">&lt;/<span class="name">entry</span>&gt;</span></span><br><span class="line">  <span class="comment">&lt;!--用户可以在这里配置自己的扩展停止词字典--&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">entry</span> <span class="attr">key</span>=<span class="string">&quot;ext_stopwords&quot;</span>&gt;</span></span><br><span class="line">    extra_stopword.dic</span><br><span class="line">  <span class="tag">&lt;/<span class="name">entry</span>&gt;</span></span><br><span class="line">  <span class="comment">&lt;!--用户可以在这里配置远程扩展字典 --&gt;</span></span><br><span class="line">  <span class="comment">&lt;!-- &lt;entry key=&quot;remote_ext_dict&quot;&gt;words_location&lt;/entry&gt; --&gt;</span></span><br><span class="line">  <span class="comment">&lt;!--用户可以在这里配置远程扩展停止词字典--&gt;</span></span><br><span class="line">  <span class="comment">&lt;!-- &lt;entry key=&quot;remote_ext_stopwords&quot;&gt;words_location&lt;/entry&gt; --&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">properties</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>最後重新啟動 Elasticsearch 就可以使用 ik analyzer.</p>
+<h3 id="安裝-amp-設定-Kibana"><a href="#安裝-amp-設定-Kibana" class="headerlink" title="安裝&amp;設定 Kibana"></a>安裝&amp;設定 Kibana</h3><p>直接從 <a target="_blank" rel="noopener" href="https://www.elastic.co/cn/products/kibana" title="Kibana">Kibana</a> 網站中下載並解壓縮:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ wget https://artifacts.elastic.co/downloads/kibana/kibana-6.7.2-linux-x86_64.tar.gz</span><br><span class="line">$ tar zxvf kibana-6.7.2-linux-x86_64.tar.gz</span><br><span class="line">$ <span class="built_in">cd</span> kibana-6.7.2-linux-x86_64</span><br></pre></td></tr></table></figure>
+
+<p>設定 <code>&lt;KIBANA_DIR&gt;/config/kibana.yml</code>:</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Kibana host and port</span></span><br><span class="line"><span class="attr">server.port:</span> <span class="number">5601</span></span><br><span class="line"><span class="attr">server.host:</span> <span class="string">&quot;localhost&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Elasticsearch url</span></span><br><span class="line"><span class="attr">elasticsearch.url:</span> <span class="string">&quot;http://localhost:9200&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="attr">logging.dest:</span> <span class="string">/path/to/kibana/log</span></span><br></pre></td></tr></table></figure>
+
+<p>執行 Kibana:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ./bin/kibana</span><br></pre></td></tr></table></figure>
+
+<p>啟動 Kibana 之後，開啟瀏覽器進入: <code>http://localhost:5601</code>，如果有正常連線到 Elasticsearch 就會看到以下畫面:</p>
+<p><img src="https://i.imgur.com/E6iiQTW.png" alt="Kibana"></p>
+<h2 id="操作-Elasticsearch"><a href="#操作-Elasticsearch" class="headerlink" title="操作 Elasticsearch"></a>操作 Elasticsearch</h2><h3 id="設定-Mapping"><a href="#設定-Mapping" class="headerlink" title="設定 Mapping"></a>設定 Mapping</h3><p>在建立索引之前，要先設定 Index 的 mapping，設定資料欄位的 datatype, format, analyzer 等等，讓搜尋效果可以更好，詳細的 Mapping 設定方式可以參考<a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html">官方文件</a>，這裡範例是指定資料欄位使用 ik analyzer:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">$ curl -XPOST <span class="string">&#x27;http://localhost:9200/index/type/_mapping&#x27;</span> -H <span class="string">&#x27;Content-Type:application/json&#x27;</span> -d<span class="string">&#x27;</span></span><br><span class="line"><span class="string">&#123;</span></span><br><span class="line"><span class="string">  &quot;properties&quot;: &#123;</span></span><br><span class="line"><span class="string">    &quot;content&quot;: &#123;</span></span><br><span class="line"><span class="string">      &quot;type&quot;: &quot;text&quot;,</span></span><br><span class="line"><span class="string">      &quot;analyzer&quot;: &quot;ik_max_word&quot;,</span></span><br><span class="line"><span class="string">      &quot;search_analyzer&quot;: &quot;ik_max_word&quot;</span></span><br><span class="line"><span class="string">    &#125;</span></span><br><span class="line"><span class="string">  &#125;</span></span><br><span class="line"><span class="string">&#125;&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="設定回傳的資料量限制"><a href="#設定回傳的資料量限制" class="headerlink" title="設定回傳的資料量限制"></a>設定回傳的資料量限制</h3><p>Elasticsearch 預設的 from + size 最多為 10000, 如果需要增加大小，需要修改以下設定:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$ curl -XPUT <span class="string">&#x27;http://&lt;host&gt;:&lt;port&gt;/&lt;index&gt;/_settings&#x27;</span> -d<span class="string">&#x27;</span></span><br><span class="line"><span class="string">&#123;</span></span><br><span class="line"><span class="string">  &quot;index&quot;: &#123;</span></span><br><span class="line"><span class="string">    &quot;max_result_window&quot; : &quot;300000&quot;</span></span><br><span class="line"><span class="string">  &#125;</span></span><br><span class="line"><span class="string">&#125;&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>但是有可能會占用更多記憶體，所以要小心設定。</p>
+<h3 id="設定-Log-level"><a href="#設定-Log-level" class="headerlink" title="設定 Log level"></a>設定 Log level</h3><p>當資料量大的時候，在 Elasticsearch 做全文搜尋時，CPU 使用率常常會很高，甚至到達 100%，我們可以透過設定 Log level 來減少 IO，降低 CPU 使用率:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ curl -XPUT <span class="string">&#x27;http://&lt;host&gt;:&lt;port&gt;/&lt;index&gt;/_settings&#x27;</span> -d<span class="string">&#x27;</span></span><br><span class="line"><span class="string">&#123;</span></span><br><span class="line"><span class="string">  &quot;index.search.slowlog.level&quot;: &quot;info&quot;</span></span><br><span class="line"><span class="string">&#125;&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="檢查狀態"><a href="#檢查狀態" class="headerlink" title="檢查狀態"></a>檢查狀態</h3><h4 id="Index-狀態"><a href="#Index-狀態" class="headerlink" title="Index 狀態"></a>Index 狀態</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ curl -XGET http://127.0.0.1:9200/_cat/indices?v</span><br></pre></td></tr></table></figure>
+
+<p>回傳結果:</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">health status index    uuid                   pri rep docs.count docs.deleted store.size pri.store.size</span><br><span class="line">yellow open   dcard    SWUzC7XRSU6DfGGwa_rtHw   5   1          6            0     84.4kb         84.4kb</span><br><span class="line">yellow open   ptt      DzwrF9YMRQm_vzpp_Xz8eg   5   1        912            0    166.4kb        166.4kb</span><br><span class="line">yellow open   mylog    x74lnUFcTZO1IU4rznok0w   5   1          5            0     37.5kb         37.5kb</span><br><span class="line">yellow open   my_index IFc49rh8So2AtXrW5gIXng   5   1          5            0     16.9kb         16.9kb</span><br><span class="line">yellow open   fbpost   xD9-BAR_R4ybkhAYnXzLYA   5   1          6            1     98.9kb         98.9kb</span><br><span class="line">yellow open   news     WLNPnFXpQ8yQEH8c_saClg   5   1          5            0     55.3kb         55.3kb</span><br><span class="line">green  open   .kibana  isZ0WfytSzWQcXXH0PxmWA   1   0          5            2     33.1kb         33.1kb</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>health: index 的健康狀態<ul>
+<li>red: 資料缺損，無法使用</li>
+<li>yellow: 資料只有一份，沒有 shards, 如果單一節點損壞的話，無法回復</li>
+<li>green: 資料有 shards 的備，如果單點損壞還是可以正常檢索</li>
+</ul>
+</li>
+<li>status: 是否啟用</li>
+<li>index: 索引名稱</li>
+<li>uuid: unique key</li>
+<li>pri: 主要 shards 數量</li>
+<li>rep: 備份 shards 數量</li>
+<li>docs.count: index 中 doc 筆數</li>
+<li>docs.deleted: index 中刪除的 doc 筆數</li>
+<li>store.size: 儲存主要和備份資料所占用的空間</li>
+<li>pri.store.size: 儲存主要資料所佔用的空間</li>
+</ul>
+<h4 id="線程狀態"><a href="#線程狀態" class="headerlink" title="線程狀態"></a>線程狀態</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ curl -s -XGET http://127.0.0.1:9200/_cat/thread_pool?v</span><br></pre></td></tr></table></figure>
+
+<h4 id="Cluster-狀態"><a href="#Cluster-狀態" class="headerlink" title="Cluster 狀態"></a>Cluster 狀態</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ curl -XGET http://127.0.0.1:9200/_cat/health?v</span><br></pre></td></tr></table></figure>
+
+<h4 id="Node-狀態"><a href="#Node-狀態" class="headerlink" title="Node 狀態"></a>Node 狀態</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ curl -XGET http://127.0.0.1:9200/_cat/nodes?v</span><br></pre></td></tr></table></figure>
+
+<h3 id="新增資料"><a href="#新增資料" class="headerlink" title="新增資料"></a>新增資料</h3><p>基本的指令格式:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ curl -XPUT <span class="string">&#x27;http://&lt;host&gt;:&lt;port&gt;/&lt;index&gt;/&lt;type&gt;/&lt;doc_id&gt;&#x27;</span> -d <span class="string">&#x27;</span></span><br><span class="line"><span class="string">&#123;&quot;data&quot;: data&#125;&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>其中 <code>doc_id</code> 不一定要有，如果沒有指定 <code>doc_id</code>, HTTP request method 需使用 <code>POST</code>. For example:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 指定 doc_id</span></span><br><span class="line">$ curl -XPUT http://localhost:9200/index/type/1 -H <span class="string">&#x27;Content-Type:application/json&#x27;</span> -d<span class="string">&#x27;</span></span><br><span class="line"><span class="string">&#123;&quot;content&quot;:&quot;蘋果好綠！宣布全球設施已 100％ 使用再生能源&quot;&#125;&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 不指定 doc_id</span></span><br><span class="line">$ curl -XPOST http://localhost:9200/index/type -H <span class="string">&#x27;Content-Type:application/json&#x27;</span> -d<span class="string">&#x27;</span></span><br><span class="line"><span class="string">&#123;&quot;content&quot;:&quot;阿里山花季謝幕 紫藤接替營造紫色浪漫&quot;&#125;&#x27;</span></span><br><span class="line"></span><br><span class="line">$ curl -XPOST http://localhost:9200/index/type -H <span class="string">&#x27;Content-Type:application/json&#x27;</span> -d<span class="string">&#x27;</span></span><br><span class="line"><span class="string">&#123;&quot;content&quot;:&quot;日本環球影城全新夜間遊行 四大特點搶先看&quot;&#125;&#x27;</span></span><br><span class="line"></span><br><span class="line">$ curl -XPOST http://localhost:9200/index/type -H <span class="string">&#x27;Content-Type:application/json&#x27;</span> -d<span class="string">&#x27;</span></span><br><span class="line"><span class="string">&#123;&quot;content&quot;:&quot;阿里山花季今閉幕群花接力開&quot;&#125;&#x27;</span></span><br><span class="line"></span><br><span class="line">$ curl -XPOST http://localhost:9200/index/fulltext -H <span class="string">&#x27;Content-Type:application/json&#x27;</span> -d<span class="string">&#x27;</span></span><br><span class="line"><span class="string">&#123;&quot;content&quot;:&quot;不甩聯合國美國怒嗆：要讓「怪物」阿薩德付出代價&quot;&#125;&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="查詢資料-By-doc-id"><a href="#查詢資料-By-doc-id" class="headerlink" title="查詢資料 (By doc_id)"></a>查詢資料 (By doc_id)</h3><p>基本指令格式:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ curl <span class="string">&#x27;http://&lt;host&gt;:&lt;port&gt;/&lt;index&gt;/&lt;type&gt;/&lt;doc_id&gt;?pretty=true</span></span><br></pre></td></tr></table></figure>
+
+<p>其中 URL 參數 <code>pretty=true</code> 代表以方便讀取的格式回傳, for example:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ curl <span class="string">&#x27;http://localhost:9200/index/type/1?pretty=true&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>回傳結果:</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;_index&quot;</span> <span class="punctuation">:</span> <span class="string">&quot;index&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;_type&quot;</span> <span class="punctuation">:</span> <span class="string">&quot;type&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;_id&quot;</span> <span class="punctuation">:</span> <span class="string">&quot;1&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;_version&quot;</span> <span class="punctuation">:</span> <span class="number">1</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;found&quot;</span> <span class="punctuation">:</span> <span class="literal"><span class="keyword">true</span></span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;_source&quot;</span> <span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;content&quot;</span><span class="punctuation">:</span><span class="string">&quot;蘋果好綠！宣布全球設施已 100％ 使用再生能源&quot;</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="刪除資料"><a href="#刪除資料" class="headerlink" title="刪除資料"></a>刪除資料</h3><p>使用 <code>DELETE</code> method, for example:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ curl -XDELETE <span class="string">&#x27;http://localhost:9200/index/type/1&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>也可以直接刪除 Index 中的所有資料:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ curl -XDELETE <span class="string">&#x27;http://localhost:9200/index&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="更新資料"><a href="#更新資料" class="headerlink" title="更新資料"></a>更新資料</h3><p>使用 <code>PUT</code> method, 重新發送一次 request 即可:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ curl -XPUT http://localhost:9200/index/type/1 -H <span class="string">&#x27;Content-Type:application/json&#x27;</span> -d<span class="string">&#x27;</span></span><br><span class="line"><span class="string">&#123;&quot;content&quot;:&quot;蘋果好綠！宣布全球設施已 100％ 使用再生能源. Update!!&quot;&#125;&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>回傳結果:</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;_index&quot;</span><span class="punctuation">:</span> <span class="string">&quot;index&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;_type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;type&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;_id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;1&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;_version&quot;</span><span class="punctuation">:</span> <span class="number">2</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;result&quot;</span><span class="punctuation">:</span> <span class="string">&quot;updated&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;_shards&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;total&quot;</span><span class="punctuation">:</span> <span class="number">2</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;successful&quot;</span><span class="punctuation">:</span> <span class="number">1</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;failed&quot;</span><span class="punctuation">:</span> <span class="number">0</span></span><br><span class="line">  <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;_seq_no&quot;</span><span class="punctuation">:</span> <span class="number">3</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;_primary_term&quot;</span><span class="punctuation">:</span> <span class="number">1</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>我們可以看到回傳的結果中 <code>_version</code> 是 2, <code>result</code> 為 <code>updated</code>, 代表是更新資料而不是新增資料。</p>
+<h3 id="搜尋"><a href="#搜尋" class="headerlink" title="搜尋"></a>搜尋</h3><p>使用 Elasticsearch 最重要的就是搜尋的功能，我們使用它所提供的 <a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/elasticsearch/reference/current/search.html">Search API</a> 來搜尋:</p>
+<h4 id="取得所有紀錄"><a href="#取得所有紀錄" class="headerlink" title="取得所有紀錄"></a>取得所有紀錄</h4><p>使用 <code>GET</code> method, 後面加上 <code>_search</code>:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ curl <span class="string">&#x27;http://localhost:9200/index/type/_search&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>回傳結果:</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;took&quot;</span><span class="punctuation">:</span> <span class="number">31</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;timed_out&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">false</span></span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;_shards&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;total&quot;</span><span class="punctuation">:</span> <span class="number">5</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;successful&quot;</span><span class="punctuation">:</span> <span class="number">5</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;skipped&quot;</span><span class="punctuation">:</span> <span class="number">0</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;failed&quot;</span><span class="punctuation">:</span> <span class="number">0</span></span><br><span class="line">  <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;hits&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;total&quot;</span><span class="punctuation">:</span> <span class="number">5</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;max_score&quot;</span><span class="punctuation">:</span> <span class="number">1</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;hits&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">      <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;_index&quot;</span><span class="punctuation">:</span> <span class="string">&quot;index&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;_type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;type&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;_id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;PXlMs2IBy_MbTvZJQ_1N&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;_score&quot;</span><span class="punctuation">:</span> <span class="number">1</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;_source&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">          <span class="attr">&quot;content&quot;</span><span class="punctuation">:</span> <span class="string">&quot;阿里山花季謝幕 紫藤接替營造紫色浪漫&quot;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">      <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;_index&quot;</span><span class="punctuation">:</span> <span class="string">&quot;index&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;_type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;type&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;_id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;1&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;_score&quot;</span><span class="punctuation">:</span> <span class="number">1</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;_source&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">          <span class="attr">&quot;content&quot;</span><span class="punctuation">:</span> <span class="string">&quot;蘋果好綠！宣布全球設施已 100％ 使用再生能源&quot;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">      <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">      <span class="comment">// ...</span></span><br><span class="line">    <span class="punctuation">]</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="全文搜尋"><a href="#全文搜尋" class="headerlink" title="全文搜尋"></a>全文搜尋</h4><p>Elasticsearch 有自己的查詢語法，詳細可以參考 <a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html">Query DSL</a>, 這裡的範例是搜尋 <code>美國</code> 並將比對到的地方 highlight:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">$ curl <span class="string">&#x27;localhost:9200/index/type/_search&#x27;</span>  -d <span class="string">&#x27;</span></span><br><span class="line"><span class="string">&#123;</span></span><br><span class="line"><span class="string">  &quot;query&quot; : &#123;</span></span><br><span class="line"><span class="string">    &quot;match&quot;: &#123; &quot;content&quot;: &quot;美國&quot; &#125;</span></span><br><span class="line"><span class="string">  &#125;,</span></span><br><span class="line"><span class="string">  &quot;highlight&quot; : &#123;</span></span><br><span class="line"><span class="string">    &quot;fields&quot; : &#123;</span></span><br><span class="line"><span class="string">      &quot;content&quot; : &#123;&#125;</span></span><br><span class="line"><span class="string">    &#125;</span></span><br><span class="line"><span class="string">  &#125;</span></span><br><span class="line"><span class="string">&#125;&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>搜尋結果:</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;took&quot;</span><span class="punctuation">:</span> <span class="number">5</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;timed_out&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">false</span></span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;_shards&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;total&quot;</span><span class="punctuation">:</span> <span class="number">5</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;successful&quot;</span><span class="punctuation">:</span> <span class="number">5</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;skipped&quot;</span><span class="punctuation">:</span> <span class="number">0</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;failed&quot;</span><span class="punctuation">:</span> <span class="number">0</span></span><br><span class="line">  <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;hits&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;total&quot;</span><span class="punctuation">:</span> <span class="number">1</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;max_score&quot;</span><span class="punctuation">:</span> <span class="number">0.92769736</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;hits&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">      <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;_index&quot;</span><span class="punctuation">:</span> <span class="string">&quot;index&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;_type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;type&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;_id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;QHlMs2IBy_MbTvZJXv3t&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;_score&quot;</span><span class="punctuation">:</span> <span class="number">0.92769736</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;_source&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">          <span class="attr">&quot;content&quot;</span><span class="punctuation">:</span> <span class="string">&quot;不甩聯合國美國怒嗆：要讓「怪物」阿薩德付出代價&quot;</span></span><br><span class="line">        <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;highlight&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">          <span class="attr">&quot;content&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">            <span class="string">&quot;不甩聯合國&lt;em&gt;美國&lt;/em&gt;怒嗆：要讓「怪物」阿薩德付出代價&quot;</span></span><br><span class="line">          <span class="punctuation">]</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">      <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">]</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="備份"><a href="#備份" class="headerlink" title="備份"></a>備份</h3><p>Elasticsearch 的備份，可以參考由 taskrabbit 開發的 <a target="_blank" rel="noopener" href="https://github.com/taskrabbit/elasticsearch-dump">elasticsearch-dump</a> 工具來做資料的備份及轉移。</p>
+<h2 id="操作-Kibana"><a href="#操作-Kibana" class="headerlink" title="操作 Kibana"></a>操作 Kibana</h2><p>由於從 cmd 操作 Elasticsearch 比較難閱讀，Kibana 提供漂亮的介面，讓我們可以更方便地操作 Elasticsearch, 並將 Elasticsearch 中的資料以視覺化的方式呈現，這裡我們簡單介紹一下 Kibana 的使用方式。</p>
+<p><img src="https://i.imgur.com/eqTx39V.png" alt="Kibana UI"></p>
+<p>一進到 Kibana 頁面，我們可以看到左側主選單有以下幾個功能:</p>
+<ul>
+<li>Discover: 檢視每個索引下的紀錄筆數和內容。</li>
+<li>Visualize: 將搜尋結果是以視覺化的圖表呈現，並可以將搜尋結果或圖表儲存。</li>
+<li>Dashboard: 組合多個已儲存的圖表或搜尋結果，方便一次瀏覽所有資訊。</li>
+<li>Dev Tools: 是一個方便的除錯測試工具，可以在 Console 輸入指令直接操作 Elasticsearch.</li>
+<li>Management: 設定 Kibana 對應的 Elasticsearch index patterns, 管理已儲存的搜尋結果 object、視覺化圖表以及進階的設定。</li>
+</ul>
+<p>如果是第一次使用，我們需要先到 Management 建立 Index pattern, 這樣就可以在 Discover 中搜尋特定條件的資料，並且在 Visualize 中以視覺化圖表的方式呈現，最後透過 Dashboard 組合多個搜尋結果 object 和圖表，一次瀏覽所需要的資訊。</p>
+<h2 id="參考資料"><a href="#參考資料" class="headerlink" title="參考資料"></a>參考資料</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://blog.toright.com/posts/5319/fulltext-search-elasticsearch-kibana-bigdata.html">安裝 ElasticSearch + Kibana 實現中文全文搜尋與數據分析</a></li>
+<li><a target="_blank" rel="noopener" href="http://www.ruanyifeng.com/blog/2017/08/elasticsearch.html">全文搜索引擎 Elasticsearch 入门教程</a></li>
+<li><a target="_blank" rel="noopener" href="https://ithelp.ithome.com.tw/articles/10189791">[ELK] Elasticsearch 安裝 (5.4.1版本)</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/008f1c2a3653">elasticsearch6.3.2安装</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Elasticsearch/" rel="tag"># Elasticsearch</a>
+              <a href="/tags/Kibana/" rel="tag"># Kibana</a>
+              <a href="/tags/ik%E5%88%86%E8%A9%9E/" rel="tag"># ik分詞</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/819b05c6/" rel="prev" title="[Node.js] 使用 SSL/TLS 憑證">
+      <i class="fa fa-chevron-left"></i> [Node.js] 使用 SSL/TLS 憑證
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/posts/9cefa9a7/" rel="next" title="[Elasticsearch] Elasticsearch + Kibana 設定使用者認證">
+      [Elasticsearch] Elasticsearch + Kibana 設定使用者認證 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B0%A1%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">簡介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="nav-number">2.</span> <span class="nav-text">基本概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%9D%E5%8F%8A%E8%A8%AD%E5%AE%9A"><span class="nav-number">3.</span> <span class="nav-text">安裝及設定</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%89%E8%A3%9D-amp-%E8%A8%AD%E5%AE%9A-Elasticsearch"><span class="nav-number">3.1.</span> <span class="nav-text">安裝&amp;設定 Elasticsearch</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%89%E8%A3%9D-amp-%E8%A8%AD%E5%AE%9A-ik-analyzer"><span class="nav-number">3.2.</span> <span class="nav-text">安裝&amp;設定 ik analyzer</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%89%E8%A3%9D-amp-%E8%A8%AD%E5%AE%9A-Kibana"><span class="nav-number">3.3.</span> <span class="nav-text">安裝&amp;設定 Kibana</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%93%8D%E4%BD%9C-Elasticsearch"><span class="nav-number">4.</span> <span class="nav-text">操作 Elasticsearch</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A8%AD%E5%AE%9A-Mapping"><span class="nav-number">4.1.</span> <span class="nav-text">設定 Mapping</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A8%AD%E5%AE%9A%E5%9B%9E%E5%82%B3%E7%9A%84%E8%B3%87%E6%96%99%E9%87%8F%E9%99%90%E5%88%B6"><span class="nav-number">4.2.</span> <span class="nav-text">設定回傳的資料量限制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A8%AD%E5%AE%9A-Log-level"><span class="nav-number">4.3.</span> <span class="nav-text">設定 Log level</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%AA%A2%E6%9F%A5%E7%8B%80%E6%85%8B"><span class="nav-number">4.4.</span> <span class="nav-text">檢查狀態</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Index-%E7%8B%80%E6%85%8B"><span class="nav-number">4.4.1.</span> <span class="nav-text">Index 狀態</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%B7%9A%E7%A8%8B%E7%8B%80%E6%85%8B"><span class="nav-number">4.4.2.</span> <span class="nav-text">線程狀態</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Cluster-%E7%8B%80%E6%85%8B"><span class="nav-number">4.4.3.</span> <span class="nav-text">Cluster 狀態</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Node-%E7%8B%80%E6%85%8B"><span class="nav-number">4.4.4.</span> <span class="nav-text">Node 狀態</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B0%E5%A2%9E%E8%B3%87%E6%96%99"><span class="nav-number">4.5.</span> <span class="nav-text">新增資料</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9F%A5%E8%A9%A2%E8%B3%87%E6%96%99-By-doc-id"><span class="nav-number">4.6.</span> <span class="nav-text">查詢資料 (By doc_id)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%AA%E9%99%A4%E8%B3%87%E6%96%99"><span class="nav-number">4.7.</span> <span class="nav-text">刪除資料</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9B%B4%E6%96%B0%E8%B3%87%E6%96%99"><span class="nav-number">4.8.</span> <span class="nav-text">更新資料</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%90%9C%E5%B0%8B"><span class="nav-number">4.9.</span> <span class="nav-text">搜尋</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8F%96%E5%BE%97%E6%89%80%E6%9C%89%E7%B4%80%E9%8C%84"><span class="nav-number">4.9.1.</span> <span class="nav-text">取得所有紀錄</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%A8%E6%96%87%E6%90%9C%E5%B0%8B"><span class="nav-number">4.9.2.</span> <span class="nav-text">全文搜尋</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%82%99%E4%BB%BD"><span class="nav-number">4.10.</span> <span class="nav-text">備份</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%93%8D%E4%BD%9C-Kibana"><span class="nav-number">5.</span> <span class="nav-text">操作 Kibana</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%83%E8%80%83%E8%B3%87%E6%96%99"><span class="nav-number">6.</span> <span class="nav-text">參考資料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Szu-Hsuan, Wu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">61</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">57</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/wshs0713" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;wshs0713" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:shuan0713@gmail.com" title="E-Mail → mailto:shuan0713@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="http://linkedin.com/in/wshs0713" title="LinkedIn → http:&#x2F;&#x2F;linkedin.com&#x2F;in&#x2F;wshs0713" rel="noopener" target="_blank"><i class="fab fa-linkedin fa-fw"></i>LinkedIn</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/wshs0713" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;wshs0713" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Szu-Hsuan, Wu</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://wshs0713.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "https://wshs0713.github.io/posts/e0cb3249/";
+    this.page.identifier = "posts/e0cb3249/";
+    this.page.title = "[Elasticsearch] 使用 Elasticsearch + Kibana 實現中文全文檢索";
+    };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://wshs0713.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+</body>
+</html>

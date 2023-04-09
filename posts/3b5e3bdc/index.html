@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en,zh-tw,default">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/favicon-180x180.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-32x32.png">
+  <link rel="mask-icon" href="/img/favicon-180x180.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"wshs0713.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="前言最近正好在研究 Google Cloud Platform (GCP)，GCP 有提供 300 美元的免費試用額度，期限是一年，免費額度用完之後需要升級帳戶才會再繼續扣款，所以可以不用擔心額度用完後就會被收錢，另外 GCP 也有提供免費的方案，可以參考 Google Cloud Platform 免費版，在用量限制內可以免費使用特定的產品。 這裡我們主要使用的產品是 GCP 中的 Compu">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[GCP] Google Compute Engine SSH連線設定">
+<meta property="og:url" content="https://wshs0713.github.io/posts/3b5e3bdc/">
+<meta property="og:site_name" content="wshs0713&#39;s blog">
+<meta property="og:description" content="前言最近正好在研究 Google Cloud Platform (GCP)，GCP 有提供 300 美元的免費試用額度，期限是一年，免費額度用完之後需要升級帳戶才會再繼續扣款，所以可以不用擔心額度用完後就會被收錢，另外 GCP 也有提供免費的方案，可以參考 Google Cloud Platform 免費版，在用量限制內可以免費使用特定的產品。 這裡我們主要使用的產品是 GCP 中的 Compu">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://bit.ly/2NF2Nvg">
+<meta property="og:image" content="https://i.imgur.com/r3MK14E.png">
+<meta property="og:image" content="https://i.imgur.com/JWpp7NU.png">
+<meta property="og:image" content="https://i.imgur.com/r3MK14E.png">
+<meta property="og:image" content="https://i.imgur.com/6zLm8Gx.png">
+<meta property="og:image" content="https://i.imgur.com/Z1ME2FQ.png">
+<meta property="article:published_time" content="2018-10-12T06:25:24.000Z">
+<meta property="article:modified_time" content="2018-10-12T06:25:24.000Z">
+<meta property="article:author" content="Szu-Hsuan, Wu">
+<meta property="article:tag" content="GCP">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://bit.ly/2NF2Nvg">
+
+<link rel="canonical" href="https://wshs0713.github.io/posts/3b5e3bdc/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>[GCP] Google Compute Engine SSH連線設定 | wshs0713's blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-8XTKEMPTGC"></script>
+    <script>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-8XTKEMPTGC');
+      }
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">wshs0713's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Programming notes</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-projects">
+
+    <a href="/projects/" rel="section"><i class="fa fa-folder fa-fw"></i>Projects</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://wshs0713.github.io/posts/3b5e3bdc/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Szu-Hsuan, Wu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="wshs0713's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          [GCP] Google Compute Engine SSH連線設定
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-10-12 14:25:24" itemprop="dateCreated datePublished" datetime="2018-10-12T14:25:24+08:00">2018-10-12</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/GCP/" itemprop="url" rel="index"><span itemprop="name">GCP</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus: </span>
+    
+    <a title="disqus" href="/posts/3b5e3bdc/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="posts/3b5e3bdc/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>1.5k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>1 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><img src="https://bit.ly/2NF2Nvg" alt="Google Cloud Platform"></p>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>最近正好在研究 Google Cloud Platform (GCP)，GCP 有提供 300 美元的免費試用額度，期限是一年，免費額度用完之後需要升級帳戶才會再繼續扣款，所以可以不用擔心額度用完後就會被收錢，另外 GCP 也有提供免費的方案，可以參考 <a target="_blank" rel="noopener" href="https://cloud.google.com/free/">Google Cloud Platform 免費版</a>，在用量限制內可以免費使用特定的產品。</p>
+<p>這裡我們主要使用的產品是 GCP 中的 Compute Engine，它提供了許多主機規格可以自行定義，並依照不同規格來收費，計價方式可以參考 <a target="_blank" rel="noopener" href="https://cloud.google.com/pricing/list">Google Cloud 價目表</a>。</p>
+<p>這篇文章主要是紀錄在 Google Compute Engine 架設好之後，如何使用 SSH 連線到 Compute Engine 上，而不用從 Google developer console 頁面中連線到機器上。</p>
+<span id="more"></span>
+
+<h1 id="Linux-和-OSX-連線至-Compute-Engine"><a href="#Linux-和-OSX-連線至-Compute-Engine" class="headerlink" title="Linux 和 OSX 連線至 Compute Engine"></a>Linux 和 OSX 連線至 Compute Engine</h1><p>首先，我們需要先產生 SSH key:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ssh-keygen -t rsa -f ~/.ssh/ssh-key-gcp -C [username]</span><br></pre></td></tr></table></figure>
+
+<p>其中的 <code>username</code> 是執行個體中要套用的金鑰使用者，如果沒有指定，Compute Engine 會自動使用產生這個金鑰的使用者。</p>
+<p>執行完上面的指令之後，會在 <code>~/.ssh/</code> 中看到以下檔案:</p>
+<ul>
+<li>ssh-key-gcp: private key, 權限必須是 <code>600</code>.</li>
+<li>ssh-key-gcp.pub: public key, 權限為 <code>644</code>.</li>
+</ul>
+<p>接著輸入以下指令，印出 public key 內容:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">cat</span> ssh-key-gcp.pub</span><br></pre></td></tr></table></figure>
+
+<p>將 public key 的內容複製後，前往專案的<a target="_blank" rel="noopener" href="https://console.cloud.google.com/compute/metadata/sshKeys?hl=zh-tw&_ga=2.71562451.-1591071787.1529480427">中繼資料</a>頁面:</p>
+<p><img src="https://i.imgur.com/r3MK14E.png" alt="中繼資料"></p>
+<p>選擇 <strong>SSH 金鑰</strong> 後，點選 <strong>編輯</strong> 按鈕，修改專案的 SSH key，將 public key 的內容貼到 SSH key 清單中，<br>最後點選 <strong>儲存</strong>，即可在 Terminal 使用以下指令連線到 Compute Engine:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ssh -i ~/.ssh/ssh-key-gcp [username]@[compute_engine_ip]</span><br></pre></td></tr></table></figure>
+
+<h1 id="Windows-連線至-Compute-Engine"><a href="#Windows-連線至-Compute-Engine" class="headerlink" title="Windows 連線至 Compute Engine"></a>Windows 連線至 Compute Engine</h1><p>在 Windows 系統中，我們一樣要先產生 SSH key，需要透過 <a target="_blank" rel="noopener" href="http://www.chiark.greenend.org.uk/~sgtatham/putty/download.html">puttygen</a> 這個工具來產生。</p>
+<p>下載並執行 puttygen，可以在這個工具中調整金鑰產生的設定，大部分情況下使用預設的選項即可，設定好之後點選 <strong>Generate</strong> 即可產生金鑰。</p>
+<p>接著在 <strong>key comment</strong> 的地方輸入 <code>username</code> (Google 使用者名稱)，並點選 <strong>Save private key</strong> 將 private key 儲存為 <code>ssh-key-gcp.ppk</code>， 以及點選 <strong>Save public key</strong> 儲存 public key 以便之後使用。</p>
+<p><img src="https://i.imgur.com/JWpp7NU.png" alt="puttygen"></p>
+<p>再來將 puttygen 中顯示的 public key 內容複製後，前往專案的<a target="_blank" rel="noopener" href="https://console.cloud.google.com/compute/metadata/sshKeys?hl=zh-tw&_ga=2.71562451.-1591071787.1529480427">中繼資料</a>頁面:</p>
+<p><img src="https://i.imgur.com/r3MK14E.png" alt="中繼資料"></p>
+<p>選擇 <strong>SSH 金鑰</strong> 後，點選 <strong>編輯</strong> 按鈕，修改專案的 SSH key，將 public key 的內容貼到 SSH key 清單中，最後點選 <strong>儲存</strong>，再來開啟 putty 後，輸入使用者名稱和 Compute Engine IP:</p>
+<p><img src="https://i.imgur.com/6zLm8Gx.png" alt="putty"></p>
+<p>接著點選 <strong>Connection</strong> &gt; <strong>SSH</strong> &gt; <strong>Auth</strong>，選擇上面步驟所產生的 Private key file (<code>ssh-key-gcp.ppk</code>):</p>
+<p><img src="https://i.imgur.com/Z1ME2FQ.png" alt="putty"></p>
+<p>這樣就可以在 Windows 中使用 putty 連線到 Compute Engine 囉!</p>
+<h1 id="參考資料"><a href="#參考資料" class="headerlink" title="參考資料"></a>參考資料</h1><ul>
+<li><a target="_blank" rel="noopener" href="https://cloud.google.com/compute/docs/instances/connecting-to-instance?hl=zh-tw">連線至 Linux 執行個體</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/GCP/" rel="tag"># GCP</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/7c844aef/" rel="prev" title="[Linux] 設定系統時區和時間">
+      <i class="fa fa-chevron-left"></i> [Linux] 設定系統時區和時間
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/posts/c04104b4/" rel="next" title="[Elasticsearch] 解決 FORBIDDEN/12/index read-only / allow delete (api) 的問題">
+      [Elasticsearch] 解決 FORBIDDEN/12/index read-only / allow delete (api) 的問題 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Linux-%E5%92%8C-OSX-%E9%80%A3%E7%B7%9A%E8%87%B3-Compute-Engine"><span class="nav-number">2.</span> <span class="nav-text">Linux 和 OSX 連線至 Compute Engine</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Windows-%E9%80%A3%E7%B7%9A%E8%87%B3-Compute-Engine"><span class="nav-number">3.</span> <span class="nav-text">Windows 連線至 Compute Engine</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%83%E8%80%83%E8%B3%87%E6%96%99"><span class="nav-number">4.</span> <span class="nav-text">參考資料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Szu-Hsuan, Wu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">61</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">57</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/wshs0713" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;wshs0713" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:shuan0713@gmail.com" title="E-Mail → mailto:shuan0713@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="http://linkedin.com/in/wshs0713" title="LinkedIn → http:&#x2F;&#x2F;linkedin.com&#x2F;in&#x2F;wshs0713" rel="noopener" target="_blank"><i class="fab fa-linkedin fa-fw"></i>LinkedIn</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/wshs0713" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;wshs0713" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Szu-Hsuan, Wu</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://wshs0713.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "https://wshs0713.github.io/posts/3b5e3bdc/";
+    this.page.identifier = "posts/3b5e3bdc/";
+    this.page.title = "[GCP] Google Compute Engine SSH連線設定";
+    };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://wshs0713.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+</body>
+</html>

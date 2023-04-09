@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en,zh-tw,default">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/favicon-180x180.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-32x32.png">
+  <link rel="mask-icon" href="/img/favicon-180x180.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"wshs0713.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="最近從 Sublime 跳槽到 Visual Studio Code(VS Code)，雖然在開啟速度上，會明顯地感覺到比 Sublime 慢，但是 VS Code 有很多的 plugin 可以讓開發效率更好，雖然 Sublime 也有不少 plugin，但是有些很基本的功能還要另外安裝，有點麻煩(例如: SideBarEnhancements，這大概是裝完 Sublime 之後第一個裝的 pl">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[VS Code] VS Code Plugins">
+<meta property="og:url" content="https://wshs0713.github.io/posts/5b00a1ae/">
+<meta property="og:site_name" content="wshs0713&#39;s blog">
+<meta property="og:description" content="最近從 Sublime 跳槽到 Visual Studio Code(VS Code)，雖然在開啟速度上，會明顯地感覺到比 Sublime 慢，但是 VS Code 有很多的 plugin 可以讓開發效率更好，雖然 Sublime 也有不少 plugin，但是有些很基本的功能還要另外安裝，有點麻煩(例如: SideBarEnhancements，這大概是裝完 Sublime 之後第一個裝的 pl">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://bit.ly/2FcMbaC">
+<meta property="og:image" content="https://i.imgur.com/r1R0oau.png">
+<meta property="og:image" content="https://i.imgur.com/4h2jTzp.png">
+<meta property="og:image" content="https://i.imgur.com/kZW2AAN.png">
+<meta property="og:image" content="https://i.imgur.com/O56prvv.png">
+<meta property="og:image" content="https://i.imgur.com/2aryGDX.gif">
+<meta property="og:image" content="https://i.imgur.com/8Ays7uD.gif">
+<meta property="og:image" content="https://i.imgur.com/LWS51GN.gif">
+<meta property="og:image" content="https://user-images.githubusercontent.com/1908863/28495106-30b3b15e-6f09-11e7-8eb6-ca4ca001ab15.png">
+<meta property="og:image" content="https://i.imgur.com/99GvHD7.gif">
+<meta property="og:image" content="https://i.imgur.com/cK8iE5E.gif">
+<meta property="og:image" content="https://i.imgur.com/4vpyOZY.gif">
+<meta property="og:image" content="https://i.imgur.com/KUVHydP.png">
+<meta property="og:image" content="https://i.imgur.com/pT6kCAr.gif">
+<meta property="article:published_time" content="2018-01-22T04:27:41.000Z">
+<meta property="article:modified_time" content="2023-04-08T08:35:41.000Z">
+<meta property="article:author" content="Szu-Hsuan, Wu">
+<meta property="article:tag" content="VS Code">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://bit.ly/2FcMbaC">
+
+<link rel="canonical" href="https://wshs0713.github.io/posts/5b00a1ae/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>[VS Code] VS Code Plugins | wshs0713's blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-8XTKEMPTGC"></script>
+    <script>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-8XTKEMPTGC');
+      }
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">wshs0713's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Programming notes</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-projects">
+
+    <a href="/projects/" rel="section"><i class="fa fa-folder fa-fw"></i>Projects</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://wshs0713.github.io/posts/5b00a1ae/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Szu-Hsuan, Wu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="wshs0713's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          [VS Code] VS Code Plugins
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-01-22 12:27:41" itemprop="dateCreated datePublished" datetime="2018-01-22T12:27:41+08:00">2018-01-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-04-08 16:35:41" itemprop="dateModified" datetime="2023-04-08T16:35:41+08:00">2023-04-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/VS-Code/" itemprop="url" rel="index"><span itemprop="name">VS Code</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus: </span>
+    
+    <a title="disqus" href="/posts/5b00a1ae/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="posts/5b00a1ae/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>14k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>13 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><a target="_blank" rel="noopener" href="http://bit.ly/2FcMbaC"><img src="http://bit.ly/2FcMbaC" alt="VS Code"></a></p>
+<p>最近從 Sublime 跳槽到 Visual Studio Code(VS Code)，雖然在開啟速度上，會明顯地感覺到比 Sublime 慢，但是 VS Code 有很多的 plugin 可以讓開發效率更好，雖然 Sublime 也有不少 plugin，但是有些很基本的功能還要另外安裝，有點麻煩(例如: SideBarEnhancements，這大概是裝完 Sublime 之後第一個裝的 plugin XD)，再加上常常在儲存檔案時出現提醒視窗也很煩，最後就決定跳槽到 VS Code，在這裡紀錄一下自己在開發時常用的 plugins.</p>
+<span id="more"></span>
+
+<h2 id="Themes-amp-Icon"><a href="#Themes-amp-Icon" class="headerlink" title="Themes &amp; Icon"></a>Themes &amp; Icon</h2><h3 id="Flatland-Monokai-Theme"><a href="#Flatland-Monokai-Theme" class="headerlink" title="Flatland Monokai Theme"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=gerane.Theme-FlatlandMonokai">Flatland Monokai Theme</a></h3><p><img src="https://i.imgur.com/r1R0oau.png"></p>
+<ul>
+<li>更多主題: <a target="_blank" rel="noopener" href="http://orta.io/vscode-themes/">Themes</a></li>
+</ul>
+<h3 id="Material-Icon-Theme"><a href="#Material-Icon-Theme" class="headerlink" title="Material Icon Theme"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=PKief.material-icon-theme">Material Icon Theme</a></h3><h4 id="File-icon"><a href="#File-icon" class="headerlink" title="File icon"></a>File icon</h4><p><img src="https://i.imgur.com/4h2jTzp.png"></p>
+<h4 id="Folder-icon"><a href="#Folder-icon" class="headerlink" title="Folder icon"></a>Folder icon</h4><p><img src="https://i.imgur.com/kZW2AAN.png"></p>
+<h3 id="Vscode-Terminal-Themes"><a href="#Vscode-Terminal-Themes" class="headerlink" title="Vscode Terminal Themes"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=ctf0.vscode-terminal-themes">Vscode Terminal Themes</a></h3><p>Terminal Themes for Visual Studio Code.</p>
+<ul>
+<li>All theme preview: <a target="_blank" rel="noopener" href="https://glitchbone.github.io/vscode-base16-term/#/">https://glitchbone.github.io/vscode-base16-term/#/</a></li>
+</ul>
+<hr>
+<h2 id="Linter"><a href="#Linter" class="headerlink" title="Linter"></a>Linter</h2><h3 id="ESLint"><a href="#ESLint" class="headerlink" title="ESLint"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint">ESLint</a></h3><p>Integrates ESLint into VS Code.</p>
+<ul>
+<li>常見的規則有<a target="_blank" rel="noopener" href="https://github.com/airbnb/javascript">Airbnb</a>、<a target="_blank" rel="noopener" href="https://github.com/google/eslint-config-google">Google</a></li>
+</ul>
+<h3 id="stylelint"><a href="#stylelint" class="headerlink" title="stylelint"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=shinnn.stylelint">stylelint</a></h3><p>Linter for CSS, SCSS, Less.</p>
+<h3 id="markdownlint"><a href="#markdownlint" class="headerlink" title="markdownlint"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=DavidAnson.vscode-markdownlint">markdownlint</a></h3><p>Linter for Markdown.</p>
+<h3 id="cornflakes-linter"><a href="#cornflakes-linter" class="headerlink" title="cornflakes-linter"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=kevinglasson.cornflakes-linter">cornflakes-linter</a></h3><p>Wrapper for Python flake8 linter and associated plugins.</p>
+<hr>
+<h2 id="Formatter"><a href="#Formatter" class="headerlink" title="Formatter"></a>Formatter</h2><h3 id="Prettier-Code-formatter"><a href="#Prettier-Code-formatter" class="headerlink" title="Prettier - Code formatter"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode">Prettier - Code formatter</a></h3><p>Prettier is an opinionated code formatter. It enforces a consistent style by parsing your code and re-printing it with its own rules that take the maximum line length into account, wrapping code when necessary.</p>
+<ul>
+<li>JavaScript, TypeScript, Flow, JSX, JSON</li>
+<li>CSS, SCSS, Less</li>
+<li>HTML, Vue, Angular HANDLEBARS, Ember, Glimmer</li>
+<li>GraphQL, Markdown, YAML</li>
+</ul>
+<h3 id="Prettier-ESLint"><a href="#Prettier-ESLint" class="headerlink" title="Prettier ESLint"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=rvest.vs-code-prettier-eslint">Prettier ESLint</a></h3><p>A Visual Studio Extension to format JavaScript and Typescript code using prettier-eslint package.</p>
+<hr>
+<h2 id="Snippets"><a href="#Snippets" class="headerlink" title="Snippets"></a>Snippets</h2><h3 id="JavaScript-ES6-code-snippets"><a href="#JavaScript-ES6-code-snippets" class="headerlink" title="JavaScript (ES6) code snippets"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=xabikos.JavaScriptSnippets">JavaScript (ES6) code snippets</a></h3><p>This extension contains code snippets for JavaScript in ES6 syntax for Vs Code editor (supports both JavaScript and TypeScript).</p>
+<h3 id="jQuery-Code-Snippets"><a href="#jQuery-Code-Snippets" class="headerlink" title="jQuery Code Snippets"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=donjayamanne.jquerysnippets">jQuery Code Snippets</a></h3><p>Over 130 jQuery Code Snippets for JavaScript code.</p>
+<p><img src="https://i.imgur.com/O56prvv.png"></p>
+<h3 id="Vue-3-Snippets"><a href="#Vue-3-Snippets" class="headerlink" title="Vue 3 Snippets"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=hollowtree.vue-snippets">Vue 3 Snippets</a></h3><p>This extension adds Vue 2 Snippets and Vue 3 Snippets into Visual Studio Code.</p>
+<h3 id="ES7-React-x2F-Redux-x2F-React-Native-snippets"><a href="#ES7-React-x2F-Redux-x2F-React-Native-snippets" class="headerlink" title="ES7+ React&#x2F;Redux&#x2F;React-Native snippets"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=dsznajder.es7-react-js-snippets">ES7+ React&#x2F;Redux&#x2F;React-Native snippets</a></h3><p>JavaScript and React&#x2F;Redux snippets in ES7+ with Babel plugin features for VS Code.</p>
+<h2 id="Auto-completes"><a href="#Auto-completes" class="headerlink" title="Auto-completes"></a>Auto-completes</h2><h3 id="Auto-Rename-Tag"><a href="#Auto-Rename-Tag" class="headerlink" title="Auto Rename Tag"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=formulahendry.auto-rename-tag">Auto Rename Tag</a></h3><p>自動 rename 對應的 tag.</p>
+<p><img src="https://i.imgur.com/2aryGDX.gif"></p>
+<h3 id="npm-Intellisense"><a href="#npm-Intellisense" class="headerlink" title="npm Intellisense"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=christian-kohler.npm-intellisense">npm Intellisense</a></h3><p>Autocompletes npm modules in import statements.</p>
+<p><img src="https://i.imgur.com/8Ays7uD.gif"></p>
+<h3 id="Path-Intellisense"><a href="#Path-Intellisense" class="headerlink" title="Path Intellisense"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=christian-kohler.path-intellisense">Path Intellisense</a></h3><p>Autocompletes file path.</p>
+<p><img src="https://i.imgur.com/LWS51GN.gif"></p>
+<hr>
+<h2 id="Markdown"><a href="#Markdown" class="headerlink" title="Markdown"></a>Markdown</h2><h3 id="Markdown-All-in-One"><a href="#Markdown-All-in-One" class="headerlink" title="Markdown All in One"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=yzhang.markdown-all-in-one">Markdown All in One</a></h3><p>All you need for Markdown (keyboard shortcuts, table of contents, auto preview and more).</p>
+<h3 id="Markdown-Preview-Enhanced"><a href="#Markdown-Preview-Enhanced" class="headerlink" title="Markdown Preview Enhanced"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=shd101wyy.markdown-preview-enhanced">Markdown Preview Enhanced</a></h3><p>Preview markdown file, 且支援許多好用的功能，例如: 插入&#x2F;上傳圖片、將 markdown file 轉為 PDF 等功能。</p>
+<p><img src="https://user-images.githubusercontent.com/1908863/28495106-30b3b15e-6f09-11e7-8eb6-ca4ca001ab15.png"></p>
+<h3 id="Markdown-PDF"><a href="#Markdown-PDF" class="headerlink" title="Markdown PDF"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=yzane.markdown-pdf">Markdown PDF</a></h3><p>Convert Markdown to PDF.</p>
+<hr>
+<h2 id="Frontend"><a href="#Frontend" class="headerlink" title="Frontend"></a>Frontend</h2><h3 id="Vetur"><a href="#Vetur" class="headerlink" title="Vetur"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=octref.vetur">Vetur</a></h3><p>Vue tooling for VS Code, powered by vue-language-server.</p>
+<h3 id="Vue-Language-Features-Volar"><a href="#Vue-Language-Features-Volar" class="headerlink" title="Vue Language Features (Volar)"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=Vue.volar">Vue Language Features (Volar)</a></h3><p>Language support for Vue 3.</p>
+<h3 id="Easy-LESS"><a href="#Easy-LESS" class="headerlink" title="Easy LESS"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=mrcrowl.easy-less">Easy LESS</a></h3><p>在儲存時，自動將 Less 轉為 css.</p>
+<h3 id="Live-Server"><a href="#Live-Server" class="headerlink" title="Live Server"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer">Live Server</a></h3><p>Launch a development local Server with live reload feature for static &amp; dynamic pages.</p>
+<h3 id="Color-Picker"><a href="#Color-Picker" class="headerlink" title="Color Picker"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=anseki.vscode-color">Color Picker</a></h3><p>調色盤，快速選取顏色:</p>
+<ul>
+<li>快捷鍵: Ctrl+C P</li>
+<li>如果無法顯示調色盤，須修改 VS code config (<code>settings.json</code>):</li>
+</ul>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;colorHelper.disableGpu&quot;</span><span class="punctuation">:</span> <span class="number">1</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://i.imgur.com/99GvHD7.gif"></p>
+<hr>
+<h2 id="Diagram"><a href="#Diagram" class="headerlink" title="Diagram"></a>Diagram</h2><h3 id="PlantUML"><a href="#PlantUML" class="headerlink" title="PlantUML"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=jebbs.plantuml">PlantUML</a></h3><p>Rich PlantUML support for Visual Studio Code.</p>
+<h3 id="Draw-io-Integration"><a href="#Draw-io-Integration" class="headerlink" title="Draw.io Integration"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=hediet.vscode-drawio">Draw.io Integration</a></h3><p>在 VS code 中使用 draw.io.</p>
+<h3 id="ERD-Editor"><a href="#ERD-Editor" class="headerlink" title="ERD Editor"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=dineug.vuerd-vscode">ERD Editor</a></h3><p>ERD Editor vscode extension.</p>
+<h2 id="Python"><a href="#Python" class="headerlink" title="Python"></a>Python</h2><h3 id="Python-1"><a href="#Python-1" class="headerlink" title="Python"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=ms-python.python">Python</a></h3><p>Python 開發必裝套件, features:</p>
+<ul>
+<li>IntelliSense: Edit your code with auto-completion, code navigation, syntax checking and more</li>
+<li>Linting: Get additional code analysis with Pylint, Flake8 and more</li>
+<li>Code formatting: Format your code with black, autopep or yapf</li>
+<li>Debugging: Debug your Python scripts, web apps, remote or multi-threaded processes</li>
+<li>Testing: Run and debug tests through the Test Explorer with unittest or pytest.</li>
+<li>Jupyter Notebooks: Create and edit Jupyter Notebooks, add and run code cells, render plots, visualize variables through the variable explorer, visualize dataframes with the data viewer, and more</li>
+<li>Environments: Automatically activate and switch between virtualenv, venv, pipenv, conda and pyenv environments</li>
+<li>Refactoring: Restructure your Python code with variable extraction and method extraction. Additionally, there is componentized support to enable additional refactoring, such as import sorting, through extensions including isort and Ruff.</li>
+</ul>
+<h3 id="Pylance"><a href="#Pylance" class="headerlink" title="Pylance"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=ms-python.vscode-pylance">Pylance</a></h3><p>Python 開發必裝套件，提供許多 Python 相關的實用功能，例如：靜態語法分析，詳細可參考套件頁面。</p>
+<h3 id="Jupyter"><a href="#Jupyter" class="headerlink" title="Jupyter"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=ms-toolsai.jupyter">Jupyter</a></h3><p>Jupyter notebook support, interactive programming and computing that supports Intellisense, debugging and more.</p>
+<h3 id="autoDocstring-Python-Docstring-Generator"><a href="#autoDocstring-Python-Docstring-Generator" class="headerlink" title="autoDocstring - Python Docstring Generator"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=njpwerner.autodocstring">autoDocstring - Python Docstring Generator</a></h3><p>自動產生 Python docstrings.</p>
+<h2 id="Go"><a href="#Go" class="headerlink" title="Go"></a>Go</h2><h3 id="Go-1"><a href="#Go-1" class="headerlink" title="Go"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=golang.Go">Go</a></h3><p>Rich Go language support for Visual Studio Code.</p>
+<h2 id="Java"><a href="#Java" class="headerlink" title="Java"></a>Java</h2><h3 id="Extension-Pack-for-Java"><a href="#Extension-Pack-for-Java" class="headerlink" title="Extension Pack for Java"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack">Extension Pack for Java</a></h3><p>Popular extensions for Java development that provides Java IntelliSense, debugging, testing, Maven&#x2F;Gradle support, project management and more.</p>
+<h2 id="Infra"><a href="#Infra" class="headerlink" title="Infra"></a>Infra</h2><h3 id="Terraform"><a href="#Terraform" class="headerlink" title="Terraform"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=4ops.terraform">Terraform</a></h3><p>Terraform configuration language support (includes Terragrunt).</p>
+<h3 id="HashiCorp-Terraform"><a href="#HashiCorp-Terraform" class="headerlink" title="HashiCorp Terraform"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=HashiCorp.terraform">HashiCorp Terraform</a></h3><p>Syntax highlighting and autocompletion for Terraform.</p>
+<h3 id="Serverless-IDE"><a href="#Serverless-IDE" class="headerlink" title="Serverless IDE"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=ThreadHeap.serverless-ide-vscode">Serverless IDE</a></h3><p>Enhanced support for AWS SAM, CloudFormation and Serverless Framework.</p>
+<h3 id="Docker"><a href="#Docker" class="headerlink" title="Docker"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-docker">Docker</a></h3><p>Makes it easy to create, manage, and debug containerized applications.</p>
+<h2 id="Other-useful-plugins"><a href="#Other-useful-plugins" class="headerlink" title="Other useful plugins"></a>Other useful plugins</h2><h3 id="Project-Manager"><a href="#Project-Manager" class="headerlink" title="Project Manager"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=alefragnani.project-manager">Project Manager</a></h3><p>Easily switch between projects.</p>
+<h3 id="Code-Runner"><a href="#Code-Runner" class="headerlink" title="Code Runner"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=formulahendry.code-runner">Code Runner</a></h3><p>Run code snippet or code file for multiple languages: C, C++, Java, JavaScript, PHP, Python, Perl, Perl 6, Ruby, Go, Lua, Groovy, PowerShell, BAT&#x2F;CMD, BASH&#x2F;SH, F# Script, F# (.NET Core), C# Script, C# (.NET Core), VBScript, TypeScript, CoffeeScript, Scala, Swift, Julia, Crystal, OCaml Script, R, AppleScript, Elixir, Visual Basic .NET, Clojure, Haxe, Objective-C, Rust, Racket, Scheme, AutoHotkey, AutoIt, Kotlin, Dart, Free Pascal, Haskell, Nim, D, Lisp, Kit, V, SCSS, Sass, CUDA, Less, Fortran, Ring, Standard ML, Zig, and custom command.</p>
+<h3 id="Code-Spell-Checker"><a href="#Code-Spell-Checker" class="headerlink" title="Code Spell Checker"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker">Code Spell Checker</a></h3><p>自動檢查拼字是否錯誤。</p>
+<h3 id="Dash"><a href="#Dash" class="headerlink" title="Dash"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=deerawan.vscode-dash">Dash</a></h3><p>方便快速查找 API 資料。</p>
+<h3 id="DotENV"><a href="#DotENV" class="headerlink" title="DotENV"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=mikestead.dotenv">DotENV</a></h3><p>Support for dotenv file syntax.</p>
+<h3 id="Debugger-for-chrome"><a href="#Debugger-for-chrome" class="headerlink" title="Debugger for chrome"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=msjsdiag.debugger-for-chrome">Debugger for chrome</a></h3><p>Debug JavaScript code in Chrome browser.</p>
+<p><img src="https://i.imgur.com/cK8iE5E.gif"></p>
+<h3 id="ejs"><a href="#ejs" class="headerlink" title=".ejs"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=QassimFarid.ejs-language-support">.ejs</a></h3><p>支援 EJS.</p>
+<h3 id="Git-History-git-log"><a href="#Git-History-git-log" class="headerlink" title="Git History(git log)"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=donjayamanne.githistory">Git History(git log)</a></h3><p>查看 Git history, git log.</p>
+<p><img src="https://i.imgur.com/4vpyOZY.gif"></p>
+<p><img src="https://i.imgur.com/KUVHydP.png"></p>
+<h3 id="GitHub-Copilot"><a href="#GitHub-Copilot" class="headerlink" title="GitHub Copilot"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=GitHub.copilot">GitHub Copilot</a></h3><p>Your AI pair programmer.</p>
+<h3 id="GitLens"><a href="#GitLens" class="headerlink" title="GitLens"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=eamodio.gitlens">GitLens</a></h3><p>GitLens supercharges Git inside VS Code and unlocks untapped knowledge within each repository. It helps you to visualize code authorship at a glance via Git blame annotations and CodeLens, seamlessly navigate and explore Git repositories, gain valuable insights via rich visualizations and powerful comparison commands, and so much more.</p>
+<h3 id="open-in-browser"><a href="#open-in-browser" class="headerlink" title="open in browser"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=techer.open-in-browser">open in browser</a></h3><p>在 browser 中開啟目前的檔案:</p>
+<ul>
+<li>Alt+B: Open in default browser</li>
+<li>Alt+Shift+B: Open in browser</li>
+</ul>
+<h3 id="Regex-Previewer"><a href="#Regex-Previewer" class="headerlink" title="Regex Previewer"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=chrmarti.regex">Regex Previewer</a></h3><p>Preview Regex 比對結果。</p>
+<p><img src="https://i.imgur.com/pT6kCAr.gif"></p>
+<h3 id="REST-Client"><a href="#REST-Client" class="headerlink" title="REST Client"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=humao.rest-client">REST Client</a></h3><p>REST Client for Visual Studio Code.</p>
+<h3 id="SFTP"><a href="#SFTP" class="headerlink" title="SFTP"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=liximomo.sftp">SFTP</a></h3><p>SFTP&#x2F;FTP 同步。</p>
+<h3 id="Swagger-Viewer"><a href="#Swagger-Viewer" class="headerlink" title="Swagger Viewer"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=Arjun.swagger-viewer">Swagger Viewer</a></h3><p>方便直接瀏覽 Swagger API 文件。</p>
+<h3 id="vscode-hexo"><a href="#vscode-hexo" class="headerlink" title="vscode-hexo"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=codeyu.vscode-hexo">vscode-hexo</a></h3><p>若有使用 Hexo 這個 blog framework, 推薦安裝此套件，讓 VSCode 支援 hexo 相關指令(init, new, generate, server, deploy, publish, clean commands).</p>
+<h3 id="VSCode-Reveal"><a href="#VSCode-Reveal" class="headerlink" title="VSCode Reveal"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=evilz.vscode-reveal">VSCode Reveal</a></h3><p>使用 VS Code 做 slides.</p>
+<h3 id="YAML"><a href="#YAML" class="headerlink" title="YAML"></a><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml">YAML</a></h3><p>YAML Language Support by Red Hat, with built-in Kubernetes syntax support.</p>
+<hr>
+<h2 id="Config"><a href="#Config" class="headerlink" title="Config"></a>Config</h2><p>除了上面的 plugins 之外，在這裡順便紀錄一下自己常用的 config:</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// settings.json</span></span><br><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;workbench.iconTheme&quot;</span><span class="punctuation">:</span> <span class="string">&quot;material-icon-theme&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;files.defaultLanguage&quot;</span><span class="punctuation">:</span> <span class="string">&quot;python&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;workbench.colorTheme&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Monokai&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;editor.fontLigatures&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">null</span></span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;[markdown]&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;editor.wordWrap&quot;</span><span class="punctuation">:</span> <span class="string">&quot;on&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;editor.quickSuggestions&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">            <span class="attr">&quot;comments&quot;</span><span class="punctuation">:</span> <span class="string">&quot;on&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;strings&quot;</span><span class="punctuation">:</span> <span class="string">&quot;on&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;other&quot;</span><span class="punctuation">:</span> <span class="string">&quot;on&quot;</span></span><br><span class="line">        <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;editor.defaultFormatter&quot;</span><span class="punctuation">:</span> <span class="string">&quot;DavidAnson.vscode-markdownlint&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;markdown.preview.fontSize&quot;</span><span class="punctuation">:</span> <span class="number">16</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;markdown.preview.lineHeight&quot;</span><span class="punctuation">:</span> <span class="number">1.8</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;files.exclude&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;**.m4a&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">true</span></span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;**.mp3&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">true</span></span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;**.mp4&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">true</span></span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;**.wav&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">true</span></span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;**/__pycache__&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">true</span></span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;**/.DS_Store&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">true</span></span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;**/.git&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">true</span></span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;**/.hg&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">true</span></span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;**/.pytest_cache&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">true</span></span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;**/.svn&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">true</span></span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;**/build&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">true</span></span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;**/CVS&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">true</span></span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;**/data&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">true</span></span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;**/env&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">true</span></span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;**/node_modules&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">true</span></span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;files.eol&quot;</span><span class="punctuation">:</span> <span class="string">&quot;\n&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;editor.fontFamily&quot;</span><span class="punctuation">:</span> <span class="string">&quot;&#x27;Source Code Pro&#x27;, Consolas, &#x27;微軟正黑體&#x27;, &#x27;Courier New&#x27;, monospace, &#x27;SauceCodePro Nerd Font&#x27;&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;emmet.includeLanguages&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;ejs&quot;</span><span class="punctuation">:</span> <span class="string">&quot;html&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="comment">//&quot;editor.formatOnSave&quot;: true,</span></span><br><span class="line">    <span class="attr">&quot;editor.codeActionsOnSave&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;source.fixAll.eslint&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">true</span></span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;[html]&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;editor.defaultFormatter&quot;</span><span class="punctuation">:</span> <span class="string">&quot;esbenp.prettier-vscode&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;editor.fontSize&quot;</span><span class="punctuation">:</span> <span class="number">16</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;projectManager.git.baseFolders&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">        <span class="string">&quot;/Users/user/Documents/workspace&quot;</span></span><br><span class="line">    <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;projectManager.any.baseFolders&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">        <span class="string">&quot;/Users/user/Documents/workspace&quot;</span></span><br><span class="line">    <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;projectManager.any.ignoredFolders&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">        <span class="string">&quot;node_modules&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;out&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;output&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;typings&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;test&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;__pycache__&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;.git&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;.pytest_cache&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;.vscode&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;.idea&quot;</span></span><br><span class="line">    <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;projectManager.any.maxDepthRecursion&quot;</span><span class="punctuation">:</span> <span class="number">1</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;search.exclude&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;**/__pycache__&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">true</span></span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;**/.pytest_cache&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">true</span></span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;workbench.editorAssociations&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;*.ipynb&quot;</span><span class="punctuation">:</span> <span class="string">&quot;jupyter-notebook&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;python.linting.flake8Enabled&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">true</span></span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;python.formatting.provider&quot;</span><span class="punctuation">:</span> <span class="string">&quot;black&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;eslint.format.enable&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">true</span></span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;eslint.rules.customizations&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;[javascript]&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;editor.defaultFormatter&quot;</span><span class="punctuation">:</span> <span class="string">&quot;esbenp.prettier-vscode&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;prettier.singleQuote&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">true</span></span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;prettier.useTabs&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">false</span></span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;prettier.semi&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">true</span></span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;prettier.trailingComma&quot;</span><span class="punctuation">:</span> <span class="string">&quot;es5&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;prettier.arrowParens&quot;</span><span class="punctuation">:</span> <span class="string">&quot;always&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;prettier.jsxSingleQuote&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">true</span></span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;prettier.printWidth&quot;</span><span class="punctuation">:</span> <span class="number">200</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;python.envFile&quot;</span><span class="punctuation">:</span> <span class="string">&quot;$&#123;workspaceFolder&#125;/config/.env&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;python.linting.pylintEnabled&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">true</span></span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;python.defaultInterpreterPath&quot;</span><span class="punctuation">:</span> <span class="string">&quot;/opt/homebrew/opt/python@3.10/bin/python3&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;notebook.cellToolbarLocation&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;default&quot;</span><span class="punctuation">:</span> <span class="string">&quot;right&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;jupyter-notebook&quot;</span><span class="punctuation">:</span> <span class="string">&quot;left&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;diffEditor.ignoreTrimWhitespace&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">false</span></span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;[json]&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;editor.defaultFormatter&quot;</span><span class="punctuation">:</span> <span class="string">&quot;esbenp.prettier-vscode&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;terminal.integrated.fontSize&quot;</span><span class="punctuation">:</span> <span class="number">16</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;files.associations&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;.env.prod&quot;</span><span class="punctuation">:</span> <span class="string">&quot;dotenv&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;python.formatting.blackArgs&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">        <span class="string">&quot;--skip-string-normalization&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;--line-length=100&quot;</span></span><br><span class="line">    <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;git.confirmSync&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">false</span></span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;python.linting.pycodestyleEnabled&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">true</span></span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;python.linting.pydocstyleEnabled&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">true</span></span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;python.formatting.autopep8Args&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">        <span class="string">&quot;--max-line-length=100&quot;</span></span><br><span class="line">    <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;python.linting.flake8Args&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">        <span class="string">&quot;--max-line-length=100&quot;</span></span><br><span class="line">    <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;python.linting.pycodestyleArgs&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">        <span class="string">&quot;--max-line-length=100&quot;</span></span><br><span class="line">    <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;workbench.colorCustomizations&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;terminal.background&quot;</span><span class="punctuation">:</span> <span class="string">&quot;#0903008f&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;terminal.foreground&quot;</span><span class="punctuation">:</span> <span class="string">&quot;#A5A2A2&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;terminalCursor.background&quot;</span><span class="punctuation">:</span> <span class="string">&quot;#A5A2A2&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;terminalCursor.foreground&quot;</span><span class="punctuation">:</span> <span class="string">&quot;#A5A2A2&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;terminal.ansiBlack&quot;</span><span class="punctuation">:</span> <span class="string">&quot;#090300&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;terminal.ansiBlue&quot;</span><span class="punctuation">:</span> <span class="string">&quot;#01a0e4&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;terminal.ansiBrightBlack&quot;</span><span class="punctuation">:</span> <span class="string">&quot;#5C5855&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;terminal.ansiBrightBlue&quot;</span><span class="punctuation">:</span> <span class="string">&quot;#01A0E4&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;terminal.ansiBrightCyan&quot;</span><span class="punctuation">:</span> <span class="string">&quot;#B5E4F4&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;terminal.ansiBrightGreen&quot;</span><span class="punctuation">:</span> <span class="string">&quot;#01A252&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;terminal.ansiBrightMagenta&quot;</span><span class="punctuation">:</span> <span class="string">&quot;#A16A94&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;terminal.ansiBrightRed&quot;</span><span class="punctuation">:</span> <span class="string">&quot;#DB2D20&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;terminal.ansiBrightWhite&quot;</span><span class="punctuation">:</span> <span class="string">&quot;#F7F7F7&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;terminal.ansiBrightYellow&quot;</span><span class="punctuation">:</span> <span class="string">&quot;#FDED02&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;terminal.ansiCyan&quot;</span><span class="punctuation">:</span> <span class="string">&quot;#B5E4F4&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;terminal.ansiGreen&quot;</span><span class="punctuation">:</span> <span class="string">&quot;#01A252&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;terminal.ansiMagenta&quot;</span><span class="punctuation">:</span> <span class="string">&quot;#A16A94&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;terminal.ansiRed&quot;</span><span class="punctuation">:</span> <span class="string">&quot;#DB2D20&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;terminal.ansiWhite&quot;</span><span class="punctuation">:</span> <span class="string">&quot;#A5A2A2&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;terminal.ansiYellow&quot;</span><span class="punctuation">:</span> <span class="string">&quot;#FDED02&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;yaml.customTags&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">        <span class="string">&quot;!And&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;!And sequence&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;!If&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;!If sequence&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;!Not&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;!Not sequence&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;!Equals&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;!Equals sequence&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;!Or&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;!Or sequence&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;!FindInMap&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;!FindInMap sequence&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;!Base64&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;!Join&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;!Join sequence&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;!Cidr&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;!Ref&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;!Sub&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;!Sub sequence&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;!GetAtt&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;!GetAZs&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;!ImportValue&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;!ImportValue sequence&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;!Select&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;!Select sequence&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;!Split&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="string">&quot;!Split sequence&quot;</span></span><br><span class="line">    <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;go.buildTags&quot;</span><span class="punctuation">:</span> <span class="string">&quot;testtools&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;go.testTags&quot;</span><span class="punctuation">:</span> <span class="string">&quot;testtools&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;go.testEnvVars&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;GOOS&quot;</span><span class="punctuation">:</span> <span class="string">&quot;&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;html.autoClosingTags&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">false</span></span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;editor.lineNumbers&quot;</span><span class="punctuation">:</span> <span class="string">&quot;on&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;aws.profile&quot;</span><span class="punctuation">:</span> <span class="string">&quot;profile:n1-int&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;editor.inlineSuggest.enabled&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">true</span></span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;[python]&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;editor.formatOnType&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">true</span></span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;github.copilot.advanced&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span><span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;github.copilot.enable&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;*&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">true</span></span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;yaml&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">false</span></span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;plaintext&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">false</span></span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;markdown&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">false</span></span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;scminput&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">false</span></span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;[yaml]&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;editor.defaultFormatter&quot;</span><span class="punctuation">:</span> <span class="string">&quot;esbenp.prettier-vscode&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="comment">// &quot;go.gopath&quot;: &quot;/Users/user/go&quot;,</span></span><br><span class="line">    <span class="comment">// &quot;prettier.configPath&quot;: &quot;/Users/user/workspace/.vscode/.prettierrc&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/VS-Code/" rel="tag"># VS Code</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/255a957f/" rel="prev" title="[Hexo] Hexo 安裝及使用 (搭配GitHub/Bitbucket Page)">
+      <i class="fa fa-chevron-left"></i> [Hexo] Hexo 安裝及使用 (搭配GitHub/Bitbucket Page)
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/posts/b9b8571c/" rel="next" title="[word2vec] Word2vec 實作">
+      [word2vec] Word2vec 實作 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Themes-amp-Icon"><span class="nav-number">1.</span> <span class="nav-text">Themes &amp; Icon</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Flatland-Monokai-Theme"><span class="nav-number">1.1.</span> <span class="nav-text">Flatland Monokai Theme</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Material-Icon-Theme"><span class="nav-number">1.2.</span> <span class="nav-text">Material Icon Theme</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#File-icon"><span class="nav-number">1.2.1.</span> <span class="nav-text">File icon</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Folder-icon"><span class="nav-number">1.2.2.</span> <span class="nav-text">Folder icon</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Vscode-Terminal-Themes"><span class="nav-number">1.3.</span> <span class="nav-text">Vscode Terminal Themes</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linter"><span class="nav-number">2.</span> <span class="nav-text">Linter</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ESLint"><span class="nav-number">2.1.</span> <span class="nav-text">ESLint</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#stylelint"><span class="nav-number">2.2.</span> <span class="nav-text">stylelint</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#markdownlint"><span class="nav-number">2.3.</span> <span class="nav-text">markdownlint</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#cornflakes-linter"><span class="nav-number">2.4.</span> <span class="nav-text">cornflakes-linter</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Formatter"><span class="nav-number">3.</span> <span class="nav-text">Formatter</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Prettier-Code-formatter"><span class="nav-number">3.1.</span> <span class="nav-text">Prettier - Code formatter</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Prettier-ESLint"><span class="nav-number">3.2.</span> <span class="nav-text">Prettier ESLint</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Snippets"><span class="nav-number">4.</span> <span class="nav-text">Snippets</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#JavaScript-ES6-code-snippets"><span class="nav-number">4.1.</span> <span class="nav-text">JavaScript (ES6) code snippets</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#jQuery-Code-Snippets"><span class="nav-number">4.2.</span> <span class="nav-text">jQuery Code Snippets</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Vue-3-Snippets"><span class="nav-number">4.3.</span> <span class="nav-text">Vue 3 Snippets</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ES7-React-x2F-Redux-x2F-React-Native-snippets"><span class="nav-number">4.4.</span> <span class="nav-text">ES7+ React&#x2F;Redux&#x2F;React-Native snippets</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Auto-completes"><span class="nav-number">5.</span> <span class="nav-text">Auto-completes</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Auto-Rename-Tag"><span class="nav-number">5.1.</span> <span class="nav-text">Auto Rename Tag</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#npm-Intellisense"><span class="nav-number">5.2.</span> <span class="nav-text">npm Intellisense</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Path-Intellisense"><span class="nav-number">5.3.</span> <span class="nav-text">Path Intellisense</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Markdown"><span class="nav-number">6.</span> <span class="nav-text">Markdown</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Markdown-All-in-One"><span class="nav-number">6.1.</span> <span class="nav-text">Markdown All in One</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Markdown-Preview-Enhanced"><span class="nav-number">6.2.</span> <span class="nav-text">Markdown Preview Enhanced</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Markdown-PDF"><span class="nav-number">6.3.</span> <span class="nav-text">Markdown PDF</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Frontend"><span class="nav-number">7.</span> <span class="nav-text">Frontend</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Vetur"><span class="nav-number">7.1.</span> <span class="nav-text">Vetur</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Vue-Language-Features-Volar"><span class="nav-number">7.2.</span> <span class="nav-text">Vue Language Features (Volar)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Easy-LESS"><span class="nav-number">7.3.</span> <span class="nav-text">Easy LESS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Live-Server"><span class="nav-number">7.4.</span> <span class="nav-text">Live Server</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Color-Picker"><span class="nav-number">7.5.</span> <span class="nav-text">Color Picker</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Diagram"><span class="nav-number">8.</span> <span class="nav-text">Diagram</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#PlantUML"><span class="nav-number">8.1.</span> <span class="nav-text">PlantUML</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Draw-io-Integration"><span class="nav-number">8.2.</span> <span class="nav-text">Draw.io Integration</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ERD-Editor"><span class="nav-number">8.3.</span> <span class="nav-text">ERD Editor</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Python"><span class="nav-number">9.</span> <span class="nav-text">Python</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Python-1"><span class="nav-number">9.1.</span> <span class="nav-text">Python</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Pylance"><span class="nav-number">9.2.</span> <span class="nav-text">Pylance</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Jupyter"><span class="nav-number">9.3.</span> <span class="nav-text">Jupyter</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#autoDocstring-Python-Docstring-Generator"><span class="nav-number">9.4.</span> <span class="nav-text">autoDocstring - Python Docstring Generator</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Go"><span class="nav-number">10.</span> <span class="nav-text">Go</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Go-1"><span class="nav-number">10.1.</span> <span class="nav-text">Go</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Java"><span class="nav-number">11.</span> <span class="nav-text">Java</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Extension-Pack-for-Java"><span class="nav-number">11.1.</span> <span class="nav-text">Extension Pack for Java</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Infra"><span class="nav-number">12.</span> <span class="nav-text">Infra</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Terraform"><span class="nav-number">12.1.</span> <span class="nav-text">Terraform</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HashiCorp-Terraform"><span class="nav-number">12.2.</span> <span class="nav-text">HashiCorp Terraform</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Serverless-IDE"><span class="nav-number">12.3.</span> <span class="nav-text">Serverless IDE</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Docker"><span class="nav-number">12.4.</span> <span class="nav-text">Docker</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Other-useful-plugins"><span class="nav-number">13.</span> <span class="nav-text">Other useful plugins</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Project-Manager"><span class="nav-number">13.1.</span> <span class="nav-text">Project Manager</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Code-Runner"><span class="nav-number">13.2.</span> <span class="nav-text">Code Runner</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Code-Spell-Checker"><span class="nav-number">13.3.</span> <span class="nav-text">Code Spell Checker</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Dash"><span class="nav-number">13.4.</span> <span class="nav-text">Dash</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DotENV"><span class="nav-number">13.5.</span> <span class="nav-text">DotENV</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Debugger-for-chrome"><span class="nav-number">13.6.</span> <span class="nav-text">Debugger for chrome</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ejs"><span class="nav-number">13.7.</span> <span class="nav-text">.ejs</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Git-History-git-log"><span class="nav-number">13.8.</span> <span class="nav-text">Git History(git log)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GitHub-Copilot"><span class="nav-number">13.9.</span> <span class="nav-text">GitHub Copilot</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GitLens"><span class="nav-number">13.10.</span> <span class="nav-text">GitLens</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#open-in-browser"><span class="nav-number">13.11.</span> <span class="nav-text">open in browser</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Regex-Previewer"><span class="nav-number">13.12.</span> <span class="nav-text">Regex Previewer</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#REST-Client"><span class="nav-number">13.13.</span> <span class="nav-text">REST Client</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SFTP"><span class="nav-number">13.14.</span> <span class="nav-text">SFTP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Swagger-Viewer"><span class="nav-number">13.15.</span> <span class="nav-text">Swagger Viewer</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#vscode-hexo"><span class="nav-number">13.16.</span> <span class="nav-text">vscode-hexo</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#VSCode-Reveal"><span class="nav-number">13.17.</span> <span class="nav-text">VSCode Reveal</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#YAML"><span class="nav-number">13.18.</span> <span class="nav-text">YAML</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Config"><span class="nav-number">14.</span> <span class="nav-text">Config</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Szu-Hsuan, Wu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">61</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">57</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/wshs0713" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;wshs0713" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:shuan0713@gmail.com" title="E-Mail → mailto:shuan0713@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="http://linkedin.com/in/wshs0713" title="LinkedIn → http:&#x2F;&#x2F;linkedin.com&#x2F;in&#x2F;wshs0713" rel="noopener" target="_blank"><i class="fab fa-linkedin fa-fw"></i>LinkedIn</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/wshs0713" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;wshs0713" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Szu-Hsuan, Wu</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://wshs0713.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "https://wshs0713.github.io/posts/5b00a1ae/";
+    this.page.identifier = "posts/5b00a1ae/";
+    this.page.title = "[VS Code] VS Code Plugins";
+    };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://wshs0713.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en,zh-tw,default">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/favicon-180x180.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-32x32.png">
+  <link rel="mask-icon" href="/img/favicon-180x180.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"wshs0713.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="前言Nginx 是一個 Web Server, 也可以用來作為 Reverse Proxy, Load Balancer 和 HTTP cache.這一篇文章主要紀錄如何安裝以及設定 Nginx。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[Nginx] Nginx 安裝及設定">
+<meta property="og:url" content="https://wshs0713.github.io/posts/6a171975/">
+<meta property="og:site_name" content="wshs0713&#39;s blog">
+<meta property="og:description" content="前言Nginx 是一個 Web Server, 也可以用來作為 Reverse Proxy, Load Balancer 和 HTTP cache.這一篇文章主要紀錄如何安裝以及設定 Nginx。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://www.nginx.com/wp-content/uploads/2018/08/NGINX-logo-rgb-large.png">
+<meta property="article:published_time" content="2019-01-23T06:32:42.000Z">
+<meta property="article:modified_time" content="2021-08-15T07:30:11.000Z">
+<meta property="article:author" content="Szu-Hsuan, Wu">
+<meta property="article:tag" content="Nginx">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://www.nginx.com/wp-content/uploads/2018/08/NGINX-logo-rgb-large.png">
+
+<link rel="canonical" href="https://wshs0713.github.io/posts/6a171975/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>[Nginx] Nginx 安裝及設定 | wshs0713's blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-8XTKEMPTGC"></script>
+    <script>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-8XTKEMPTGC');
+      }
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">wshs0713's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Programming notes</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-projects">
+
+    <a href="/projects/" rel="section"><i class="fa fa-folder fa-fw"></i>Projects</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://wshs0713.github.io/posts/6a171975/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Szu-Hsuan, Wu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="wshs0713's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          [Nginx] Nginx 安裝及設定
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-01-23 14:32:42" itemprop="dateCreated datePublished" datetime="2019-01-23T14:32:42+08:00">2019-01-23</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-08-15 15:30:11" itemprop="dateModified" datetime="2021-08-15T15:30:11+08:00">2021-08-15</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Nginx/" itemprop="url" rel="index"><span itemprop="name">Nginx</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus: </span>
+    
+    <a title="disqus" href="/posts/6a171975/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="posts/6a171975/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>8.2k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>7 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><img src="https://www.nginx.com/wp-content/uploads/2018/08/NGINX-logo-rgb-large.png" alt="Nginx"></p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Nginx 是一個 Web Server, 也可以用來作為 Reverse Proxy, Load Balancer 和 HTTP cache.<br>這一篇文章主要紀錄如何安裝以及設定 Nginx。</p>
+<span id="more"></span>
+
+<h2 id="安裝"><a href="#安裝" class="headerlink" title="安裝"></a>安裝</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ sudo apt-get update</span><br><span class="line">$ sudo apt-get install nginx</span><br></pre></td></tr></table></figure>
+
+<h2 id="常用指令"><a href="#常用指令" class="headerlink" title="常用指令"></a>常用指令</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 測試 Nginx config</span></span><br><span class="line">$ sudo nginx -t</span><br><span class="line"></span><br><span class="line"><span class="comment"># 啟動 Nginx</span></span><br><span class="line">$ sudo nginx -c &lt;config_path&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 關閉 Nginx</span></span><br><span class="line">$ sudo nginx -s stop</span><br><span class="line"></span><br><span class="line"><span class="comment"># Reload</span></span><br><span class="line">$ sudo nginx -s reload</span><br></pre></td></tr></table></figure>
+
+<h2 id="Nginx-設定"><a href="#Nginx-設定" class="headerlink" title="Nginx 設定"></a>Nginx 設定</h2><h3 id="資料夾結構"><a href="#資料夾結構" class="headerlink" title="資料夾結構"></a>資料夾結構</h3><p>Nginx 主要的設定內容放在 <code>/etc/nginx</code>，資料夾結構如下:</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">/etc/nginx/</span><br><span class="line">├─ conf.d/</span><br><span class="line">├─ fastcgi.conf</span><br><span class="line">├─ fastcgi_params</span><br><span class="line">├─ koi-utf</span><br><span class="line">├─ koi-win</span><br><span class="line">├─ mime.types</span><br><span class="line">├─ nginx.conf</span><br><span class="line">├─ proxy.conf</span><br><span class="line">├─ proxy_params</span><br><span class="line">├─ scgi_params</span><br><span class="line">├─ sites-available/</span><br><span class="line">├─ sites-enabled/</span><br><span class="line">├─ uwsgi_params</span><br><span class="line">└─ win-utf</span><br></pre></td></tr></table></figure>
+
+<p>其中:</p>
+<ul>
+<li><code>/etc/nginx/sites-available</code>: 用來存放每個服務的設定檔</li>
+<li><code>/etc/nginx/sites-enabled</code>: 用來放要啟用的服務的設定檔，在此資料夾底下建立 symbolic link 連結到 <code>/etc/nginx/sites-available</code> 底下的設定檔</li>
+</ul>
+<h3 id="設定檔說明"><a href="#設定檔說明" class="headerlink" title="設定檔說明"></a>設定檔說明</h3><p>Nginx 主要的設定檔是 <code>/etc/nginx/nginx.conf</code>，基本結構如下:</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Global block: 設定 Nginx server 運行的相關配置，ex. worker_processes, pid</span></span><br><span class="line"></span><br><span class="line"><span class="section">events</span> &#123;</span><br><span class="line">    <span class="comment"># events block: 設定 Nginx server 和 client 的網路連結</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="section">http</span> &#123;</span><br><span class="line">    <span class="comment"># http block: 包含 proxy, cache, log...等功能都在此區塊設定</span></span><br><span class="line">    <span class="section">server</span> &#123;</span><br><span class="line">        <span class="comment"># server block: 通常會設定 server name, listen port...等</span></span><br><span class="line">        <span class="section">location</span> / &#123;</span><br><span class="line">            <span class="comment"># location block: 設定針對不同路徑做不同的處理</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>基本範例:</p>
+<p><code>/etc/nginx/nginx.conf</code>:</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Nginx user</span></span><br><span class="line"><span class="comment">#user   nobody;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 設定 worker process 的數量，通常會設定成 CPU 的核心數，或是也可以設成 auto 讓 Nginx 自動偵測</span></span><br><span class="line"><span class="attribute">worker_processes</span>    <span class="number">4</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">#pid    /var/run/nginx.pid;</span></span><br><span class="line"></span><br><span class="line"><span class="section">events</span> &#123;</span><br><span class="line">    <span class="comment"># 允許同一時間連線總數量</span></span><br><span class="line">    <span class="attribute">worker_connections</span>  <span class="number">1024</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 使用 epoll 效能較好</span></span><br><span class="line">    <span class="attribute">use</span> <span class="literal">epoll</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="section">http</span> &#123;</span><br><span class="line">    <span class="attribute">include</span>       /etc/nginx/mime.types;</span><br><span class="line">    <span class="attribute">include</span>       /etc/nginx/proxy.conf;</span><br><span class="line">    <span class="attribute">default_type</span>  application/octet-stream;</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 不顯示 Nginx 版本，避免暴露出伺服器可能的弱點</span></span><br><span class="line">    <span class="attribute">server_tokens</span> <span class="literal">off</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Log settings</span></span><br><span class="line">    <span class="comment">#log_format  main  &#x27;$remote_addr - $remote_user [$time_local] &quot;$request&quot; &#x27;</span></span><br><span class="line">    <span class="comment">#                  &#x27;$status $body_bytes_sent &quot;$http_referer&quot; &#x27;</span></span><br><span class="line">    <span class="comment">#                  &#x27;&quot;$http_user_agent&quot; &quot;$http_x_forwarded_for&quot;&#x27;;</span></span><br><span class="line"></span><br><span class="line">    <span class="attribute">access_log</span>  /var/log/nginx/access.log main;</span><br><span class="line">    <span class="attribute">error_log</span>   /var/log/nginx/<span class="literal">error</span>.log;</span><br><span class="line"></span><br><span class="line">    <span class="attribute">sendfile</span>        <span class="literal">on</span>;</span><br><span class="line">    <span class="attribute">tcp_nopush</span>      <span class="literal">on</span>;</span><br><span class="line">    <span class="attribute">tcp_nodelay</span>     <span class="literal">on</span>;</span><br><span class="line"></span><br><span class="line">    <span class="attribute">keepalive_timeout</span>  <span class="number">65</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment"># gzip 壓縮, 預設是不啟動</span></span><br><span class="line">    <span class="attribute">gzip</span>            <span class="literal">on</span>;</span><br><span class="line">    <span class="attribute">gzip_vary</span>       <span class="literal">on</span>;</span><br><span class="line">    <span class="attribute">gzip_disable</span>    <span class="string">&quot;msie6&quot;</span>;</span><br><span class="line">    <span class="attribute">gzip_min_length</span> <span class="number">1000</span>;</span><br><span class="line">    <span class="attribute">gzip_proxied</span>    expired <span class="literal">no</span>-cache <span class="literal">no</span>-store private auth;</span><br><span class="line">    <span class="attribute">gzip_types</span>      text/plain text/css text/javascript application/json</span><br><span class="line">                    application/javascript application/x-javascript</span><br><span class="line">                    text/xml application/xml image/png image/x-icon</span><br><span class="line">                    image/x-jng image/svg+xml image/webp image/gif image/jpeg;</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 載入設定檔</span></span><br><span class="line">    <span class="attribute">include</span> /etc/nginx/conf.d/<span class="regexp">*.conf</span>;</span><br><span class="line">    <span class="attribute">include</span> /etc/nginx/sites-enabled/*;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>/etc/nginx/proxy.conf</code>:</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">proxy_http_version</span>  <span class="number">1</span>.<span class="number">1</span>;</span><br><span class="line"></span><br><span class="line"><span class="attribute">proxy_set_header</span>    Connection  <span class="string">&quot;&quot;</span>;</span><br><span class="line"><span class="attribute">proxy_set_header</span>    X-Real-IP   <span class="variable">$remote_addr</span>;</span><br><span class="line"><span class="attribute">proxy_set_header</span>    X-Forwarded-For <span class="variable">$proxy_add_x_forwarded_for</span>;</span><br><span class="line"><span class="attribute">proxy_set_header</span>    Host    <span class="variable">$http_host</span>;</span><br></pre></td></tr></table></figure>
+
+<p>載入的 Server 設定檔(<code>/etc/nginx/sites-available/api.conf</code>)範例:</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">server</span> &#123;</span><br><span class="line">    <span class="attribute">listen</span>       <span class="number">80</span>;</span><br><span class="line">    <span class="attribute">server_name</span>  localhost;</span><br><span class="line">    <span class="attribute">root</span>    /home/user/web;</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 預設編碼，若未設定，讓網頁中 meta 或 header 會自行定義</span></span><br><span class="line">    <span class="comment">#charset koi8-r;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># Access log 存放位置</span></span><br><span class="line">    <span class="comment">#access_log  /var/log/nginx/localhost.access.log;</span></span><br><span class="line">    <span class="comment">#error_log   /var/log/nginx/localhost.error.log;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># Cache 靜態檔案</span></span><br><span class="line">    <span class="section">location</span> <span class="regexp">~* \.(ico|jpg|jpeg|png|gif|js|css|svg)$</span> &#123;</span><br><span class="line">        <span class="attribute">access_log</span> <span class="literal">off</span>;</span><br><span class="line">        <span class="attribute">log_not_found</span> <span class="literal">off</span>;</span><br><span class="line"></span><br><span class="line">        <span class="attribute">expires</span> <span class="number">1m</span>;</span><br><span class="line">        <span class="attribute">add_header</span> Cache-Control <span class="string">&quot;public, no-transform&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="section">location</span> / &#123;</span><br><span class="line">        <span class="attribute">index</span>   index.html index.htm;</span><br><span class="line">        <span class="attribute">try_files</span> <span class="variable">$uri</span> <span class="variable">$uri</span>/ <span class="variable">$uri</span>.html =<span class="number">404</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 禁止存取隱藏檔案</span></span><br><span class="line">    <span class="section">location</span> <span class="regexp">~ /\.</span> &#123;</span><br><span class="line">        <span class="attribute">access_log</span> <span class="literal">off</span>;</span><br><span class="line">        <span class="attribute">log_not_found</span> <span class="literal">off</span>;</span><br><span class="line">        <span class="attribute">deny</span> all;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Location-syntax"><a href="#Location-syntax" class="headerlink" title="Location syntax"></a>Location syntax</h3><p>Location 有以下兩種語法:</p>
+<ul>
+<li><code>location [ = | ~ | ~* | ^~ ] uri &#123; ... &#125;</code></li>
+<li><code>location @name &#123; ... &#125;</code></li>
+</ul>
+<p>這裡我們先以第一種語法為主，它的優先順序及說明如下:</p>
+<ol>
+<li><code>location = /url</code>: Exactly matching<ul>
+<li>比對成功後，會停止比對後面的規則</li>
+</ul>
+</li>
+<li><code>location ^~ /url</code>: The url must start with the specified pattern.<ul>
+<li>一般字串比對</li>
+<li>比對成功後，會停止比對後面的規則</li>
+</ul>
+</li>
+<li><code>location ~ /url</code> 或 <code>location ~* /url</code>: Regex matching<ul>
+<li><code>~</code>: case sensitive matching</li>
+<li><code>~*</code>: case insensitive matching</li>
+</ul>
+</li>
+<li><code>location /url</code>: The url must start with the specified pattern.</li>
+<li><code>location /</code>: 所有 request 都會比對到此規則</li>
+</ol>
+<p>以上就是 location 的基本語法，另外可以到 <a target="_blank" rel="noopener" href="https://nginx.viraptor.info/">Nginx location match tester</a> 去測試 location 的設定~</p>
+<h3 id="Proxy-設定範例"><a href="#Proxy-設定範例" class="headerlink" title="Proxy 設定範例"></a>Proxy 設定範例</h3><p>此範例是由 localhost:6000 接收到 request 後, 轉發到設定的 api server.</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">upstream</span> api &#123;</span><br><span class="line">    <span class="attribute">server</span> server.com:<span class="number">8000</span>;</span><br><span class="line">    <span class="attribute">keepalive</span> <span class="number">64</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="section">server</span> &#123;</span><br><span class="line">    <span class="attribute">listen</span>       <span class="number">6000</span>;</span><br><span class="line">    <span class="attribute">server_name</span>  localhost;</span><br><span class="line"></span><br><span class="line">    <span class="comment"># HTTP authentication</span></span><br><span class="line">    <span class="attribute">auth_basic</span>  <span class="string">&quot;Auth&quot;</span>;</span><br><span class="line">    <span class="attribute">auth_basic_user_file</span>    /path/to/password/file;</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 設定 body 長度限制</span></span><br><span class="line">    <span class="attribute">client_max_body_size</span>    <span class="number">100M</span>;</span><br><span class="line"></span><br><span class="line">    <span class="section">location</span> <span class="regexp">~* \.(ico|jpg|jpeg|png|gif|js|css|svg)$</span> &#123;</span><br><span class="line">        <span class="attribute">access_log</span> <span class="literal">off</span>;</span><br><span class="line">        <span class="attribute">log_not_found</span> <span class="literal">off</span>;</span><br><span class="line"></span><br><span class="line">        <span class="attribute">expires</span> <span class="number">1m</span>;</span><br><span class="line">        <span class="attribute">add_header</span> Cache-Control <span class="string">&quot;public, no-transform&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="section">location</span> / &#123;</span><br><span class="line">        <span class="attribute">proxy_pass</span>          http://api;</span><br><span class="line">        <span class="attribute">proxy_connect_timeout</span>   <span class="number">10s</span>;</span><br><span class="line">        <span class="attribute">proxy_read_timeout</span>      <span class="number">60s</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 禁止存取隱藏檔案</span></span><br><span class="line">    <span class="section">location</span> <span class="regexp">~ /\.</span> &#123;</span><br><span class="line">        <span class="attribute">access_log</span> <span class="literal">off</span>;</span><br><span class="line">        <span class="attribute">log_not_found</span> <span class="literal">off</span>;</span><br><span class="line">        <span class="attribute">deny</span> all;</span><br><span class="line">    &#125;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+
+<p>其中 <code>upstream</code> block 定義了要將 request proxy 過去的 application, <code>keepalive</code> 是設定閒置的連線最大數量，當超過此上限時，將會關閉最近使用最少的連線，假設目前有100個閒置的連線，而我們設定 <code>keepalive=64</code>，所以最近最少使用的36個連線會被關閉，這個參數要小心設定，如果設太小，會造成 Nginx 一直關閉、開啟和後端的連線，會出現大量的 TIME_WAIT 的情況。另外要讓 Nginx 可以使用 <code>keepalive</code> 和後端連線必須要使用 HTTP 1.1，因此需要設定 <code>proxy_http_version 1.1</code>，同時也記得設定 <code>proxy_set_header Connection &quot;&quot;</code> 清理 header.</p>
+<p><code>auth_basic</code> 和 <code>auth_basic_user_file</code> 則是設定 Nginx 使用 HTTP authentication, <code>auth_basic_user_file</code> 為 password file.</p>
+<p><code>client_max_body_size</code> 設定 Body 最大長度限制，超過限制則會出現 <code>HTTP ERROR: 413 Request Entity Too Large</code> 的錯誤訊息。</p>
+<p>最後使用 <code>proxy_pass</code> 設定轉發到 updstream api server.</p>
+<h3 id="Proxy-as-failover-設定範例"><a href="#Proxy-as-failover-設定範例" class="headerlink" title="Proxy as failover 設定範例"></a>Proxy as failover 設定範例</h3><p>在此設定範例中，如果第一個 server fail(<code>proxy_connect_timeout</code>)次數超過 <code>max_fails</code> (預設為1), 第二個 server 將會用來取代 server1，持續的時間為 <code>fail_timeout</code>。</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">upstream</span> api &#123;</span><br><span class="line">    <span class="attribute">server</span> server1.com:<span class="number">8000</span> fail_timeout=<span class="number">60s</span> max_fails=<span class="number">1</span>;</span><br><span class="line">    <span class="attribute">server</span> server2.com:<span class="number">8080</span> backup;</span><br><span class="line">    <span class="attribute">keepalive</span> <span class="number">256</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="section">server</span> &#123;</span><br><span class="line">    <span class="attribute">listen</span>       <span class="number">6000</span>;</span><br><span class="line">    <span class="attribute">server_name</span>  localhost;</span><br><span class="line"></span><br><span class="line">    <span class="section">location</span> / &#123;</span><br><span class="line">        <span class="attribute">proxy_pass</span>          http://api;</span><br><span class="line">        <span class="attribute">proxy_connect_timeout</span>   <span class="number">10s</span>;</span><br><span class="line">        <span class="attribute">proxy_read_timeout</span>      <span class="number">60s</span>;</span><br><span class="line">    &#125;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Load-balancing-設定範例"><a href="#Load-balancing-設定範例" class="headerlink" title="Load balancing 設定範例"></a>Load balancing 設定範例</h3><p>Nginx 提供以下三種 load balancing 方法:</p>
+<ul>
+<li>round-robin: 會將請求輪流平均分配到每台伺服器上 (預設)</li>
+<li>least_conn: 將請求分配到目前連線數最少的伺服器上</li>
+<li>ip-hash: 利用 hash function 來決定使用者要被分配到哪個伺服器，此方法可以達到同一使用者(IP address)每次連結的伺服器是相同的</li>
+</ul>
+<p>此範例是將 Nginx 作為 Load Balancer, 並設定 load balancing 方式為 <code>least_conn</code>，將 request 分配至使用連線數最少的 server:</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">upstream</span> api &#123;</span><br><span class="line">    least_conn;</span><br><span class="line">    <span class="attribute">server</span> server1.com;</span><br><span class="line">    <span class="attribute">server</span> server2.com;</span><br><span class="line">    <span class="attribute">server</span> server3.com;</span><br><span class="line">    <span class="attribute">keepalive</span> <span class="number">64</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="section">server</span> &#123;</span><br><span class="line">    <span class="attribute">listen</span>       <span class="number">6000</span>;</span><br><span class="line">    <span class="attribute">server_name</span>  localhost;</span><br><span class="line"></span><br><span class="line">    <span class="section">location</span> / &#123;</span><br><span class="line">        <span class="attribute">proxy_pass</span> http://api;</span><br><span class="line">        <span class="attribute">proxy_connect_timeout</span>   <span class="number">10s</span>;</span><br><span class="line">        <span class="attribute">proxy_read_timeout</span>      <span class="number">60s</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>另外也可以設定分配的權重(weight)，weight 預設為 1，以下範例表示如果有 5 個新的請求，則會有 3 次被分配到 server1, server2 和 server3 各一次:</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">upstream</span> api &#123;</span><br><span class="line">    <span class="attribute">server</span> server1.com weight=<span class="number">3</span>;</span><br><span class="line">    <span class="attribute">server</span> server2.com;</span><br><span class="line">    <span class="attribute">server</span> server3.com;</span><br><span class="line">    <span class="attribute">keepalive</span> <span class="number">64</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="section">server</span> &#123;</span><br><span class="line">    <span class="attribute">listen</span>       <span class="number">6000</span>;</span><br><span class="line">    <span class="attribute">server_name</span>  localhost;</span><br><span class="line"></span><br><span class="line">    <span class="section">location</span> / &#123;</span><br><span class="line">        <span class="attribute">proxy_pass</span> http://api;</span><br><span class="line">        <span class="attribute">proxy_connect_timeout</span>   <span class="number">10s</span>;</span><br><span class="line">        <span class="attribute">proxy_read_timeout</span>      <span class="number">60s</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="HTTPS"><a href="#HTTPS" class="headerlink" title="HTTPS"></a>HTTPS</h3><p>現在多數的服務都會使用 HTTPS，在設定 HTTPS 之前，需要先申請 SSL 憑證，可以參考: <a href="/posts/d4a319ec/">[SSL] Nginx + Let’s encrypt SSL 憑證</a>，依照此文章設定完成後，可以在 <code>nginx.conf</code> 的 http block 中加上以下內容:</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># ...</span></span><br><span class="line"></span><br><span class="line"><span class="section">http</span> &#123;</span><br><span class="line">    <span class="comment"># ...</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># SSL settings</span></span><br><span class="line">    <span class="attribute">ssl_protocols</span>   TLSv1 TLSv1.<span class="number">1</span> TLSv1.<span class="number">2</span>;</span><br><span class="line">    <span class="attribute">ssl_prefer_server_ciphers</span>   <span class="literal">on</span>;</span><br><span class="line">    <span class="attribute">ssl_ciphers</span> ECDH+AESGCM:EDCH+AES256:ECDH+AES128:!MD5:!aNULL;</span><br><span class="line">    <span class="comment"># Enable SSL cache</span></span><br><span class="line">    <span class="attribute">ssl_session_cache</span> shared:SSL:<span class="number">30m</span>;</span><br><span class="line">    <span class="attribute">ssl_session_tickets</span> <span class="literal">on</span>;</span><br><span class="line">    <span class="attribute">ssl_session_timeout</span> <span class="number">1h</span>;</span><br><span class="line">    <span class="comment"># Enable OCSP stapling</span></span><br><span class="line">    <span class="attribute">ssl_stapling</span> <span class="literal">on</span>;</span><br><span class="line">    <span class="attribute">ssl_stapling_verify</span> <span class="literal">on</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment"># ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="參考資料"><a href="#參考資料" class="headerlink" title="參考資料"></a>參考資料</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://blog.gtwang.org/linux/nginx-php-fpm-configuration-optimization/">Nginx 與 PHP-FPM 最佳化效能設定教學與技巧</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.maxlist.xyz/2020/06/18/flask-nginx/">淺談 Nginx 基本配置、負載均衡、緩存和反向代理</a></li>
+<li><a target="_blank" rel="noopener" href="http://nginx.org/en/docs/http/ngx_http_core_module.html#location">Nginx Location</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.fatalerrors.org/a/common-nginx-regular-expressions.html">Common Nginx regular expressions</a></li>
+<li><a target="_blank" rel="noopener" href="https://smalltowntechblog.wordpress.com/2014/10/25/nginx-location-regex%E7%AD%86%E8%A8%98/">Nginx Location REGEX 比對語法和設定</a></li>
+<li><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/59846238/guide-on-how-to-use-regex-in-nginx-location-block-section">Guide on how to use regex in Nginx location block section?</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Nginx/" rel="tag"># Nginx</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/d4a319ec/" rel="prev" title="[SSL] Nginx + Let's encrypt SSL 憑證">
+      <i class="fa fa-chevron-left"></i> [SSL] Nginx + Let's encrypt SSL 憑證
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/posts/8c1276a7/" rel="next" title="[Nginx] 解決 connect() failed (111: Connection refused) while connecting to upstream">
+      [Nginx] 解決 connect() failed (111: Connection refused) while connecting to upstream <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%9D"><span class="nav-number">2.</span> <span class="nav-text">安裝</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B8%B8%E7%94%A8%E6%8C%87%E4%BB%A4"><span class="nav-number">3.</span> <span class="nav-text">常用指令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Nginx-%E8%A8%AD%E5%AE%9A"><span class="nav-number">4.</span> <span class="nav-text">Nginx 設定</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B3%87%E6%96%99%E5%A4%BE%E7%B5%90%E6%A7%8B"><span class="nav-number">4.1.</span> <span class="nav-text">資料夾結構</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A8%AD%E5%AE%9A%E6%AA%94%E8%AA%AA%E6%98%8E"><span class="nav-number">4.2.</span> <span class="nav-text">設定檔說明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Location-syntax"><span class="nav-number">4.3.</span> <span class="nav-text">Location syntax</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Proxy-%E8%A8%AD%E5%AE%9A%E7%AF%84%E4%BE%8B"><span class="nav-number">4.4.</span> <span class="nav-text">Proxy 設定範例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Proxy-as-failover-%E8%A8%AD%E5%AE%9A%E7%AF%84%E4%BE%8B"><span class="nav-number">4.5.</span> <span class="nav-text">Proxy as failover 設定範例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Load-balancing-%E8%A8%AD%E5%AE%9A%E7%AF%84%E4%BE%8B"><span class="nav-number">4.6.</span> <span class="nav-text">Load balancing 設定範例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HTTPS"><span class="nav-number">4.7.</span> <span class="nav-text">HTTPS</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%83%E8%80%83%E8%B3%87%E6%96%99"><span class="nav-number">5.</span> <span class="nav-text">參考資料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Szu-Hsuan, Wu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">61</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">57</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/wshs0713" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;wshs0713" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:shuan0713@gmail.com" title="E-Mail → mailto:shuan0713@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="http://linkedin.com/in/wshs0713" title="LinkedIn → http:&#x2F;&#x2F;linkedin.com&#x2F;in&#x2F;wshs0713" rel="noopener" target="_blank"><i class="fab fa-linkedin fa-fw"></i>LinkedIn</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/wshs0713" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;wshs0713" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Szu-Hsuan, Wu</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://wshs0713.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "https://wshs0713.github.io/posts/6a171975/";
+    this.page.identifier = "posts/6a171975/";
+    this.page.title = "[Nginx] Nginx 安裝及設定";
+    };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://wshs0713.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+</body>
+</html>

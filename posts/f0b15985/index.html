@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en,zh-tw,default">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/favicon-180x180.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-32x32.png">
+  <link rel="mask-icon" href="/img/favicon-180x180.png" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"wshs0713.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="簡介Webpack 是一個 module bundler，把許多不同類型的模組 build 成靜態資源。 主要功能：  將 CSS、圖片與其他資源打包 Pre-processing Less、CoffeeScript、JSX、ES6 等檔案 可依 entry 文件不同，把 .js 打包成多個 .js 檔案 可以搭配許多 Loaders  這一篇文章主要是紀錄 Webpack 搭配 Express">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[Webpack] Webpack 設定及使用">
+<meta property="og:url" content="https://wshs0713.github.io/posts/f0b15985/">
+<meta property="og:site_name" content="wshs0713&#39;s blog">
+<meta property="og:description" content="簡介Webpack 是一個 module bundler，把許多不同類型的模組 build 成靜態資源。 主要功能：  將 CSS、圖片與其他資源打包 Pre-processing Less、CoffeeScript、JSX、ES6 等檔案 可依 entry 文件不同，把 .js 打包成多個 .js 檔案 可以搭配許多 Loaders  這一篇文章主要是紀錄 Webpack 搭配 Express">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://cdn-images-1.medium.com/max/1600/1*9IXiJMp60QAt3MP0R8qX_A.png">
+<meta property="article:published_time" content="2018-03-19T09:49:36.000Z">
+<meta property="article:modified_time" content="2018-03-19T09:49:36.000Z">
+<meta property="article:author" content="Szu-Hsuan, Wu">
+<meta property="article:tag" content="Node.js">
+<meta property="article:tag" content="Webpack">
+<meta property="article:tag" content="Express">
+<meta property="article:tag" content="Babel">
+<meta property="article:tag" content="HMR">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn-images-1.medium.com/max/1600/1*9IXiJMp60QAt3MP0R8qX_A.png">
+
+<link rel="canonical" href="https://wshs0713.github.io/posts/f0b15985/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>[Webpack] Webpack 設定及使用 | wshs0713's blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-8XTKEMPTGC"></script>
+    <script>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-8XTKEMPTGC');
+      }
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">wshs0713's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Programming notes</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-projects">
+
+    <a href="/projects/" rel="section"><i class="fa fa-folder fa-fw"></i>Projects</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://wshs0713.github.io/posts/f0b15985/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Szu-Hsuan, Wu">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="wshs0713's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          [Webpack] Webpack 設定及使用
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-03-19 17:49:36" itemprop="dateCreated datePublished" datetime="2018-03-19T17:49:36+08:00">2018-03-19</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Webpack/" itemprop="url" rel="index"><span itemprop="name">Webpack</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus: </span>
+    
+    <a title="disqus" href="/posts/f0b15985/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="posts/f0b15985/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>12k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>11 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><a target="_blank" rel="noopener" href="https://medium.codylamson.com/minimum-viable-webpack-babel-react-setup-without-create-react-app-47959f43fbac"><img src="https://cdn-images-1.medium.com/max/1600/1*9IXiJMp60QAt3MP0R8qX_A.png" alt="Webpack"></a></p>
+<h1 id="簡介"><a href="#簡介" class="headerlink" title="簡介"></a>簡介</h1><p><a target="_blank" rel="noopener" href="https://webpack.js.org/" title="Webpack">Webpack</a> 是一個 module bundler，把許多不同類型的模組 build 成靜態資源。</p>
+<p>主要功能：</p>
+<ul>
+<li>將 CSS、圖片與其他資源打包</li>
+<li>Pre-processing Less、CoffeeScript、JSX、ES6 等檔案</li>
+<li>可依 entry 文件不同，把 .js 打包成多個 .js 檔案</li>
+<li>可以搭配許多 Loaders</li>
+</ul>
+<p>這一篇文章主要是紀錄 Webpack 搭配 Express、Hot module replacement 、 Babel 和許多常用的 Lodaers 的設定及使用方式.</p>
+<span id="more"></span>
+
+<h1 id="Loaders-介紹"><a href="#Loaders-介紹" class="headerlink" title="Loaders 介紹"></a>Loaders 介紹</h1><p>在使用 Webpack 時，常常會搭配各種 loaders 來做靜態資源的打包，接下來我們先介紹一下常用到的 lodaers:</p>
+<h2 id="babel-loader"><a href="#babel-loader" class="headerlink" title="babel-loader"></a>babel-loader</h2><p><a target="_blank" rel="noopener" href="https://babeljs.io/" title="Babel">Babel</a> 是一個JavaScript compiler，可以將新的 JS 語法轉譯為瀏覽器支援的 ES5，因為 JavaScript 幾乎是每年會提出一個新的規格草案，但是瀏覽器沒辦法很快就能夠支援新的 JS，所以我們需要先轉譯成瀏覽器支援的 ES5。</p>
+<p>設定方式:</p>
+<p><code>.babelrc</code>:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="string">&quot;presets&quot;</span>: [<span class="string">&quot;es2017&quot;</span>, <span class="string">&quot;react&quot;</span>]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>webpack.config.js</code>:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">module</span>: &#123;</span><br><span class="line">        <span class="attr">rules</span>: [&#123;</span><br><span class="line">            <span class="attr">test</span>: <span class="regexp">/\.(js|jsx)$/</span>,</span><br><span class="line">            <span class="attr">exclude</span>: <span class="string">&#x27;/node_modules/&#x27;</span>,</span><br><span class="line">            <span class="attr">use</span>: &#123;</span><br><span class="line">                <span class="attr">loader</span>: <span class="string">&#x27;babel-loader&#x27;</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;]</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="css-loader-and-style-loader"><a href="#css-loader-and-style-loader" class="headerlink" title="css-loader and style-loader"></a>css-loader and style-loader</h2><p><strong>css-loader</strong>: 載入 CSS file.<br><strong>style-loader</strong>: Add CSS to the DOM by injecting a <code>&lt;style&gt;</code> tag. 通常搭配css-loader一起使用。</p>
+<p><code>webpack.config.js</code>:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">module</span>: &#123;</span><br><span class="line">        <span class="attr">rules</span>: [&#123;</span><br><span class="line">            <span class="attr">test</span>: <span class="regexp">/\.css$/</span>,</span><br><span class="line">            <span class="attr">use</span>: [<span class="string">&#x27;style-loader&#x27;</span>, <span class="string">&#x27;css-loader&#x27;</span>]</span><br><span class="line">        &#125;]</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>使用方式:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// in index.js</span></span><br><span class="line"><span class="keyword">import</span> <span class="string">&#x27;./css/style.css&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<h2 id="less-loader"><a href="#less-loader" class="headerlink" title="less-loader"></a>less-loader</h2><p>將 Less 轉為 CSS.</p>
+<p><code>webpack.config.js</code>:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">module</span>: &#123;</span><br><span class="line">        <span class="attr">rules</span>: [&#123;</span><br><span class="line">            <span class="attr">test</span>: <span class="regexp">/\.less$/</span>,</span><br><span class="line">            <span class="attr">use</span>: [&#123;</span><br><span class="line">                <span class="attr">loader</span>: <span class="string">&quot;style-loader&quot;</span> <span class="comment">// creates style nodes from JS strings</span></span><br><span class="line">            &#125;, &#123;</span><br><span class="line">                <span class="attr">loader</span>: <span class="string">&quot;css-loader&quot;</span> <span class="comment">// translates CSS into CommonJS</span></span><br><span class="line">            &#125;, &#123;</span><br><span class="line">                <span class="attr">loader</span>: <span class="string">&quot;less-loader&quot;</span> <span class="comment">// compiles Less to CSS</span></span><br><span class="line">            &#125;]</span><br><span class="line">        &#125;]</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>使用方式:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// in index.js</span></span><br><span class="line"><span class="keyword">import</span> <span class="string">&#x27;./css/style.less&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<h2 id="file-loader"><a href="#file-loader" class="headerlink" title="file-loader"></a>file-loader</h2><p>載入檔案，回傳 public URL.</p>
+<p><code>webpack.config.js</code>:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">module</span>: &#123;</span><br><span class="line">        <span class="attr">rules</span>: [&#123;</span><br><span class="line">            <span class="attr">test</span>: <span class="regexp">/\.(jpe?g|JPE?G|png|PNG|gif|GIF|svg|SVG|woff|woff2|eot|ttf)(\?v=\d+\.\d+\.\d+)?$/</span>,</span><br><span class="line">            <span class="attr">use</span>: [&#123;</span><br><span class="line">                <span class="attr">loader</span>: <span class="string">&#x27;file-loader&#x27;</span>,</span><br><span class="line">                <span class="attr">options</span>: &#123;</span><br><span class="line">                    <span class="attr">name</span>: <span class="string">&#x27;[hash].[ext]&#x27;</span>,    <span class="comment">//[hash].[ext] or [name].[ext]</span></span><br><span class="line">                    <span class="attr">publicPath</span>: <span class="string">&quot;/src/&quot;</span>,</span><br><span class="line">                    <span class="attr">outputPath</span>: <span class="string">&quot;img/&quot;</span></span><br><span class="line">                &#125;</span><br><span class="line">            &#125;]</span><br><span class="line">        &#125;]</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>使用方式:</p>
+<ul>
+<li><p>If <code>options.name == &quot;[name].[ext]&quot;</code>:</p>
+  <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// in index.js</span></span><br><span class="line"><span class="keyword">import</span> <span class="string">&#x27;./img/user-icon.png&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+  <figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- main.html --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">&quot;userIcon&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">img</span> <span class="attr">src</span>=<span class="string">&quot;/src/img/user-icon.png&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">img</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+<li><p>else:</p>
+  <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> user_icon <span class="keyword">from</span> <span class="string">&#x27;./img/user-icon.png&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> img = <span class="variable language_">document</span>.<span class="title function_">createElement</span>(<span class="string">&quot;img&quot;</span>);</span><br><span class="line">img.<span class="property">src</span> = user_icon;</span><br><span class="line">$(<span class="string">&quot;#userIcon&quot;</span>).<span class="title function_">append</span>(img);</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="url-loader"><a href="#url-loader" class="headerlink" title="url-loader"></a>url-loader</h2><p>和 <code>file-loader</code> 類似, 但在檔案大小小於 limit 時, 會回傳一個 base64 url.</p>
+<p><code>webpack.config.js</code>:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">module</span>: &#123;</span><br><span class="line">        <span class="attr">rules</span>: [&#123;</span><br><span class="line">            <span class="attr">test</span>: <span class="regexp">/\.(jpe?g|JPE?G|png|PNG|gif|GIF|svg|SVG|woff|woff2|eot|ttf)(\?v=\d+\.\d+\.\d+)?$/</span>,</span><br><span class="line">            <span class="attr">use</span>: [&#123;</span><br><span class="line">                <span class="attr">loader</span>: <span class="string">&#x27;url-loader&#x27;</span>,</span><br><span class="line">                <span class="attr">options</span>: &#123;</span><br><span class="line">                    <span class="attr">limit</span>: <span class="number">8192</span>     <span class="comment">// 當圖片大小小於 8k 時使用 base64 URL, 其餘使用直接連接到圖片的 URL</span></span><br><span class="line">                &#125;</span><br><span class="line">            &#125;]</span><br><span class="line">        &#125;]</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>使用方式:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//index.js</span></span><br><span class="line"><span class="keyword">import</span> user_icon <span class="keyword">from</span> <span class="string">&#x27;./img/user-icon.png&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> img = <span class="variable language_">document</span>.<span class="title function_">createElement</span>(<span class="string">&quot;img&quot;</span>);</span><br><span class="line">img.<span class="property">src</span> = user_icon;</span><br><span class="line">$(<span class="string">&quot;#userIcon&quot;</span>).<span class="title function_">append</span>(img);</span><br></pre></td></tr></table></figure>
+
+<h1 id="Plugins"><a href="#Plugins" class="headerlink" title="Plugins"></a>Plugins</h1><p>Webpack 也提供了許多方便的 plugins, 這裡介紹一下常用的 plugins:</p>
+<h2 id="uglifyjs-webpack-plugin"><a href="#uglifyjs-webpack-plugin" class="headerlink" title="uglifyjs-webpack-plugin"></a>uglifyjs-webpack-plugin</h2><p><a target="_blank" rel="noopener" href="https://github.com/webpack-contrib/uglifyjs-webpack-plugin">uglifyjs-webpack-plugin</a> 主要功能是 minify JavaScript, 減少 js file size.  </p>
+<h2 id="webpack-dev-middleware"><a href="#webpack-dev-middleware" class="headerlink" title="webpack-dev-middleware"></a>webpack-dev-middleware</h2><p>webpack-dev-middleware 可以讓 webpack 被 Express app 或是其他可使用 middleware 的框架所使用。</p>
+<h2 id="webpack-dev-server"><a href="#webpack-dev-server" class="headerlink" title="webpack-dev-server"></a>webpack-dev-server</h2><p>webpack-dev-server 本身就是小型的 Express server，整合了 Express 和 webpack-dev-middleware。<br>雖然方便架設，但彈性較少，無法跟現有的 Express app 結合。</p>
+<h2 id="Hot-Module-Replacement"><a href="#Hot-Module-Replacement" class="headerlink" title="Hot Module Replacement"></a>Hot Module Replacement</h2><p>Hot Module Replacement (簡稱 HMR)，主要功能是在修改任意檔案並儲存後，會自動編譯打包 (等同於 <code>webpack --watch</code> 的功能)，接著更新瀏覽器畫面，只會 reload 更新的部分，而不會全部 reload。</p>
+<p>HMR 有兩種套件:</p>
+<ul>
+<li>react-hot-loader: webpack-dev-server 的衍生套件。</li>
+<li>webpack-hot-middleware: webpack-dev-middleware 的衍生套件。</li>
+</ul>
+<p>請依照選擇的環境安裝。</p>
+<p>這裡我們選擇的環境是 <strong>webpack-dev-middleware + Express + webpack-hot-middleware</strong>, Dashboard 則是使用<a target="_blank" rel="noopener" href="https://github.com/FormidableLabs/webpack-dashboard" title="webpack-dashboard">webpack-dashboard</a>.</p>
+<h1 id="安裝"><a href="#安裝" class="headerlink" title="安裝"></a>安裝</h1><p>安裝 Webpack and Loaders</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># webpack</span></span><br><span class="line">$ npm install --save-dev webpack webpack-cli</span><br><span class="line"></span><br><span class="line"><span class="comment"># webpack loaders</span></span><br><span class="line">$ npm install --save-dev css-loader style-loader url-loader file-loader less less-loader</span><br><span class="line"></span><br><span class="line"><span class="comment"># babel</span></span><br><span class="line">npm install --save-dev babel-core babel-loader babel-preset-es2017</span><br></pre></td></tr></table></figure>
+
+<p>安裝 webpack-dev-middleware、webpack-hot-middleware</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># webpack-dev-middleware and HMR</span></span><br><span class="line">$ npm install --save-dev webpack-dev-middleware webpack-hot-middleware</span><br><span class="line"></span><br><span class="line"><span class="comment"># uglifyjs-webpack-plugin</span></span><br><span class="line">$ npm install --save-dev uglifyjs-webpack-plugin</span><br></pre></td></tr></table></figure>
+
+<p>安裝 <a target="_blank" rel="noopener" href="https://github.com/FormidableLabs/webpack-dashboard" title="webpack-dashboard">webpack-dashboard</a>: A friendly UI for webpack.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npm install --save-dev webpack-dashboard</span><br></pre></td></tr></table></figure>
+
+<h1 id="Webpack-相關指令"><a href="#Webpack-相關指令" class="headerlink" title="Webpack 相關指令"></a>Webpack 相關指令</h1><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">webpack                       <span class="comment"># 會在開發模式下開始一次性的建置</span></span><br><span class="line">webpack -p                    <span class="comment"># 會建置production的程式碼</span></span><br><span class="line">webpack --watch               <span class="comment"># 會監聽程式碼的修改，當儲存時有修改時會更新檔案</span></span><br><span class="line">webpack -d                    <span class="comment"># 加入source maps檔案</span></span><br><span class="line">webpack --progress --color    <span class="comment"># 加上處理進度和顏色</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="設定-Webpack"><a href="#設定-Webpack" class="headerlink" title="設定 Webpack"></a>設定 Webpack</h1><p>這裡的設定範例是依照我們所選擇的環境: webpack-dev-middleware + Express + webpack-hot-middleware, 並使用以下 loaders:</p>
+<ul>
+<li>babel-loaders</li>
+<li>css-loader</li>
+<li>style-loader</li>
+<li>less-loader</li>
+<li>url-loader</li>
+</ul>
+<p><code>webpack.config.js</code> 設定範例:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> path = <span class="built_in">require</span>(<span class="string">&#x27;path&#x27;</span>);</span><br><span class="line"><span class="keyword">const</span> webpack = <span class="built_in">require</span>(<span class="string">&#x27;webpack&#x27;</span>);</span><br><span class="line"><span class="keyword">const</span> <span class="title class_">DashboardPlugin</span> = <span class="built_in">require</span>(<span class="string">&#x27;webpack-dashboard/plugin&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> env = process.<span class="property">env</span>.<span class="property">NODE_ENV</span>;</span><br><span class="line"><span class="variable language_">module</span>.<span class="property">exports</span> = &#123;</span><br><span class="line">    <span class="attr">mode</span>: env || <span class="string">&#x27;development&#x27;</span>,</span><br><span class="line">    <span class="attr">entry</span>: [</span><br><span class="line">        <span class="string">&#x27;webpack-hot-middleware/client?reload=true&#x27;</span>,    <span class="comment">// HMR</span></span><br><span class="line">        <span class="string">&#x27;./public/js/index.js&#x27;</span>                          <span class="comment">// 進入點</span></span><br><span class="line">    ],</span><br><span class="line">    <span class="attr">output</span>: &#123;</span><br><span class="line">        <span class="attr">path</span>: path.<span class="title function_">join</span>(__dirname, <span class="string">&#x27;/dist/&#x27;</span>),</span><br><span class="line">        <span class="attr">filename</span>: <span class="string">&#x27;bundle.js&#x27;</span>,</span><br><span class="line">        <span class="attr">publicPath</span>: <span class="string">&#x27;/src/&#x27;</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">module</span>: &#123;</span><br><span class="line">        <span class="attr">rules</span>: [&#123;</span><br><span class="line">            <span class="attr">test</span>: <span class="regexp">/\.(js|jsx)$/</span>,</span><br><span class="line">            <span class="attr">exclude</span>: <span class="string">&#x27;/node_modules/&#x27;</span>,</span><br><span class="line">            <span class="attr">use</span>: &#123;</span><br><span class="line">                <span class="attr">loader</span>: <span class="string">&#x27;babel-loader&#x27;</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;, &#123;</span><br><span class="line">            <span class="attr">test</span>: <span class="regexp">/\.css$/</span>,</span><br><span class="line">            <span class="attr">use</span>: [<span class="string">&#x27;style-loader&#x27;</span>, <span class="string">&#x27;css-loader&#x27;</span>]</span><br><span class="line">        &#125;, &#123;</span><br><span class="line">            <span class="attr">test</span>: <span class="regexp">/\.less$/</span>,</span><br><span class="line">            <span class="attr">use</span>: [&#123;</span><br><span class="line">                <span class="attr">loader</span>: <span class="string">&quot;style-loader&quot;</span>  <span class="comment">// creates style nodes from JS strings</span></span><br><span class="line">            &#125;, &#123;</span><br><span class="line">                <span class="attr">loader</span>: <span class="string">&quot;css-loader&quot;</span>    <span class="comment">// translates CSS into CommonJS</span></span><br><span class="line">            &#125;, &#123;</span><br><span class="line">                <span class="attr">loader</span>: <span class="string">&quot;less-loader&quot;</span>   <span class="comment">// compiles Less to CSS</span></span><br><span class="line">            &#125;]</span><br><span class="line">        &#125;, &#123;</span><br><span class="line">            <span class="attr">test</span>: <span class="regexp">/\.(jpe?g|JPE?G|png|PNG|gif|GIF|svg|SVG|woff|woff2|eot|ttf)(\?v=\d+\.\d+\.\d+)?$/</span>,</span><br><span class="line">            <span class="attr">use</span>: [&#123;</span><br><span class="line">                <span class="attr">loader</span>: <span class="string">&#x27;url-loader&#x27;</span>,</span><br><span class="line">                <span class="attr">options</span>: &#123;</span><br><span class="line">                    <span class="attr">limit</span>: <span class="number">8192</span>         <span class="comment">// 當圖片大小小於 8k 時使用 base64 URL, 其餘使用直接連接到圖片的 URL</span></span><br><span class="line">                &#125;</span><br><span class="line">            &#125;]</span><br><span class="line"></span><br><span class="line">        &#125;]</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">devtool</span>: <span class="string">&#x27;cheap-module-eval-source-map&#x27;</span>,    <span class="comment">// 設置 eval 或 SourceMap 屬性，debug 用</span></span><br><span class="line">    <span class="attr">plugins</span>: [</span><br><span class="line">        <span class="keyword">new</span> webpack.<span class="title class_">HotModuleReplacementPlugin</span>(),</span><br><span class="line">        <span class="comment">// new DashboardPlugin()                //如果沒有使用express, 將plugin加到webpack.config.js</span></span><br><span class="line">    ]</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>搭配 Babel, 需安裝 <code>babel-loader</code> 並另外再設定 <code>.babelrc</code>:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="string">&quot;presets&quot;</span>: [<span class="string">&quot;es2017&quot;</span>]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以在 <code>package.json</code> 加上以下 script, 方便之後執行:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="string">&quot;scripts&quot;</span>: &#123;</span><br><span class="line">        <span class="string">&quot;test&quot;</span>: <span class="string">&quot;echo \&quot;Error: no test specified\&quot; &amp;&amp; exit 1&quot;</span>,</span><br><span class="line">        <span class="string">&quot;dev&quot;</span>: <span class="string">&quot;NODE_ENV=development webpack-dashboard -p 2458 -- node app.js&quot;</span>,</span><br><span class="line">        <span class="string">&quot;deploy&quot;</span>: <span class="string">&quot;NODE_ENV=production webpack -p --config webpack.config.js&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其中，<code>dev</code>指令中的<code>-p</code>可換為指定的port.</p>
+<h2 id="撰寫-app-js"><a href="#撰寫-app-js" class="headerlink" title="撰寫 app.js"></a>撰寫 app.js</h2><p>再來，我們先撰寫一個簡單的 <code>app.js</code>, 並在裡面加上 Webpack、webpack-dev-middleware、HMR 和 webpack-dashboard 的相關設定:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> express = <span class="built_in">require</span>(<span class="string">&#x27;express&#x27;</span>);</span><br><span class="line"><span class="keyword">const</span> session = <span class="built_in">require</span>(<span class="string">&#x27;express-session&#x27;</span>);</span><br><span class="line"><span class="keyword">const</span> bodyParser = <span class="built_in">require</span>(<span class="string">&#x27;body-parser&#x27;</span>);</span><br><span class="line"><span class="keyword">const</span> cookieParser = <span class="built_in">require</span>(<span class="string">&#x27;cookie-parser&#x27;</span>);</span><br><span class="line"><span class="keyword">const</span> path = <span class="built_in">require</span>(<span class="string">&#x27;path&#x27;</span>);</span><br><span class="line"><span class="keyword">const</span> logger = <span class="built_in">require</span>(<span class="string">&#x27;morgan&#x27;</span>);</span><br><span class="line"><span class="keyword">const</span> helmet = <span class="built_in">require</span>(<span class="string">&#x27;helmet&#x27;</span>);</span><br><span class="line"><span class="keyword">const</span> http = <span class="built_in">require</span>(<span class="string">&#x27;http&#x27;</span>);</span><br><span class="line"><span class="keyword">const</span> https = <span class="built_in">require</span>(<span class="string">&#x27;https&#x27;</span>);</span><br><span class="line"><span class="keyword">const</span> webpack = <span class="built_in">require</span>(<span class="string">&#x27;webpack&#x27;</span>);</span><br><span class="line"><span class="keyword">const</span> webpackDev = <span class="built_in">require</span>(<span class="string">&#x27;webpack-dev-middleware&#x27;</span>);</span><br><span class="line"><span class="keyword">const</span> webpackHot = <span class="built_in">require</span>(<span class="string">&#x27;webpack-hot-middleware&#x27;</span>);</span><br><span class="line"><span class="keyword">const</span> <span class="title class_">DashboardPlugin</span> = <span class="built_in">require</span>(<span class="string">&#x27;webpack-dashboard/plugin&#x27;</span>);</span><br><span class="line"><span class="keyword">const</span> webpackConfig = <span class="built_in">require</span>(<span class="string">&#x27;./webpack.config&#x27;</span>);</span><br><span class="line"><span class="keyword">const</span> config = <span class="built_in">require</span>(<span class="string">&#x27;./config&#x27;</span>);</span><br><span class="line"><span class="keyword">const</span> routes = <span class="built_in">require</span>(<span class="string">&#x27;./routes&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// ====== 基本設定 ======</span></span><br><span class="line"><span class="keyword">const</span> app = <span class="title function_">express</span>();</span><br><span class="line">app.<span class="title function_">use</span>(express.<span class="title function_">static</span>(path.<span class="title function_">join</span>(__dirname, <span class="string">&#x27;public&#x27;</span>)));</span><br><span class="line">app.<span class="title function_">set</span>(<span class="string">&#x27;views&#x27;</span>, path.<span class="title function_">join</span>(__dirname, <span class="string">&#x27;views&#x27;</span>));</span><br><span class="line">app.<span class="title function_">set</span>(<span class="string">&#x27;view engine&#x27;</span>, <span class="string">&#x27;ejs&#x27;</span>);</span><br><span class="line"></span><br><span class="line">app.<span class="title function_">set</span>(<span class="string">&#x27;port&#x27;</span>, process.<span class="property">env</span>.<span class="property">PORT</span> || <span class="number">3000</span>);</span><br><span class="line">app.<span class="title function_">set</span>(<span class="string">&#x27;httpsport&#x27;</span>, process.<span class="property">env</span>.<span class="property">HTTPSPORT</span> || <span class="number">3001</span>);</span><br><span class="line"></span><br><span class="line">app.<span class="title function_">use</span>(<span class="title function_">helmet</span>());</span><br><span class="line">app.<span class="title function_">use</span>(<span class="title function_">logger</span>(<span class="string">&#x27;dev&#x27;</span>));</span><br><span class="line">app.<span class="title function_">use</span>(bodyParser.<span class="title function_">json</span>());</span><br><span class="line">app.<span class="title function_">use</span>(bodyParser.<span class="title function_">urlencoded</span>(&#123;<span class="attr">extended</span>: <span class="literal">false</span>&#125;));</span><br><span class="line">app.<span class="title function_">use</span>(<span class="title function_">cookieParser</span>());</span><br><span class="line">app.<span class="title function_">use</span>(<span class="string">&#x27;/&#x27;</span>, routes);</span><br><span class="line"></span><br><span class="line"><span class="comment">// ====== Session ======</span></span><br><span class="line">app.<span class="title function_">set</span>(<span class="string">&#x27;trust proxy&#x27;</span>, <span class="number">1</span>) <span class="comment">// trust first proxy</span></span><br><span class="line">app.<span class="title function_">use</span>(<span class="title function_">session</span>(&#123;</span><br><span class="line">    <span class="attr">secret</span>: config.<span class="property">server</span>.<span class="property">secret</span>,</span><br><span class="line">    <span class="attr">cookie</span>: &#123;</span><br><span class="line">        <span class="attr">maxAge</span>: <span class="number">86400</span> * <span class="number">1000</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">resave</span>: <span class="literal">true</span>,</span><br><span class="line">    <span class="attr">saveUninitialized</span>: <span class="literal">true</span></span><br><span class="line">&#125;));</span><br><span class="line">app.<span class="title function_">use</span>(<span class="function">(<span class="params">req, res, next</span>) =&gt;</span> &#123;</span><br><span class="line">    res.<span class="property">locals</span>.<span class="property">login</span> = req.<span class="property">session</span>.<span class="property">login</span>;</span><br><span class="line">    res.<span class="property">locals</span>.<span class="property">account</span> = req.<span class="property">session</span>.<span class="property">account</span>;</span><br><span class="line">    <span class="title function_">next</span>();</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// ====== Webpack (增加此段code) ======</span></span><br><span class="line"><span class="keyword">const</span> compiler = <span class="title function_">webpack</span>(webpackConfig);</span><br><span class="line">compiler.<span class="title function_">apply</span>(<span class="keyword">new</span> <span class="title class_">DashboardPlugin</span>());</span><br><span class="line"></span><br><span class="line"><span class="comment">// 將 webpack 傳入 webpack-dev-middleware 並套用至 app，同時傳入屬性，webpack 就可以被加載進來</span></span><br><span class="line">app.<span class="title function_">use</span>(<span class="title function_">webpackDev</span>(compiler, &#123;</span><br><span class="line">    <span class="attr">noInfo</span>: <span class="literal">true</span>,</span><br><span class="line">    <span class="attr">publicPath</span>: webpackConfig.<span class="property">output</span>.<span class="property">publicPath</span></span><br><span class="line">&#125;));</span><br><span class="line"></span><br><span class="line"><span class="comment">// 將 webpack 傳入 webpack-hot-middleware 並套用至 app，就可達到 HMR 的效果</span></span><br><span class="line">app.<span class="title function_">use</span>(<span class="title function_">webpackHot</span>(compiler));</span><br><span class="line"></span><br><span class="line"><span class="comment">// ====== Error handler ======</span></span><br><span class="line"><span class="comment">// catch 404 and forward to error handler</span></span><br><span class="line">app.<span class="title function_">use</span>(<span class="function">(<span class="params">req, res, next</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">let</span> err = <span class="keyword">new</span> <span class="title class_">Error</span>(<span class="string">&#x27;Not Found&#x27;</span>);</span><br><span class="line">    err.<span class="property">status</span> = <span class="number">404</span>;</span><br><span class="line">    <span class="title function_">next</span>(err);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">app.<span class="title function_">use</span>(<span class="function">(<span class="params">err, req, res, next</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="comment">// set locals, only providing error in development</span></span><br><span class="line">    res.<span class="property">locals</span>.<span class="property">message</span> = err.<span class="property">message</span>;</span><br><span class="line">    res.<span class="property">locals</span>.<span class="property">error</span> = req.<span class="property">app</span>.<span class="title function_">get</span>(<span class="string">&#x27;env&#x27;</span>) === <span class="string">&#x27;development&#x27;</span> ? err : &#123;&#125;;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// render the error page</span></span><br><span class="line">    res.<span class="title function_">status</span>(err.<span class="property">status</span> || <span class="number">500</span>);</span><br><span class="line">    res.<span class="title function_">render</span>(<span class="string">&#x27;error&#x27;</span>);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// ====== Server ======</span></span><br><span class="line"><span class="comment">// HTTP</span></span><br><span class="line"><span class="keyword">let</span> httpServer = app.<span class="title function_">listen</span>(app.<span class="title function_">get</span>(<span class="string">&#x27;port&#x27;</span>), <span class="function">(<span class="params">err</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">if</span>(err) &#123;</span><br><span class="line">        <span class="variable language_">console</span>.<span class="title function_">error</span>(err);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`Listening at port <span class="subst">$&#123;httpServer.address().port&#125;</span>.`</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// HTTPS</span></span><br><span class="line"><span class="comment">/*let options = &#123;</span></span><br><span class="line"><span class="comment">    key: fs.readFileSync(config.serverKey),</span></span><br><span class="line"><span class="comment">    cert: fs.readFileSync(config.serverCrt)</span></span><br><span class="line"><span class="comment">&#125;</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">https.createServer(options, app).listen(app.get(&#x27;httpsport&#x27;), (err) =&gt; &#123;</span></span><br><span class="line"><span class="comment">    if (err) &#123;</span></span><br><span class="line"><span class="comment">        console.error(err);</span></span><br><span class="line"><span class="comment">    &#125;</span></span><br><span class="line"><span class="comment">    console.log(`Listening at port $&#123;app.get(&#x27;httpsport&#x27;)&#125;.`);</span></span><br><span class="line"><span class="comment">&#125;);*/</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="啟動-Server"><a href="#啟動-Server" class="headerlink" title="啟動 Server"></a>啟動 Server</h2><p>依照上述步驟設定好 Webpack，並撰寫好 <code>app.js</code> 後，要記得在 HTML 中加入打包好的 JS:</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">&quot;/src/bundle.js&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>最後就可以啟動 Server:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># develop</span></span><br><span class="line">$ npm run dev</span><br><span class="line"></span><br><span class="line"><span class="comment"># deploy</span></span><br><span class="line">$ npm run deploy</span><br></pre></td></tr></table></figure>
+
+<p>這樣就完成了使用 Webpack 來打包我們的網站囉~</p>
+<h1 id="參考資料"><a href="#參考資料" class="headerlink" title="參考資料"></a>參考資料</h1><ul>
+<li><a target="_blank" rel="noopener" href="https://webpack.js.org/" title="Webpack">Webpack</a></li>
+<li><a target="_blank" rel="noopener" href="https://doc.webpack-china.org/loaders/">Loaders</a></li>
+<li><a target="_blank" rel="noopener" href="https://doc.webpack-china.org/concepts/">Webpack官方中文文件</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/AriaFallah/WebpackTutorial/tree/master/zh-TW/part1">Webpack Tutorial</a></li>
+<li><a target="_blank" rel="noopener" href="https://medium.com/html-test/%E5%BE%9E%E7%84%A1%E5%88%B0%E6%9C%89%E5%BB%BA%E7%AB%8B-webpack-%E8%A8%AD%E5%AE%9A%E6%AA%94-%E4%B8%80-42fbc76a2d37">從無到有建立 webpack 設定檔（一）</a></li>
+<li><a target="_blank" rel="noopener" href="https://medium.com/html-test/webpack-%E7%9A%84%E5%9F%BA%E6%9C%AC%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B-585f2bc952b9">【webpack】的基本工作流程</a></li>
+<li><a target="_blank" rel="noopener" href="https://j6qup3.github.io/2016/08/15/%E7%8C%B4%E5%AD%90%E4%B9%9F%E8%83%BD%E7%9C%8B%E6%87%82%E7%9A%84-React-%E6%95%99%E5%AD%B8-3/">猴子也能看懂的 React 教學 - 3 - Webpack 建置指南</a></li>
+<li><a target="_blank" rel="noopener" href="http://blog.techbridge.cc/2016/07/30/react-dev-enviroment-webpack-browserify/">一看就懂的 React 開發環境建置與 Webpack 入門教學</a></li>
+<li><a target="_blank" rel="noopener" href="http://zhaoda.net/webpack-handbook/index.html">Webpack中文指南</a></li>
+<li><a target="_blank" rel="noopener" href="https://fakefish.github.io/react-webpack-cookbook/Introduction-to-Webpack.html">Webpack 教學2</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Node-js/" rel="tag"># Node.js</a>
+              <a href="/tags/Webpack/" rel="tag"># Webpack</a>
+              <a href="/tags/Express/" rel="tag"># Express</a>
+              <a href="/tags/Babel/" rel="tag"># Babel</a>
+              <a href="/tags/HMR/" rel="tag"># HMR</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/22d5a4ab/" rel="prev" title="[Babel] Babel 使用筆記">
+      <i class="fa fa-chevron-left"></i> [Babel] Babel 使用筆記
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/posts/593a6ec9/" rel="next" title="[GitHub] 免密碼 push/pull/clone 操作專案">
+      [GitHub] 免密碼 push/pull/clone 操作專案 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%B0%A1%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">簡介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Loaders-%E4%BB%8B%E7%B4%B9"><span class="nav-number">2.</span> <span class="nav-text">Loaders 介紹</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#babel-loader"><span class="nav-number">2.1.</span> <span class="nav-text">babel-loader</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#css-loader-and-style-loader"><span class="nav-number">2.2.</span> <span class="nav-text">css-loader and style-loader</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#less-loader"><span class="nav-number">2.3.</span> <span class="nav-text">less-loader</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#file-loader"><span class="nav-number">2.4.</span> <span class="nav-text">file-loader</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#url-loader"><span class="nav-number">2.5.</span> <span class="nav-text">url-loader</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Plugins"><span class="nav-number">3.</span> <span class="nav-text">Plugins</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#uglifyjs-webpack-plugin"><span class="nav-number">3.1.</span> <span class="nav-text">uglifyjs-webpack-plugin</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#webpack-dev-middleware"><span class="nav-number">3.2.</span> <span class="nav-text">webpack-dev-middleware</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#webpack-dev-server"><span class="nav-number">3.3.</span> <span class="nav-text">webpack-dev-server</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Hot-Module-Replacement"><span class="nav-number">3.4.</span> <span class="nav-text">Hot Module Replacement</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%89%E8%A3%9D"><span class="nav-number">4.</span> <span class="nav-text">安裝</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Webpack-%E7%9B%B8%E9%97%9C%E6%8C%87%E4%BB%A4"><span class="nav-number">5.</span> <span class="nav-text">Webpack 相關指令</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%A8%AD%E5%AE%9A-Webpack"><span class="nav-number">6.</span> <span class="nav-text">設定 Webpack</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%92%B0%E5%AF%AB-app-js"><span class="nav-number">6.1.</span> <span class="nav-text">撰寫 app.js</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%95%9F%E5%8B%95-Server"><span class="nav-number">6.2.</span> <span class="nav-text">啟動 Server</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%83%E8%80%83%E8%B3%87%E6%96%99"><span class="nav-number">7.</span> <span class="nav-text">參考資料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Szu-Hsuan, Wu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">61</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">57</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/wshs0713" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;wshs0713" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:shuan0713@gmail.com" title="E-Mail → mailto:shuan0713@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="http://linkedin.com/in/wshs0713" title="LinkedIn → http:&#x2F;&#x2F;linkedin.com&#x2F;in&#x2F;wshs0713" rel="noopener" target="_blank"><i class="fab fa-linkedin fa-fw"></i>LinkedIn</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/wshs0713" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;wshs0713" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Szu-Hsuan, Wu</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://wshs0713.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "https://wshs0713.github.io/posts/f0b15985/";
+    this.page.identifier = "posts/f0b15985/";
+    this.page.title = "[Webpack] Webpack 設定及使用";
+    };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://wshs0713.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+</body>
+</html>
